@@ -1,0 +1,29 @@
+@import uk.gov.hmrc.mobilepayments.controllers.api.ApiAccess
+@import play.api.libs.json.Json
+
+@(apiAccess: ApiAccess)
+{
+  "scopes":[
+    {
+      "key":"read:native-apps-api-orchestration",
+      "name":"Execute mobile-payments call",
+      "description":"Mobile Payments"
+    }
+  ],
+  "api":{
+    "name":"Mobile Payments",
+    "description":"Service to allow app users to make payments to HMRC",
+    "context":"mobile/payments",
+    "categories": [
+      "PRIVATE_GOVERNMENT"
+    ],
+    "versions":[
+      {
+        "version":"1.0",
+        "status":"STABLE",
+        "endpointsEnabled": true,
+        "access": @Json.toJson(apiAccess)
+      }
+    ]
+  }
+}
