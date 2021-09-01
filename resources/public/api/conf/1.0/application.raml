@@ -22,3 +22,18 @@ uses:
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
 /mobile/payments:
+  /banks:
+    get:
+      displayName: Get a list of available banks
+      description: This endpoint retrieves a list of banks for the user to select from to make a payment
+      is: [headers.acceptHeader]
+      (annotations.scope): "read:native-apps-api-orchestration"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+      queryParameters:
+        journeyId:
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:

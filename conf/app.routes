@@ -1,3 +1,3 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.mobilepayments.controllers.MicroserviceHelloWorldController.hello
+GET        /banks             uk.gov.hmrc.mobilepayments.controllers.BankController.getBanks(journeyId: String)
