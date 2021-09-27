@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.domain
 
-import play.api.libs.json.JsValue
-import play.api.mvc.Action
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import play.api.libs.json.{Json, OFormat}
 
-trait BankController {
-  def getBanks(journeyId: JourneyId): Action[JsValue]
+final case class BanksResponse(data: Seq[Bank])
+
+object BanksResponse {
+  implicit val jsonFormat: OFormat[BanksResponse] = Json.format[BanksResponse]
 }

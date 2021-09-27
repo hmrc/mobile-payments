@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.domain.types
 
-import play.api.libs.json.JsValue
-import play.api.mvc.Action
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import eu.timepit.refined._
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.string.MatchesRegex
 
-trait BankController {
-  def getBanks(journeyId: JourneyId): Action[JsValue]
+object ModelTypes {
+
+  type JourneyId = String Refined ValidJourneyId
+
+  private type ValidJourneyId =
+    MatchesRegex[W.`"""[A-Fa-f0-9]{8}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{12}"""`.T]
+
 }

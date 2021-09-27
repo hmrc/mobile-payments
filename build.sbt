@@ -1,6 +1,5 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "mobile-payments"
@@ -14,11 +13,18 @@ lazy val microservice = Project(appName, file("."))
       ScoverageSbtPlugin
     ): _*
   )
-  .disablePlugins(JUnitXmlReportPlugin)
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .disablePlugins(JUnitXmlReportPlugin)
+  .settings(publishingSettings: _*)
   .settings(resolvers += Resolver.jcenterRepo)
+  .settings(
+    routesImport ++= Seq(
+      "uk.gov.hmrc.domain._",
+      "uk.gov.hmrc.mobilepayments.domain.types._",
+      "uk.gov.hmrc.mobilepayments.domain.types.ModelTypes._"
+    )
+  )
   .settings(
     majorVersion := 0,
     scalaVersion := "2.12.13",

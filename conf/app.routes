@@ -1,3 +1,0 @@
-# microservice specific routes
-
-GET        /banks             uk.gov.hmrc.mobilepayments.controllers.BankController.getBanks(journeyId: String)

@@ -1,0 +1,1 @@
+GET        /banks        uk.gov.hmrc.mobilepayments.controllers.SandboxBankController.getBanks(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)

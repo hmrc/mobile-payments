@@ -16,16 +16,23 @@
 
 package uk.gov.hmrc.mobilepayments.controllers
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.mobilepayments.common.BaseSpec
+import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, MockResponses}
+import uk.gov.hmrc.mobilepayments.services.OpenBankingService
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-class BankControllerSpec extends AnyWordSpec with Matchers {
+class BankControllerSpec extends BaseSpec with AuthorisationStub with MockResponses {
+
+  val mockService:                 OpenBankingService = mock[OpenBankingService]
+  implicit val mockAuditConnector: AuditConnector     = mock[AuditConnector]
+  implicit val mockAuthConnector:  AuthConnector      = mock[AuthConnector]
 
   private val fakeRequest = FakeRequest("GET", "/")
-  private val controller = new BankController(Helpers.stubControllerComponents())
+  private val controller  = new LiveBankController(mockAuthConnector, Helpers.stubControllerComponents(), mockService)
 
   "GET /" should {
     "return 200" in {
