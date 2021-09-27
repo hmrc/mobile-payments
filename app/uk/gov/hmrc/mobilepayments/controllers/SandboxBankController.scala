@@ -19,28 +19,27 @@ package uk.gov.hmrc.mobilepayments.controllers
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
-import uk.gov.hmrc.mobilepayments.controllers.handlers.RequestHandler
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobileselfassessment.controllers.action.AccessControl
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SandboxBankController @Inject() (
-  override val authConnector:    AuthConnector,
-  cc:                            ControllerComponents
-)(implicit val executionContext: ExecutionContext)
+  override val authConnector:                                   AuthConnector,
+  @Named("controllers.confidenceLevel") override val confLevel: Int,
+  cc:                                                           ControllerComponents
+)(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
     with BankController
-    with RequestHandler
     with AccessControl {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
 
   def getBanks(journeyId: JourneyId): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
-      Future.successful(Ok(Json.toJson("{}}")))
+      Future.successful(Ok(Json.toJson("{}")))
     }
 }

@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.mobilepayments.domain
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json}
 
 final case class BanksResponse(data: Seq[Bank])
 
 object BanksResponse {
-  implicit val jsonFormat: OFormat[BanksResponse] = Json.format[BanksResponse]
+  implicit val format: Format[BanksResponse] = Json.format[BanksResponse]
 }

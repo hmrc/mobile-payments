@@ -14,98 +14,80 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.action
+package uk.gov.hmrc.mobileselfassessment.controllers.action
 
 import play.api.Logger
-import play.api.http.Status.{NOT_ACCEPTABLE, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.mvc._
-import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{confidenceLevel, credentials, internalId}
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength}
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorResponse}
-import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mobilepayments.controllers.errors.AccountWithLowCL
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Authority(
-  internalId: String,
-  ggId:       String)
-
-final case class AuthenticatedRequest[A](
-  authority: Option[Authority],
-  request:   Request[A])
-    extends WrappedRequest(request)
-
 trait Authorisation extends Results with AuthorisedFunctions {
 
-  lazy val requiresAuth:        Boolean               = true
-  lazy val lowConfidenceLevel:  AccountWithLowCL      = AccountWithLowCL("Account with insufficient confidence")
-  lazy val authIdNotFound:      UpstreamErrorResponse = UpstreamErrorResponse("Account not found!", 401, 401)
-  lazy val credentialsNotFound: UpstreamErrorResponse = UpstreamErrorResponse("Credentials not found!", 401, 401)
-  val logger:                   Logger                = Logger(this.getClass)
+  val confLevel: Int
+  private val logger: Logger = Logger(this.getClass)
+
+  lazy val requiresAuth = true
+  lazy val lowConfidenceLevel: AccountWithLowCL = AccountWithLowCL("")
+
+  def grantAccess()(implicit hc: HeaderCarrier): Future[Boolean] =
+    authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
+      .retrieve(confidenceLevel) { foundConfidenceLevel =>
+        if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
+        else Future successful true
+      }
 
   def invokeAuthBlock[A](
     request: Request[A],
-    block:   AuthenticatedRequest[A] => Future[Result]
+    block:   Request[A] => Future[Result]
   ): Future[Result] = {
-    implicit val hc: HeaderCarrier = fromRequest(request)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
-    grantAccess()
-      .flatMap { authority =>
-        block(AuthenticatedRequest(Some(authority), request))
+    grantAccess
+      .flatMap { _ =>
+        block(request)
       }
       .recover {
         case _: uk.gov.hmrc.http.Upstream4xxResponse =>
           logger.info("Unauthorized! Failed to grant access since 4xx response!")
-          Unauthorized(Json.toJson(ErrorResponse(UNAUTHORIZED, "UNAUTHORIZED")))
+          Unauthorized(Json.toJson(ErrorUnauthorized.asInstanceOf[ErrorResponse]))
 
         case _: AccountWithLowCL =>
           logger.info("Unauthorized! Account with low CL!")
-          Unauthorized(Json.toJson(ErrorResponse(UNAUTHORIZED, "LOW_CONFIDENCE_LEVEL")))
+          Unauthorized(Json.toJson(ErrorUnauthorizedLowCL.asInstanceOf[ErrorResponse]))
       }
   }
-
-  def grantAccess()(implicit hc: HeaderCarrier): Future[Authority] =
-    authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
-      .retrieve(confidenceLevel and internalId and credentials) {
-        case _ ~ None ~ _ => throw authIdNotFound
-        case _ ~ _ ~ None => throw credentialsNotFound
-        case foundConfidenceLevel ~ Some(userId) ~ Some(credentials) =>
-          if (foundConfidenceLevel.level < 200) throw lowConfidenceLevel
-          if (userId.isEmpty) throw authIdNotFound
-          if (credentials.providerId.isEmpty) throw credentialsNotFound
-          Future(Authority(userId, credentials.providerId))
-      }
 }
 
 trait AccessControl extends HeaderValidator with Authorisation {
   outer =>
   def parser: BodyParser[AnyContent]
 
-  def validateAcceptWithAuth(rules: Option[String] => Boolean): ActionBuilder[AuthenticatedRequest, AnyContent] =
-    new ActionBuilder[AuthenticatedRequest, AnyContent] {
+  def validateAcceptWithAuth(rules: Option[String] => Boolean): ActionBuilder[Request, AnyContent] =
+    new ActionBuilder[Request, AnyContent] {
 
-      override def parser: BodyParser[AnyContent] = outer.parser
-
-      override protected def executionContext: ExecutionContext = outer.executionContext
+      override def parser:                     BodyParser[AnyContent] = outer.parser
+      override protected def executionContext: ExecutionContext       = outer.executionContext
 
       def invokeBlock[A](
         request: Request[A],
-        block:   AuthenticatedRequest[A] => Future[Result]
+        block:   Request[A] => Future[Result]
       ): Future[Result] =
         if (rules(request.headers.get("Accept"))) {
           if (requiresAuth) invokeAuthBlock(request, block)
-          else block(AuthenticatedRequest(None, request))
-        } else {
+          else block(request)
+        } else
           Future.successful(
             Status(ErrorAcceptHeaderInvalid.httpStatusCode)(
-              Json.toJson(ErrorResponse(NOT_ACCEPTABLE, "ACCEPT_HEADER_INVALID"))
+              Json.toJson(ErrorAcceptHeaderInvalid.asInstanceOf[ErrorResponse])
             )
           )
-        }
     }
 }

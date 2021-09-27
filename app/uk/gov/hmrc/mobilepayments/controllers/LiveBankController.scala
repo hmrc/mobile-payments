@@ -20,22 +20,24 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.handlers.RequestHandler
+import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.OpenBankingService
+import uk.gov.hmrc.mobileselfassessment.controllers.action.AccessControl
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton()
 class LiveBankController @Inject() (
-  override val authConnector:    AuthConnector,
-  cc:                            ControllerComponents,
-  openBankingService:            OpenBankingService
-)(implicit val executionContext: ExecutionContext)
+  override val authConnector:                                   AuthConnector,
+  @Named("controllers.confidenceLevel") override val confLevel: Int,
+  cc:                                                           ControllerComponents,
+  openBankingService:                                           OpenBankingService
+)(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
     with BankController
     with RequestHandler
@@ -46,11 +48,13 @@ class LiveBankController @Inject() (
   def getBanks(journeyId: JourneyId): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
-      openBankingService
-        .getBanks(journeyId)
-        .map {
-//          case Left(error) ⇒ Left(error)
-          case Right(body) ⇒ Ok(Json.toJson(body))
-        }
+      withHandledRequest[BanksResponse] { _ =>
+        openBankingService
+          .getBanks(journeyId)
+          .map {
+            case Left(error) ⇒ Left(error)
+            case Right(body) ⇒ Right(Ok(Json.toJson(body)))
+          }
+      }
     }
 }

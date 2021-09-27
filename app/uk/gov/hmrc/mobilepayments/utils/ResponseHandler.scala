@@ -17,8 +17,9 @@
 package uk.gov.hmrc.mobilepayments.utils
 
 import play.api.Logger
-import uk.gov.hmrc.http.UpstreamErrorResponse
-import uk.gov.hmrc.mobilepayments.controllers.errors.{GenericError, UpstreamError}
+import play.api.http.Status.NOT_FOUND
+import uk.gov.hmrc.http.{BadRequestException, NotFoundException, Upstream4xxResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorResponse, GenericError, MalformedRequest, UpstreamError}
 import uk.gov.hmrc.serviceResponse.ServiceResponse
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +40,6 @@ trait ResponseHandler {
         case error: UpstreamErrorResponse =>
           logger.error(s"Upstream error received from $serviceName:\n ${error.message}")
           Left(UpstreamError(error.message))
-
         case error =>
           logger.error(s"Generic error received from $serviceName:\n ${error.getMessage}")
           Left(GenericError(error.getMessage))
