@@ -60,7 +60,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MockRe
   "when get banks invoked and service returns NotFoundException then" should {
     "return 404" in {
       stubAuthorisationGrantAccess(confidenceLevel)
-      mockGetBanks(Future.failed(new NotFoundException("Error")))
+      mockGetBanks(Future.failed(Upstream4xxResponse("Error", 404, 404)))
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
