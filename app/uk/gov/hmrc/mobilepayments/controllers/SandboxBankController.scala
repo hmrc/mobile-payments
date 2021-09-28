@@ -19,12 +19,14 @@ package uk.gov.hmrc.mobilepayments.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.mobilepayments.controllers.SandboxBankController.rawBanksJson
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.io.Source
 
 @Singleton()
 class SandboxBankController @Inject() (
@@ -40,6 +42,12 @@ class SandboxBankController @Inject() (
 
   def getBanks(journeyId: JourneyId): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      Future.successful(Ok(Json.toJson("{}")))
+      Future.successful(Ok(Json.toJson(rawBanksJson)))
     }
+}
+
+object SandboxBankController {
+
+  val rawBanksJson =
+    Json.parse(Source.fromFile(s"app/uk/gov/hmrc/mobilepayments/resources/sample-banks.json").getLines.mkString)
 }

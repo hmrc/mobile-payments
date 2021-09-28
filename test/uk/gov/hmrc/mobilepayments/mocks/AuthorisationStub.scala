@@ -19,8 +19,8 @@ package uk.gov.hmrc.mobilepayments.mocks
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
-import uk.gov.hmrc.auth.core.{AuthConnector, BearerTokenExpired, ConfidenceLevel}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,9 +34,9 @@ trait AuthorisationStub extends MockFactory {
       .expects(*, *, *, *)
       .returning(Future successful response)
 
-  def stubAuthorisationWithNoActiveSessionException()(implicit authConnector: AuthConnector) =
+  def stubAuthorisationWithAuthorisationException()(implicit authConnector: AuthConnector) =
     (authConnector
       .authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
-      .returning(Future failed BearerTokenExpired())
+      .returning(Future failed UpstreamErrorResponse("Error", 401, 401))
 }

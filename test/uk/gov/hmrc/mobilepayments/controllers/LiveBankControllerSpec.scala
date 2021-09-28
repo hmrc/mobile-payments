@@ -19,7 +19,7 @@ package uk.gov.hmrc.mobilepayments.controllers
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
@@ -54,6 +54,8 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MockRe
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
+      val response = contentAsJson(result).as[BanksResponse]
+      response.data.size shouldBe 2
     }
   }
 
@@ -74,6 +76,18 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MockRe
     "return 401" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       mockGetBanks(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+
+      val request = FakeRequest("GET", "/banks")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getBanks(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get banks invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")

@@ -87,40 +87,40 @@ trait MockResponses {
           """.stripMargin
 
   val rawBanksMalformedJson: String = s"""
-                                |
-                                |{
-                                |  "data": [
-                                |    {
-                                |      "bank_id": "obie-mettle-production",
-                                |      "name": "Mettle",
-                                |      "friendly_name": "Mettle",
-                                |      "is_sandbox": false,
-                                |      "logo": "https://public.ecospend.com/images/banks/Mettle.svg",
-                                |      "icon": "https://public.ecospend.com/images/banks/Mettle_icon.svg",
-                                |      "standard": "obie",
-                                |      "country_iso_code": "GB",
-                                |      "group": "Mettle",
-                                |      "order": 100000,
-                                |      "service_status": true,
-                                |      "refund_supported": true,
-                                |      "abilities": {
-                                |        "domestic_payment": true,
-                                |        "domestic_scheduled_payment": true,
-                                |        "domestic_standing_order": false,
-                                |        "domestic_standing_order_installment": false,
-                                |        "international_payment": false,
-                                |        "international_scheduled_payment": false,
-                                |        "international_standing_order": false
-                                |      }
-                                |    }
-                                |    }
-                                |  ],
-                                |  "meta": {
-                                |    "total_count": 68,
-                                |    "total_pages": 1,
-                                |    "current_page": 1
-                                |  }
-                                |}
-                                |
+                                         |
+                                         |{
+                                         |  "data": [
+                                         |    {
+                                         |      "bank_id": "obie-mettle-production",
+                                         |      "name": "Mettle",
+                                         |      "friendly_name": "Mettle",
+                                         |      "is_sandbox": false,
+                                         |      "logo": "https://public.ecospend.com/images/banks/Mettle.svg",
+                                         |      "icon": "https://public.ecospend.com/images/banks/Mettle_icon.svg",
+                                         |      "standard": "obie",
+                                         |      "country_iso_code": "GB",
+                                         |      "group": "Mettle",
+                                         |      "order": 100000,
+                                         |      "service_status": true,
+                                         |      "refund_supported": true,
+                                         |      "abilities": {
+                                         |        "domestic_payment": true,
+                                         |        "domestic_scheduled_payment": true,
+                                         |        "domestic_standing_order": false,
+                                         |        "domestic_standing_order_installment": false,
+                                         |        "international_payment": false,
+                                         |        "international_scheduled_payment": false,
+                                         |        "international_standing_order": false
+                                         |      }
+                                         |    }
+                                         |    }
+                                         |  ],
+                                         |  "meta": {
+                                         |    "total_count": 68,
+                                         |    "total_pages": 1,
+                                         |    "current_page": 1
+                                         |  }
+                                         |}
+                                         |
           """.stripMargin
 }
