@@ -24,7 +24,7 @@ import uk.gov.hmrc.mobilepayments.controllers.handlers.RequestHandler
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.OpenBankingService
-import uk.gov.hmrc.mobileselfassessment.controllers.action.AccessControl
+import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 

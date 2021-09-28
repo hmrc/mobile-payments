@@ -32,10 +32,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MockResponses {
 
-  val confidenceLevel: ConfidenceLevel     = ConfidenceLevel.L200
-  val internalId:      Option[String]      = Some("auth1234")
-  val credentials:     Option[Credentials] = Some(Credentials("123456789", "type"))
-  val mockService:     OpenBankingService  = mock[OpenBankingService]
+  private val confidenceLevel: ConfidenceLevel     = ConfidenceLevel.L200
+  private val internalId:      Option[String]      = Some("auth1234")
+  private val credentials:     Option[Credentials] = Some(Credentials("123456789", "type"))
+  private val mockService:     OpenBankingService  = mock[OpenBankingService]
 
   implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
   implicit val mockAuthConnector:  AuthConnector  = mock[AuthConnector]

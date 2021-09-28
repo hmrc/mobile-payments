@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobileselfassessment.controllers.action
+package uk.gov.hmrc.mobilepayments.controllers.action
 
 import play.api.Logger
 import play.api.libs.json.Json
