@@ -17,7 +17,6 @@
 package uk.gov.hmrc.mobilepayments.mocks
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 
 trait MockResponses {

@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.test.Helpers.await
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.controllers.errors.{GenericError, MalformedRequest, UpstreamError}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.MockResponses
 
@@ -37,46 +37,22 @@ class OpenBankingServiceSpec extends BaseSpec with MockResponses {
       (mockConnector
         .getBanks(_: JourneyId)(_: HeaderCarrier))
         .expects(journeyId, hc)
-        .returning(Future.successful(Right(banksResponse)))
+        .returning(Future.successful(banksResponse))
 
       val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.right.get.data.size shouldBe 2
+      result.data.size shouldBe 2
     }
   }
 
-  "test when connector returns GenericError then" should {
-    "return error" in {
+  "test when connector returns NotFoundException then" should {
+    "return an error" in {
       (mockConnector
         .getBanks(_: JourneyId)(_: HeaderCarrier))
         .expects(journeyId, hc)
-        .returning(Future.successful(Left(GenericError("an error"))))
-
-      val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.left.get shouldEqual GenericError("an error")
-    }
-  }
-
-  "test when connector returns UpstreamError then" should {
-    "return error" in {
-      (mockConnector
-        .getBanks(_: JourneyId)(_: HeaderCarrier))
-        .expects(journeyId, hc)
-        .returning(Future.successful(Left(UpstreamError("an error"))))
-
-      val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.left.get shouldEqual UpstreamError("an error")
-    }
-  }
-
-  "test when connector returns MalformedRequest then" should {
-    "return error" in {
-      (mockConnector
-        .getBanks(_: JourneyId)(_: HeaderCarrier))
-        .expects(journeyId, hc)
-        .returning(Future.successful(Left(MalformedRequest("an error"))))
-
-      val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.left.get shouldEqual MalformedRequest("an error")
+        .returning(Future.failed(UpstreamErrorResponse("Error", 400, 400)))
+      intercept[UpstreamErrorResponse] {
+        await(sut.getBanks(journeyId))
+      }
     }
   }
 }

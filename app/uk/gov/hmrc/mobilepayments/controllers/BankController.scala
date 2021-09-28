@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.mobilepayments.controllers
 
-import play.api.libs.json.JsValue
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 trait BankController {
-  def getBanks(journeyId: JourneyId): Action[JsValue]
+  def getBanks(journeyId: JourneyId): Action[AnyContent]
 }

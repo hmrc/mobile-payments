@@ -17,7 +17,6 @@
 package uk.gov.hmrc.mobilepayments.mocks
 
 import org.scalamock.scalatest.MockFactory
-import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}

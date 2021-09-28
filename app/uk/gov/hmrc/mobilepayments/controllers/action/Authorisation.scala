@@ -34,8 +34,8 @@ trait Authorisation extends Results with AuthorisedFunctions {
   val confLevel: Int
   private val logger: Logger = Logger(this.getClass)
 
-  lazy val requiresAuth = true
-  lazy val lowConfidenceLevel: AccountWithLowCL = AccountWithLowCL("")
+  lazy val requiresAuth       = true
+  lazy val lowConfidenceLevel = new AccountWithLowCL
 
   def grantAccess()(implicit hc: HeaderCarrier): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)

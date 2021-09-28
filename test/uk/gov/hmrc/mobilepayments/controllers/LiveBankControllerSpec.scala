@@ -17,12 +17,11 @@
 package uk.gov.hmrc.mobilepayments.controllers
 
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.syntax.retrieved._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
+import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, MockResponses}
 import uk.gov.hmrc.mobilepayments.services.OpenBankingService
@@ -32,8 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MockResponses {
 
-  private val confidenceLevel: ConfidenceLevel     = ConfidenceLevel.L200
-  private val mockService:     OpenBankingService  = mock[OpenBankingService]
+  private val confidenceLevel: ConfidenceLevel    = ConfidenceLevel.L200
+  private val mockService:     OpenBankingService = mock[OpenBankingService]
 
   implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
   implicit val mockAuthConnector:  AuthConnector  = mock[AuthConnector]
@@ -46,18 +45,60 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MockRe
   )
 
   "when get banks invoked and service returns success then" should {
-    "return 200 with data" in {
+    "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
-      val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      mockGetBanks(Future.successful(banksResponse))
 
-      (mockService
-        .getBanks(_: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
-        .expects(journeyId, ec, hc)
-        .returning(Future.successful(Right(banksResponse)))
+      val request = FakeRequest("GET", "/banks")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
       val result = sut.getBanks(journeyId)(request)
-      status(result)        shouldBe 200
-      contentAsJson(result) shouldBe banksJson
+      status(result) shouldBe 200
     }
   }
+
+  "when get banks invoked and service returns NotFoundException then" should {
+    "return 404" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      mockGetBanks(Future.failed(new NotFoundException("Error")))
+
+      val request = FakeRequest("GET", "/banks")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getBanks(journeyId)(request)
+      status(result) shouldBe 404
+    }
+  }
+
+  "when get banks invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      mockGetBanks(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+
+      val request = FakeRequest("GET", "/banks")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getBanks(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get banks invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      mockGetBanks(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
+
+      val request = FakeRequest("GET", "/banks")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getBanks(journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
+  private def mockGetBanks(f: Future[BanksResponse]) =
+    (mockService
+      .getBanks(_: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
+      .expects(*, *, *)
+      .returning(f)
 }

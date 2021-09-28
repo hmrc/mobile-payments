@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.mobilepayments.controllers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mobilepayments.controllers.handlers.RequestHandler
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
+import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.OpenBankingService
-import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 
@@ -40,20 +39,20 @@ class LiveBankController @Inject() (
 )(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
     with BankController
-    with RequestHandler
-    with AccessControl {
+    with AccessControl
+    with ErrorHandling {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
+  override val app:    String                 = "Bank-Controller"
 
-  def getBanks(journeyId: JourneyId): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+  def getBanks(journeyId: JourneyId): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
-      withHandledRequest[BanksResponse] { _ =>
+      errorWrapper {
         openBankingService
           .getBanks(journeyId)
-          .map {
-            case Left(error) ⇒ Left(error)
-            case Right(body) ⇒ Right(Ok(Json.toJson(body)))
+          .map { response =>
+            Ok(Json.toJson(response))
           }
       }
     }

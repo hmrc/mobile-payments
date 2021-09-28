@@ -21,17 +21,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.utils.ResponseHandler
-import uk.gov.hmrc.serviceResponse.ServiceResponse
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class OpenBankingService @Inject() (connector: OpenBankingConnector) extends ResponseHandler {
+class OpenBankingService @Inject() (connector: OpenBankingConnector) {
 
   def getBanks(
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
-  ): ServiceResponse[BanksResponse] = connector.getBanks(journeyId)
+  ): Future[BanksResponse] = connector.getBanks(journeyId)
 }

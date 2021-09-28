@@ -20,11 +20,8 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector.serviceName
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.utils.ResponseHandler
-import uk.gov.hmrc.serviceResponse.ServiceResponse
 
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,20 +30,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class OpenBankingConnector @Inject() (
   http:                              CoreGet,
   @Named("open-banking") serviceUrl: String
-)(implicit ex:                       ExecutionContext)
-    extends ResponseHandler {
+)(implicit ex:                       ExecutionContext) {
 
-  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): ServiceResponse[BanksResponse] =
-    withHandledResponse(banks(journeyId), serviceName)
-
-  private def banks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[BanksResponse] = {
+  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[BanksResponse] = {
     val journey = journeyId.value
     http.GET[BanksResponse](
       url = s"$serviceUrl/banks?journeyId=$journey"
     )
   }
-}
-
-object OpenBankingConnector {
-  private val serviceName = "open-banking"
 }
