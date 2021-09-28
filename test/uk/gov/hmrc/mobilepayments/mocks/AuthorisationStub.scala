@@ -26,20 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait AuthorisationStub extends MockFactory {
 
-  type GrantAccess     = ConfidenceLevel ~ Option[String] ~ Option[Credentials]
-  type GrantAccessNino = Option[String]
-
-  def stubAuthorisationFetchNino(response: GrantAccessNino)(implicit authConnector: AuthConnector) =
-    (authConnector
-      .authorise(_: Predicate, _: Retrieval[GrantAccessNino])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
-      .returning(Future successful response)
-
-  def stubAuthorisationFetchNinoFailure()(implicit authConnector: AuthConnector) =
-    (authConnector
-      .authorise(_: Predicate, _: Retrieval[GrantAccessNino])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
-      .returning(Future failed Upstream4xxResponse("503", 503, 503))
+  type GrantAccess = ConfidenceLevel
 
   def stubAuthorisationGrantAccess(response: GrantAccess)(implicit authConnector: AuthConnector) =
     (authConnector
@@ -47,15 +34,9 @@ trait AuthorisationStub extends MockFactory {
       .expects(*, *, *, *)
       .returning(Future successful response)
 
-  def stubAuthorisationWithNoActiveSessionException(response: GrantAccessNino)(implicit authConnector: AuthConnector) =
+  def stubAuthorisationWithNoActiveSessionException()(implicit authConnector: AuthConnector) =
     (authConnector
       .authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returning(Future failed BearerTokenExpired())
-
-  def stubAuthorisationWithAuthorisationException(response: GrantAccessNino)(implicit authConnector: AuthConnector) =
-    (authConnector
-      .authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
-      .returning(Future failed InsufficientEnrolments())
 }
