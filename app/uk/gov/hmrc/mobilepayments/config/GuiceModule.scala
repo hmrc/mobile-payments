@@ -49,6 +49,9 @@ class GuiceModule(
           .asScala
       )
     )
+    bind(classOf[String])
+      .annotatedWith(named("open-banking"))
+      .toInstance(servicesConfig.baseUrl("open-banking"))
   }
 
   private def bindConfigStringSeq(path: String): Unit = {

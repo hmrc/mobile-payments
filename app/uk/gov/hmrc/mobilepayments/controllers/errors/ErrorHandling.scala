@@ -46,15 +46,16 @@ trait ErrorHandling {
 
   def errorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
     func.recover {
-      case _: NotFoundException =>
-        log("Resource not found!")
-        Status(ErrorNotFound.httpStatusCode)(toJson(ErrorNotFound.asInstanceOf[ErrorResponse]))
-
       case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 =>
         log("Upstream service returned 401")
         Status(ErrorUnauthorizedUpstream.httpStatusCode)(toJson(ErrorUnauthorizedUpstream.asInstanceOf[ErrorResponse]))
 
+      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 404 =>
+        log("Resource not found!")
+        Status(ErrorNotFound.httpStatusCode)(toJson(ErrorNotFound.asInstanceOf[ErrorResponse]))
+
       case e: Exception =>
+        logger.warn(s"Native Error - $app Internal server error: ${e.getMessage}", e)
         logger.warn(s"Native Error - $app Internal server error: ${e.getMessage}", e)
         Status(ErrorInternalServerError.httpStatusCode)(toJson(ErrorInternalServerError.asInstanceOf[ErrorResponse]))
     }
