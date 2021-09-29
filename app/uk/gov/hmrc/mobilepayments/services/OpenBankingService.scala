@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.services
 
-import play.api.mvc.{Action, AnyContent}
+import com.google.inject.{Inject, Singleton}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
+import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
-trait BankController {
-  def getBanks(journeyId: JourneyId): Action[AnyContent]
+import scala.concurrent.{ExecutionContext, Future}
+
+@Singleton
+class OpenBankingService @Inject() (connector: OpenBankingConnector) {
+
+  def getBanks(
+    journeyId:                 JourneyId
+  )(implicit executionContext: ExecutionContext,
+    headerCarrier:             HeaderCarrier
+  ): Future[BanksResponse] = connector.getBanks(journeyId)
 }

@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.config
+package uk.gov.hmrc.mobilepayments.domain
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.{Inject, Singleton}
+case class Shuttering(
+  shuttered: Boolean,
+  title:     Option[String] = None,
+  message:   Option[String] = None)
 
-@Singleton
-class AppConfig @Inject() (
-  config:         Configuration,
-  servicesConfig: ServicesConfig) {
+case object Shuttering {
+  implicit val format: OFormat[Shuttering] = Json.format[Shuttering]
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
-  val openBankingBaseUrl: String = servicesConfig.baseUrl("open-banking")
-
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost:    String  = config.get[String]("microservice.metrics.graphite.host")
+  def shutteringDisabled: Shuttering = this.apply(shuttered = false)
 }

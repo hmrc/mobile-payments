@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.mocks
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status
-import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.libs.json.{Format, Json}
 
-class BankControllerSpec extends AnyWordSpec with Matchers {
+case class MockError(
+  httpStatusCode: Int,
+  error:          String)
 
-  private val fakeRequest = FakeRequest("GET", "/")
-  private val controller = new BankController(Helpers.stubControllerComponents())
-
-  "GET /" should {
-    "return 200" in {
-      val result = controller.getBanks("journeyId")(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
-  }
+object MockError {
+  implicit val format: Format[MockError] = Json.format[MockError]
 }

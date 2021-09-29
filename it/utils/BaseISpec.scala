@@ -16,6 +16,7 @@
 
 package utils
 
+import eu.timepit.refined.auto._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.WsScalaTestClient
@@ -24,6 +25,7 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 abstract class BaseISpec
     extends AnyWordSpecLike
@@ -37,11 +39,14 @@ abstract class BaseISpec
   override implicit lazy val app: Application = appBuilder.build()
 
   protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
+  val journeyId:                  JourneyId        = "27085215-69a4-4027-8f72-b04b10ec16b0"
 
   def config: Map[String, Any] =
     Map[String, Any](
       "auditing.enabled"                             -> false,
-      "microservice.services.auth.port"              -> wireMockPort
+      "microservice.services.auth.port"              -> wireMockPort,
+      "microservice.services.open-banking.port"      -> wireMockPort,
+      "microservice.services.mobile-shuttering.port" -> wireMockPort
     )
 
   protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure(config)

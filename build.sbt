@@ -1,6 +1,5 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "mobile-payments"
@@ -14,11 +13,17 @@ lazy val microservice = Project(appName, file("."))
       ScoverageSbtPlugin
     ): _*
   )
-  .disablePlugins(JUnitXmlReportPlugin)
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .disablePlugins(JUnitXmlReportPlugin)
+  .settings(publishingSettings: _*)
   .settings(resolvers += Resolver.jcenterRepo)
+  .settings(
+    routesImport ++= Seq(
+      "uk.gov.hmrc.mobilepayments.domain.types._",
+      "uk.gov.hmrc.mobilepayments.domain.types.ModelTypes._"
+    )
+  )
   .settings(
     majorVersion := 0,
     scalaVersion := "2.12.13",
@@ -27,8 +32,12 @@ lazy val microservice = Project(appName, file("."))
     dependencyOverrides ++= overrides,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
-    unmanagedSourceDirectories in Test := (baseDirectory in Test)(base => Seq(base / "test")).value,
+    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base =>
+      Seq(base / "it", base / "test-common")
+    ).value,
+    unmanagedSourceDirectories in Test := (baseDirectory in Test)(base =>
+      Seq(base / "test", base / "test-common")
+    ).value,
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     scalacOptions ++= Seq(
       "-deprecation",
@@ -49,7 +58,7 @@ lazy val microservice = Project(appName, file("."))
       //"-Xfatal-warnings",
       "-Xlint"
     ),
-    coverageMinimumStmtTotal := 60,
+    coverageMinimumStmtTotal := 80,
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;.*BuildInfo.*;.*Routes.*;.*javascript.*;.*Reverse.*"
