@@ -9,7 +9,7 @@ object ShutteringStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/mobile-shuttering/service/mobile-self-assessment/shuttered-status?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
+          s"/mobile-shuttering/service/mobile-payments/shuttered-status?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
         )
       ).willReturn(
           aResponse()
@@ -28,7 +28,7 @@ object ShutteringStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/mobile-shuttering/service/mobile-self-assessment/shuttered-status?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
+          s"/mobile-shuttering/service/mobile-payments/shuttered-status?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
         )
       ).willReturn(
           aResponse()
