@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.config
+package uk.gov.hmrc.mobilepayments.controllers
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.Json
+import play.api.mvc.{Result, Results}
+import uk.gov.hmrc.mobilepayments.domain.Shuttering
 
-import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
-@Singleton
-class AppConfig @Inject() (
-  config:         Configuration,
-  servicesConfig: ServicesConfig) {
+trait ControllerChecks extends Results {
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
-  val openBankingBaseUrl: String = servicesConfig.baseUrl("open-banking")
+  private final val WebServerIsDown = new Status(521)
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost:    String  = config.get[String]("microservice.metrics.graphite.host")
+  def withShuttering(shuttering: Shuttering)(fn: => Future[Result]): Future[Result] =
+    if (shuttering.shuttered) Future.successful(WebServerIsDown(Json.toJson(shuttering))) else fn
+
 }

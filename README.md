@@ -16,7 +16,12 @@ API
 |--------|----|----|
 | ```/mobile-payments/banks``` | GET | Fetch the list of supported banks. [More...](docs/banks.md)|
 
-# Sandbox
+Shuttered
+---------
+Shuttering of this service is handled by [mobile-shuttering](https://github.com/hmrc/mobile-shuttering)
+
+Sandbox
+---------
 To trigger the sandbox endpoints locally, use the "X-MOBILE-USER-ID" header with one of the following values:
 208606423740 or 167927702220
 

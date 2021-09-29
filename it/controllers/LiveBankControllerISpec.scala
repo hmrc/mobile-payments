@@ -4,6 +4,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
+import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import utils.BaseISpec
@@ -13,6 +14,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
   "GET /banks" should {
     "return 200 with bank data" in {
       grantAccess()
+      stubForShutteringDisabled
       stubForGetBanks(rawBanksJson)
 
       val request: WSRequest = wsUrl(
@@ -26,6 +28,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
     "return 500 when response from open-banking is malformed" in {
       grantAccess()
+      stubForShutteringDisabled
       stubForGetBanks(rawBanksMalformedJson)
 
       val request: WSRequest = wsUrl(
@@ -37,6 +40,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
     "return 401 when a 401 is returned from open-banking" in {
       grantAccess()
+      stubForShutteringDisabled
       stubForGetBanksFailure(401)
 
       val request: WSRequest = wsUrl(
@@ -48,6 +52,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
     "return 404 when a 404 is returned from open-banking" in {
       grantAccess()
+      stubForShutteringDisabled
       stubForGetBanksFailure()
 
       val request: WSRequest = wsUrl(
@@ -69,6 +74,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
     "return 500 when unknown error is returned from open-banking" in {
       grantAccess()
+      stubForShutteringDisabled
       stubForGetBanksFailure(500)
 
       val request: WSRequest = wsUrl(
@@ -76,6 +82,17 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
       ).addHttpHeaders(acceptJsonHeader)
       val response = await(request.get())
       response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/banks?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get())
+      response.status shouldBe 521
     }
   }
 }
