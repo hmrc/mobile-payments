@@ -20,12 +20,13 @@ import play.api.Logger
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
+import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
-import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, MockResponses}
+import uk.gov.hmrc.mobilepayments.mocks.AuthorisationStub
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-class SandboxBankControllerSpec extends BaseSpec with AuthorisationStub with MockResponses {
+class SandboxBankControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData {
   private val logger:          Logger          = Logger(this.getClass)
   private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
 

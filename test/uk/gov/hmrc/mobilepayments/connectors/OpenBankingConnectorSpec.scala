@@ -18,13 +18,14 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{NotFoundException, _}
+import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
-import uk.gov.hmrc.mobilepayments.mocks.{ConnectorStub, MockResponses}
+import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
 import scala.concurrent.Future
 
-class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MockResponses {
+class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData {
   val mockGet:                    CoreGet       = mock[CoreGet]
   implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 

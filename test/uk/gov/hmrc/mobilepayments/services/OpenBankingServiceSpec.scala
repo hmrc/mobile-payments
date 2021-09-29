@@ -18,15 +18,15 @@ package uk.gov.hmrc.mobilepayments.services
 
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.mocks.MockResponses
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class OpenBankingServiceSpec extends BaseSpec with MockResponses {
+class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
 

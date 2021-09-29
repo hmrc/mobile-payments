@@ -1,14 +1,14 @@
 package controllers
 
-import mocks.MockResponses
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
+import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 import utils.BaseISpec
 
-class LiveBankControllerISpec extends BaseISpec with MockResponses {
+class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
   "GET /banks" should {
     "return 200 with bank data" in {

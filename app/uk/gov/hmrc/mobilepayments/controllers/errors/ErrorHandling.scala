@@ -31,10 +31,6 @@ case object ErrorUnauthorizedUpstream
 
 class GrantAccessException(message: String) extends HttpException(message, 401)
 
-class AuthIdNotFound extends GrantAccessException("Unauthorised! Account not found!")
-
-class CredentialsNotFound extends GrantAccessException("Unauthorised! Credentials not found!")
-
 class AccountWithLowCL extends GrantAccessException("Unauthorised! Account with low CL!")
 
 trait ErrorHandling {

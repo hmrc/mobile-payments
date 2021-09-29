@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package mocks
+package uk.gov.hmrc.mobilepayments
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.BanksResponse
 
-trait MockResponses {
+trait MobilePaymentsTestData {
 
   lazy val banksJson: JsValue = Json.parse(rawBanksJson)
 
@@ -123,4 +123,5 @@ trait MockResponses {
                                          |}
                                          |
           """.stripMargin
+
 }
