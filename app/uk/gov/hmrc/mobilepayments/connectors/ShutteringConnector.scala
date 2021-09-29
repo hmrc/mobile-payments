@@ -39,7 +39,7 @@ class ShutteringConnector @Inject()(
   )(implicit headerCarrier: HeaderCarrier,
     ex:                     ExecutionContext
   ): Future[Shuttering] =
-    http.GET[JsValue](s"$serviceUrl/mobile-shuttering/service/mobile-payments/shuttered-status?journeyId=$journeyId").map {
+    http.GET[JsValue](s"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId").map {
       json =>
         (json).as[Shuttering]
     } recover {
