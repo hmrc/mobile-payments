@@ -6,7 +6,7 @@ import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.BanksResponse
 import utils.BaseISpec
 
 class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {

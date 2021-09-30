@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain
+package uk.gov.hmrc.mobilepayments.domain.dto
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.mobilepayments.domain.dto.CreateSessionDataRequest.originSa
 
-final case class BanksResponse(data: Seq[Bank])
+final case class CreateSessionDataRequest(
+  amount: Long,
+  origin: String = originSa)
 
-object BanksResponse {
-  implicit val format: Format[BanksResponse] = Json.format[BanksResponse]
+object CreateSessionDataRequest {
+  implicit val format: Format[CreateSessionDataRequest] = Json.format[CreateSessionDataRequest]
+  private val originSa = "PtaSa"
 }

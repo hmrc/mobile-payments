@@ -19,7 +19,7 @@ package uk.gov.hmrc.mobilepayments.services
 import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import scala.concurrent.{ExecutionContext, Future}

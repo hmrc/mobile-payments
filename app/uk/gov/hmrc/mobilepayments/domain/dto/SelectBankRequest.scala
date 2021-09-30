@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.config
+package uk.gov.hmrc.mobilepayments.domain.dto
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Format, Json}
 
-import javax.inject.{Inject, Singleton}
+final case class SelectBankRequest(bankId: String)
 
-@Singleton
-class AppConfig @Inject() (
-  config:         Configuration,
-  servicesConfig: ServicesConfig) {
-
-  val authBaseUrl:        String = servicesConfig.baseUrl("auth")
-  val openBankingBaseUrl: String = servicesConfig.baseUrl("open-banking")
-
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost:    String  = config.get[String]("microservice.metrics.graphite.host")
+object SelectBankRequest {
+  implicit val format: Format[SelectBankRequest] = Json.format[SelectBankRequest]
 }

@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.mobilepayments.controllers
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.mobilepayments.controllers.SandboxBankController.rawBanksJson
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
@@ -47,14 +46,15 @@ class SandboxBankController @Inject() (
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future.successful(Ok(Json.toJson(rawBanksJson)))
+          Future.successful(Ok(Json.toJson(sampleJson)))
         }
       }
     }
-}
 
-object SandboxBankController {
-
-  val rawBanksJson =
-    Json.parse(Source.fromFile(s"app/uk/gov/hmrc/mobilepayments/resources/sample-banks.json").getLines.mkString)
+  private def sampleJson: JsValue = {
+    val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sample-banks.json")
+    val raw    = source.getLines.mkString
+    source.close()
+    Json.parse(raw)
+  }
 }

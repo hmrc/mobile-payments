@@ -19,17 +19,16 @@ package uk.gov.hmrc.mobilepayments.connectors
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
 import play.api.Logger
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ShutteringConnector @Inject()(
-  http:                                   CoreGet,
+class ShutteringConnector @Inject() (
+  http:                                   HttpClient,
   @Named("mobile-shuttering") serviceUrl: String) {
 
   val logger: Logger = Logger(this.getClass)
@@ -39,16 +38,17 @@ class ShutteringConnector @Inject()(
   )(implicit headerCarrier: HeaderCarrier,
     ex:                     ExecutionContext
   ): Future[Shuttering] =
-    http.GET[JsValue](s"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId").map {
-      json =>
-        (json).as[Shuttering]
-    } recover {
-      case e: Upstream5xxResponse =>
-        logger.warn(s"Internal Server Error received from mobile-shuttering:\n $e \nAssuming unshuttered.")
-        Shuttering.shutteringDisabled
+    http
+      .GET[Shuttering](
+        s"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId"
+      )
+      .recover {
+        case e: Upstream5xxResponse =>
+          logger.warn(s"Internal Server Error received from mobile-shuttering:\n $e \nAssuming unshuttered.")
+          Shuttering.shutteringDisabled
 
-      case e =>
-        logger.warn(s"Call to mobile-shuttering failed:\n $e \nAssuming unshuttered.")
-        Shuttering.shutteringDisabled
-    }
+        case e =>
+          logger.warn(s"Call to mobile-shuttering failed:\n $e \nAssuming unshuttered.")
+          Shuttering.shutteringDisabled
+      }
 }
