@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.controllers.banks
 
 import org.scalamock.handlers.CallHandler
 import play.api.test.Helpers._
@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector

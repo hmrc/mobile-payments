@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto
+package uk.gov.hmrc.mobilepayments.controllers.errors
 
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.mobilepayments.domain.Bank
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
+import play.api.mvc.{Request, Result}
 
-final case class BanksResponse(data: Seq[Bank])
+import scala.concurrent.Future
 
-object BanksResponse {
-  implicit val format: Format[BanksResponse] = Json.format[BanksResponse]
+trait JsonHandler {
+
+  def withValidJson[T](
+    func:             T => Future[Result]
+  )(implicit request: Request[JsValue],
+    r:                Reads[T]
+  ): Future[Result] =
+    request.body.validate[T] match {
+      case JsSuccess(t, _) => func(t)
+      case JsError(errors) => Future failed new MalformedRequestException(errors.toString())
+    }
 }

@@ -18,23 +18,32 @@ package uk.gov.hmrc.mobilepayments
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.{BanksResponse, SessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
 
 import scala.io.Source
 
 trait MobilePaymentsTestData {
 
-  lazy val banksResponse:       BanksResponse       = Json.fromJson[BanksResponse](json("test-banks")).get
-  lazy val shutteredResponse:   Shuttering          = Json.fromJson[Shuttering](json("test-shuttered")).get
-  lazy val sessionDataResponse: SessionDataResponse = Json.fromJson[SessionDataResponse](json("test-session-data")).get
+  lazy val banksResponse:       BanksResponse       = Json.fromJson[BanksResponse](js("banks-response")).get
+  lazy val shutteredResponse:   Shuttering          = Json.fromJson[Shuttering](js("shuttered-response")).get
+  lazy val sessionDataResponse: SessionDataResponse = Json.fromJson[SessionDataResponse](js("session-data-response")).get
+  lazy val paymentInitiatedResponse: InitiatePaymentResponse =
+    Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get
 
-  val rawMalformedJson: String = "{\"data\": [{,]}"
+  lazy val rawMalformedJson: String = "{\"data\": [{,]}"
+  lazy val banksResponseJson: String = json("banks-response")
+  lazy val sessionDataResponseJson: String = json("session-data-response")
+  lazy val createPaymentRequestJson: String = json("create-payment-request")
+  lazy val paymentInitiatedResponseJson: String = json("payment-initiated-response")
 
-  private def json(fileName: String): JsValue = {
-    val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/$fileName.json")
+  private def json(fileName: String): String = {
+    val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")
     val raw    = source.getLines.mkString
     source.close()
-    Json.parse(raw)
+    raw
   }
 
+  private def js(fileName: String): JsValue = {
+    Json.parse(json(fileName))
+  }
 }

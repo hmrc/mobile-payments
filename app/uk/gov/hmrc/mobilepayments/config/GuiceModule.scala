@@ -41,6 +41,7 @@ class GuiceModule(
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
     bind(classOf[CorePost]).to(classOf[WSHttpImpl])
     bindConfigInt("controllers.confidenceLevel")
+    bindConfigString("openBankingPaymentReturnUrl", "openBankingPaymentReturnUrl")
     bind(classOf[ApiAccess]).toInstance(
       ApiAccess(
         "PRIVATE",
@@ -49,6 +50,9 @@ class GuiceModule(
           .asScala
       )
     )
+    bind(classOf[String])
+      .annotatedWith(named("auth"))
+      .toInstance(servicesConfig.baseUrl("auth"))
     bind(classOf[String])
       .annotatedWith(named("open-banking"))
       .toInstance(servicesConfig.baseUrl("open-banking"))

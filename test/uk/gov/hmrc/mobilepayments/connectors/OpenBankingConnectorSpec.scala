@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.connectors
 
+import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{NotFoundException, _}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
@@ -23,12 +24,15 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
 import scala.concurrent.Future
+import scala.util.Failure
 
-class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData {
+class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData with ScalaFutures {
   val mockHttp:                   HttpClient    = mock[HttpClient]
   implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  val sut = new OpenBankingConnector(mockHttp, "baseUrl")
+  val sut           = new OpenBankingConnector(mockHttp, "baseUrl")
+  val sessionDataId = "51cc67d6-21da-11ec-9621-0242ac130002"
+  val returnUrl     = "https://tax.hmrc.gov.uk/payment-result"
 
   "when getBanks call is successful it" should {
     "return banks" in {
@@ -50,7 +54,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
     "return session data" in {
       performSuccessfulPOST(Future.successful(sessionDataResponse))(mockHttp)
       val result = await(sut.createSession(123L, journeyId))
-      result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+      result.sessionDataId shouldEqual sessionDataId
       result.nextUrl shouldEqual "https://api.foo.com"
     }
   }
@@ -60,6 +64,42 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       performUnsuccessfulPOST(new NotFoundException("not found"))(mockHttp)
       intercept[NotFoundException] {
         await(sut.createSession(123L, journeyId))
+      }
+    }
+  }
+
+  "when selectBank call is successful it" should {
+    "return success" in {
+      performSuccessfulPOST(Future.successful(sessionDataResponse))(mockHttp)
+      val selectBank = sut.selectBank(sessionDataId, "123-asd", journeyId)
+      selectBank transformWith {
+        case Failure(_) => fail("should not be reachable")
+      }
+    }
+  }
+
+  "when selectBank call returns NotFoundException it" should {
+    "return error" in {
+      performUnsuccessfulPOST(new NotFoundException("not found"))(mockHttp)
+      intercept[NotFoundException] {
+        await(sut.selectBank(sessionDataId, "123-asd", journeyId))
+      }
+    }
+  }
+
+  "when initiatePayment call is successful it" should {
+    "return payment url" in {
+      performSuccessfulPOST(Future.successful(paymentInitiatedResponse))(mockHttp)
+      val result = await(sut.initiatePayment(sessionDataId, returnUrl, journeyId))
+      result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+    }
+  }
+
+  "when initiatePayment call returns NotFoundException it" should {
+    "return an error" in {
+      performUnsuccessfulPOST(new NotFoundException("not found"))(mockHttp)
+      intercept[NotFoundException] {
+        await(sut.initiatePayment(sessionDataId, returnUrl, journeyId))
       }
     }
   }

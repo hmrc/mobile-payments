@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.config
+package uk.gov.hmrc.mobilepayments.domain.dto.request
 
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.CreateSessionDataRequest.originSa
 
-import javax.inject.{Inject, Singleton}
+final case class CreateSessionDataRequest(
+  amount: Long,
+  origin: String = originSa)
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
-
-  val auditingEnabled:             Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost:                String  = config.get[String]("microservice.metrics.graphite.host")
-  val openBankingPaymentReturnUrl: String  = config.get[String]("openBankingPaymentReturnUrl")
+object CreateSessionDataRequest {
+  implicit val format: Format[CreateSessionDataRequest] = Json.format[CreateSessionDataRequest]
+  private val originSa = "PtaSa"
 }

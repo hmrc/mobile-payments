@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.controllers.banks
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService

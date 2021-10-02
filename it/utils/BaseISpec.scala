@@ -39,7 +39,7 @@ abstract class BaseISpec
   override implicit lazy val app: Application = appBuilder.build()
 
   protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
-  val journeyId:                  JourneyId        = "27085215-69a4-4027-8f72-b04b10ec16b0"
+  val journeyId: JourneyId = "27085215-69a4-4027-8f72-b04b10ec16b0"
 
   def config: Map[String, Any] =
     Map[String, Any](
