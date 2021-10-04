@@ -24,7 +24,6 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
 import scala.concurrent.Future
-import scala.util.Failure
 
 class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData with ScalaFutures {
   val mockHttp:                   HttpClient    = mock[HttpClient]
@@ -36,7 +35,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when getBanks call is successful it" should {
     "return banks" in {
-      performSuccessfulGET(Future.successful(banksResponse))(mockHttp)
+      performSuccessfulGET(Future successful banksResponse)(mockHttp)
       await(sut.getBanks(journeyId)).data.size shouldBe 4
     }
   }
@@ -52,7 +51,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when createSession call is successful it" should {
     "return session data" in {
-      performSuccessfulPOST(Future.successful(sessionDataResponse))(mockHttp)
+      performSuccessfulPOST(Future successful sessionDataResponse)(mockHttp)
       val result = await(sut.createSession(123L, journeyId))
       result.sessionDataId shouldEqual sessionDataId
       result.nextUrl shouldEqual "https://api.foo.com"
@@ -70,11 +69,9 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when selectBank call is successful it" should {
     "return success" in {
-      performSuccessfulPOST(Future.successful(sessionDataResponse))(mockHttp)
-      val selectBank = sut.selectBank(sessionDataId, "123-asd", journeyId)
-      selectBank transformWith {
-        case Failure(_) => fail("should not be reachable")
-      }
+      performSuccessfulPOST(Future successful HttpResponse.apply(200, ""))(mockHttp)
+      val result = await(sut.selectBank(sessionDataId, "123-asd", journeyId))
+      result.status shouldEqual 200
     }
   }
 
@@ -89,7 +86,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when initiatePayment call is successful it" should {
     "return payment url" in {
-      performSuccessfulPOST(Future.successful(paymentInitiatedResponse))(mockHttp)
+      performSuccessfulPOST(Future successful paymentInitiatedResponse)(mockHttp)
       val result = await(sut.initiatePayment(sessionDataId, returnUrl, journeyId))
       result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
     }

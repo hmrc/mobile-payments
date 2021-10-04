@@ -31,8 +31,7 @@ class MalformedRequestException(message: String) extends HttpException(message, 
 case object ErrorUnauthorizedUpstream
     extends ErrorResponse(401, "UNAUTHORIZED", "Upstream service such as auth returned 401")
 
-case object ErrorMalformedRequest
-  extends ErrorResponse(400, "MALFORMED", "Malformed JSON")
+case object ErrorMalformedRequest extends ErrorResponse(400, "MALFORMED", "Malformed JSON")
 
 class GrantAccessException(message: String) extends HttpException(message, 401)
 
@@ -43,7 +42,7 @@ trait ErrorHandling {
   val app: String
   private val logger: Logger = Logger(this.getClass)
 
-  def withErrorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] = {
+  def withErrorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
     func.recover {
       case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 =>
         logger.warn("Upstream service returned 401")
@@ -61,5 +60,4 @@ trait ErrorHandling {
         logger.warn(s"Native Error - $app Internal server error 2: ${e.getMessage}", e)
         Status(ErrorInternalServerError.httpStatusCode)(toJson(ErrorInternalServerError.asInstanceOf[ErrorResponse]))
     }
-  }
 }

@@ -57,9 +57,9 @@ class OpenBankingConnector @Inject() (
     bankId:                 String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] = {
+  ): Future[HttpResponse] = {
     val journey = journeyId.value
-    http.POST[SelectBankRequest, Unit](
+    http.POST[SelectBankRequest, HttpResponse](
       url = s"$serviceUrl/session/$sessionDataId/select-bank?journeyId=$journey",
       SelectBankRequest(bankId)
     )

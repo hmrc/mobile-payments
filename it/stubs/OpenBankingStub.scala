@@ -1,13 +1,13 @@
 package stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import eu.timepit.refined.auto._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 object OpenBankingStub {
-  val journeyId: JourneyId = "27085215-69a4-4027-8f72-b04b10ec16b0"
-  val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
+  val journeyId:     JourneyId = "27085215-69a4-4027-8f72-b04b10ec16b0"
+  val sessionDataId: String    = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   def stubForGetBanks(response: String): StubMapping =
     stubFor(

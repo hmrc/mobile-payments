@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.InitiatePaymentResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
@@ -33,14 +33,18 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LivePaymentControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData with ShutteringMock {
+class LivePaymentControllerSpec
+    extends BaseSpec
+    with AuthorisationStub
+    with MobilePaymentsTestData
+    with ShutteringMock {
 
-  private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
+  private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
-  implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  implicit val mockAuditConnector:    AuditConnector    = mock[AuditConnector]
+  implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
 
   private val sut = new LivePaymentController(
     mockAuthConnector,

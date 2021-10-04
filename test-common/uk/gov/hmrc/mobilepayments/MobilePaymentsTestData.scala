@@ -24,16 +24,19 @@ import scala.io.Source
 
 trait MobilePaymentsTestData {
 
-  lazy val banksResponse:       BanksResponse       = Json.fromJson[BanksResponse](js("banks-response")).get
-  lazy val shutteredResponse:   Shuttering          = Json.fromJson[Shuttering](js("shuttered-response")).get
-  lazy val sessionDataResponse: SessionDataResponse = Json.fromJson[SessionDataResponse](js("session-data-response")).get
+  lazy val banksResponse:     BanksResponse = Json.fromJson[BanksResponse](js("banks-response")).get
+  lazy val shutteredResponse: Shuttering    = Json.fromJson[Shuttering](js("shuttered-response")).get
+
+  lazy val sessionDataResponse: SessionDataResponse =
+    Json.fromJson[SessionDataResponse](js("session-data-response")).get
+
   lazy val paymentInitiatedResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get
 
-  lazy val rawMalformedJson: String = "{\"data\": [{,]}"
-  lazy val banksResponseJson: String = json("banks-response")
-  lazy val sessionDataResponseJson: String = json("session-data-response")
-  lazy val createPaymentRequestJson: String = json("create-payment-request")
+  lazy val rawMalformedJson:             String = "{\"data\": [{,]}"
+  lazy val banksResponseJson:            String = json("banks-response")
+  lazy val sessionDataResponseJson:      String = json("session-data-response")
+  lazy val createPaymentRequestJson:     String = json("create-payment-request")
   lazy val paymentInitiatedResponseJson: String = json("payment-initiated-response")
 
   private def json(fileName: String): String = {
@@ -43,7 +46,6 @@ trait MobilePaymentsTestData {
     raw
   }
 
-  private def js(fileName: String): JsValue = {
+  private def js(fileName: String): JsValue =
     Json.parse(json(fileName))
-  }
 }

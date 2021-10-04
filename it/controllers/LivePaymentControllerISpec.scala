@@ -6,8 +6,7 @@ import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.InitiatePaymentResponse
 import utils.BaseISpec
 
 class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
@@ -96,6 +95,90 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
       val response = await(request.post(Json.parse(createPaymentRequestJson)))
       response.status shouldBe 521
+    }
+
+    "return 401 when a 401 is returned from select bank" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(sessionDataResponseJson)
+      stubForSelectBankFailure(401)
+      stubForInitiatePaymentFailure(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments?journeyId=$journeyId"
+      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+      response.status shouldBe 401
+    }
+
+    "return 404 when a 404 is returned from select bank" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(sessionDataResponseJson)
+      stubForSelectBankFailure()
+      stubForInitiatePaymentFailure()
+
+      val request: WSRequest = wsUrl(
+        s"/payments?journeyId=$journeyId"
+      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+      response.status shouldBe 404
+    }
+
+    "return 500 when unknown error is returned from select bank" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(sessionDataResponseJson)
+      stubForSelectBankFailure(500)
+      stubForInitiatePaymentFailure(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments?journeyId=$journeyId"
+      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+      response.status shouldBe 500
+    }
+
+    "return 401 when a 401 is returned from initiate payment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(sessionDataResponseJson)
+      stubForSelectBank()
+      stubForInitiatePaymentFailure(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments?journeyId=$journeyId"
+      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+      response.status shouldBe 401
+    }
+
+    "return 404 when a 404 is returned from initiate payment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(sessionDataResponseJson)
+      stubForSelectBank()
+      stubForInitiatePaymentFailure()
+
+      val request: WSRequest = wsUrl(
+        s"/payments?journeyId=$journeyId"
+      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+      response.status shouldBe 404
+    }
+
+    "return 500 when unknown error is returned from initiate payment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(sessionDataResponseJson)
+      stubForSelectBank()
+      stubForInitiatePaymentFailure(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments?journeyId=$journeyId"
+      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+      response.status shouldBe 500
     }
   }
 }

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import play.api.test.Helpers.await
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
@@ -30,10 +30,10 @@ import scala.concurrent.{Await, Future}
 class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
-  private val amount:        Long   = 1234L
-  private val bankId:        String = "asd-123"
-  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
-  private val returnUrl:     String = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+  private val amount:        Long                 = 1234L
+  private val bankId:        String               = "asd-123"
+  private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val returnUrl:     String               = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
 
   private val sut = new OpenBankingService(mockConnector, returnUrl)
 
@@ -59,7 +59,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
   "when connector initiatePayment succeeds then" should {
     "return payment response" in {
       mockSession(Future successful sessionDataResponse)
-      mockSelectBank(Future successful Unit)
+      mockSelectBank(Future successful HttpResponse.apply(200, ""))
       mockInitiatePayment(Future successful paymentInitiatedResponse)
 
       val result = Await.result(sut.initiatePayment(amount, bankId, journeyId), 0.5.seconds)
@@ -91,7 +91,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
   "when initiatePayment fails then" should {
     "return an error" in {
       mockSession(Future successful sessionDataResponse)
-      mockSelectBank(Future successful Unit)
+      mockSelectBank(Future successful HttpResponse.apply(200, ""))
       mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
@@ -112,7 +112,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       .expects(amount, journeyId, hc)
       .returning(future)
 
-  private def mockSelectBank(future: Future[Unit]): Unit =
+  private def mockSelectBank(future: Future[HttpResponse]): Unit =
     (mockConnector
       .selectBank(_: String, _: String, _: JourneyId)(_: HeaderCarrier))
       .expects(sessionDataId, bankId, journeyId, hc)
