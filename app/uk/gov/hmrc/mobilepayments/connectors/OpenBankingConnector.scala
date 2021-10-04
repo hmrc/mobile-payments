@@ -21,7 +21,7 @@ import com.google.inject.name.Named
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, SelectBankRequest}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import javax.inject.Singleton
@@ -75,6 +75,17 @@ class OpenBankingConnector @Inject() (
     http.POST[InitiatePaymentRequest, InitiatePaymentResponse](
       url = s"$serviceUrl/session/$sessionDataId/initiate-payment?journeyId=$journey",
       InitiatePaymentRequest(returnUrl)
+    )
+  }
+
+  def getPaymentStatus(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[OpenBankingPaymentStatusResponse] = {
+    val journey = journeyId.value
+    http.GET[OpenBankingPaymentStatusResponse](
+      url = s"$serviceUrl/session/$sessionDataId/payment-status?journeyId=$journey"
     )
   }
 }

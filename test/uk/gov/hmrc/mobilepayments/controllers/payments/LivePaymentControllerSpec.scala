@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.InitiatePaymentResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
@@ -41,6 +41,7 @@ class LivePaymentControllerSpec
 
   private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
+  private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuditConnector:    AuditConnector    = mock[AuditConnector]
@@ -58,7 +59,7 @@ class LivePaymentControllerSpec
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockInitiatePayment(Future successful paymentInitiatedResponse)
+      mockInitiatePayment(Future successful paymentSessionResponse)
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -89,7 +90,7 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockInitiatePayment(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+      mockInitiatePayment(Future failed new Upstream4xxResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -117,7 +118,7 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockInitiatePayment(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
+      mockInitiatePayment(Future failed new Upstream5xxResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -128,7 +129,77 @@ class LivePaymentControllerSpec
     }
   }
 
-  private def mockInitiatePayment(future: Future[InitiatePaymentResponse]) =
+  "when get payment status invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetPaymentStatus(Future successful PaymentStatusResponse("Authorised"))
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[PaymentStatusResponse]
+      response.status shouldEqual "Authorised"
+    }
+  }
+
+  "when get payment status invoked and service returns NotFoundException then" should {
+    "return 404" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetPaymentStatus(Future.failed(Upstream4xxResponse("Error", 404, 404)))
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 404
+    }
+  }
+
+  "when get payment status and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetPaymentStatus(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get payment status invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get payment status invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetPaymentStatus(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
+  private def mockInitiatePayment(future: Future[PaymentSessionResponse]) =
     (mockOpenBankingService
       .initiatePayment(_: Long, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)
@@ -136,4 +207,10 @@ class LivePaymentControllerSpec
 
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =
     mockShutteringResponse(Shuttering(shuttered = false))
+
+  private def mockGetPaymentStatus(f: Future[PaymentStatusResponse]) =
+    (mockOpenBankingService
+      .getPaymentStatus(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returning(f)
 }

@@ -18,14 +18,21 @@ package uk.gov.hmrc.mobilepayments
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response._
 
 import scala.io.Source
 
 trait MobilePaymentsTestData {
 
-  lazy val banksResponse:     BanksResponse = Json.fromJson[BanksResponse](js("banks-response")).get
-  lazy val shutteredResponse: Shuttering    = Json.fromJson[Shuttering](js("shuttered-response")).get
+  lazy val banksResponse: BanksResponse = Json.fromJson[BanksResponse](js("banks-response")).get
+
+  lazy val paymentStatusOpenBankingResponse: OpenBankingPaymentStatusResponse =
+    Json.fromJson[OpenBankingPaymentStatusResponse](js("payment-status-ob-response")).get
+
+  lazy val paymentStatusResponse: PaymentStatusResponse =
+    Json.fromJson[PaymentStatusResponse](js("payment-status-response")).get
+
+  lazy val shutteredResponse: Shuttering = Json.fromJson[Shuttering](js("shuttered-response")).get
 
   lazy val sessionDataResponse: SessionDataResponse =
     Json.fromJson[SessionDataResponse](js("session-data-response")).get
@@ -33,11 +40,15 @@ trait MobilePaymentsTestData {
   lazy val paymentInitiatedResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get
 
+  lazy val paymentSessionResponse: PaymentSessionResponse =
+    Json.fromJson[PaymentSessionResponse](js("payment-session-response")).get
+
   lazy val rawMalformedJson:             String = "{\"data\": [{,]}"
   lazy val banksResponseJson:            String = json("banks-response")
   lazy val sessionDataResponseJson:      String = json("session-data-response")
   lazy val createPaymentRequestJson:     String = json("create-payment-request")
   lazy val paymentInitiatedResponseJson: String = json("payment-initiated-response")
+  lazy val paymentStatusResponseJson:    String = json("payment-status-ob-response")
 
   private def json(fileName: String): String = {
     val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")
