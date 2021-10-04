@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.banks
+package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import org.scalamock.handlers.CallHandler
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.InitiatePaymentResponse
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
 import scala.concurrent.Future
 
-class SandboxBankControllerSpec
+class SandboxPaymentControllerSpec
     extends BaseSpec
     with AuthorisationStub
     with MobilePaymentsTestData
@@ -40,7 +41,7 @@ class SandboxBankControllerSpec
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
 
-  private val sut = new SandboxBankController(
+  private val sut = new SandboxPaymentController(
     mockAuthConnector,
     ConfidenceLevel.L200.level,
     Helpers.stubControllerComponents(),
@@ -52,13 +53,14 @@ class SandboxBankControllerSpec
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
-      val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+      val request = FakeRequest("POST", "/payments")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
 
-      val result = sut.getBanks(journeyId)(request)
+      val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 200
-      val response = contentAsJson(result).as[BanksResponse]
-      response.data.size shouldBe 68
+      val response = contentAsJson(result).as[InitiatePaymentResponse]
+      response.paymentUrl shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
     }
   }
 
@@ -66,10 +68,11 @@ class SandboxBankControllerSpec
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
-      val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+      val request = FakeRequest("POST", "/payments")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
 
-      val result = sut.getBanks(journeyId)(request)
+      val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 401
     }
   }
