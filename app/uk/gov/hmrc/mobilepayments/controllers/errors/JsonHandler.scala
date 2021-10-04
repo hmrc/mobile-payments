@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.config
+package uk.gov.hmrc.mobilepayments.controllers.errors
 
-import play.api.Configuration
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
+import play.api.mvc.{Request, Result}
 
-import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
+trait JsonHandler {
 
-  val auditingEnabled:             Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost:                String  = config.get[String]("microservice.metrics.graphite.host")
-  val openBankingPaymentReturnUrl: String  = config.get[String]("openBankingPaymentReturnUrl")
+  def withValidJson[T](
+    func:             T => Future[Result]
+  )(implicit request: Request[JsValue],
+    r:                Reads[T]
+  ): Future[Result] =
+    request.body.validate[T] match {
+      case JsSuccess(t, _) => func(t)
+      case JsError(errors) => Future failed new MalformedRequestException(errors.toString())
+    }
 }

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain
+package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
 
-final case class BanksResponse(data: Seq[Bank])
+final case class SessionDataResponse(
+  sessionDataId: String,
+  nextUrl:       String)
 
-object BanksResponse {
-  implicit val format: Format[BanksResponse] = Json.format[BanksResponse]
+object SessionDataResponse {
+  implicit def format: Format[SessionDataResponse] = Json.format[SessionDataResponse]
 }

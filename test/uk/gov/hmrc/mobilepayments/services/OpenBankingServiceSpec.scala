@@ -17,10 +17,11 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import play.api.test.Helpers.await
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import scala.concurrent.duration._
@@ -28,31 +29,98 @@ import scala.concurrent.{Await, Future}
 
 class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
-  val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
+  private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
+  private val amount:        Long                 = 1234L
+  private val bankId:        String               = "asd-123"
+  private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val returnUrl:     String               = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
 
-  private val sut = new OpenBankingService(mockConnector)
+  private val sut = new OpenBankingService(mockConnector, returnUrl)
 
-  "test when connector returns success with banks then" should {
+  "when connector returns success with banks then" should {
     "return banks" in {
-      (mockConnector
-        .getBanks(_: JourneyId)(_: HeaderCarrier))
-        .expects(journeyId, hc)
-        .returning(Future.successful(banksResponse))
+      mockBanks(Future successful banksResponse)
 
       val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.data.size shouldBe 2
+      result.data.size shouldBe 4
     }
   }
 
-  "test when connector returns NotFoundException then" should {
+  "when connector returns NotFoundException then" should {
     "return an error" in {
-      (mockConnector
-        .getBanks(_: JourneyId)(_: HeaderCarrier))
-        .expects(journeyId, hc)
-        .returning(Future.failed(UpstreamErrorResponse("Error", 400, 400)))
+      mockBanks(Future failed UpstreamErrorResponse("Error", 400, 400))
+
       intercept[UpstreamErrorResponse] {
         await(sut.getBanks(journeyId))
       }
     }
   }
+
+  "when connector initiatePayment succeeds then" should {
+    "return payment response" in {
+      mockSession(Future successful sessionDataResponse)
+      mockSelectBank(Future successful HttpResponse.apply(200, ""))
+      mockInitiatePayment(Future successful paymentInitiatedResponse)
+
+      val result = Await.result(sut.initiatePayment(amount, bankId, journeyId), 0.5.seconds)
+      result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+    }
+  }
+
+  "when session fails then" should {
+    "return an error" in {
+      mockSession(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        await(sut.initiatePayment(amount, bankId, journeyId))
+      }
+    }
+  }
+
+  "when selectBank fails then" should {
+    "return an error" in {
+      mockSession(Future successful sessionDataResponse)
+      mockSelectBank(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        await(sut.initiatePayment(amount, bankId, journeyId))
+      }
+    }
+  }
+
+  "when initiatePayment fails then" should {
+    "return an error" in {
+      mockSession(Future successful sessionDataResponse)
+      mockSelectBank(Future successful HttpResponse.apply(200, ""))
+      mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        await(sut.initiatePayment(amount, bankId, journeyId))
+      }
+    }
+  }
+
+  private def mockBanks(future: Future[BanksResponse]): Unit =
+    (mockConnector
+      .getBanks(_: JourneyId)(_: HeaderCarrier))
+      .expects(journeyId, hc)
+      .returning(future)
+
+  private def mockSession(future: Future[SessionDataResponse]): Unit =
+    (mockConnector
+      .createSession(_: Long, _: JourneyId)(_: HeaderCarrier))
+      .expects(amount, journeyId, hc)
+      .returning(future)
+
+  private def mockSelectBank(future: Future[HttpResponse]): Unit =
+    (mockConnector
+      .selectBank(_: String, _: String, _: JourneyId)(_: HeaderCarrier))
+      .expects(sessionDataId, bankId, journeyId, hc)
+      .returning(future)
+
+  private def mockInitiatePayment(future: Future[InitiatePaymentResponse]): Unit =
+    (mockConnector
+      .initiatePayment(_: String, _: String, _: JourneyId)(_: HeaderCarrier))
+      .expects(sessionDataId, returnUrl, journeyId, hc)
+      .returning(future)
 }

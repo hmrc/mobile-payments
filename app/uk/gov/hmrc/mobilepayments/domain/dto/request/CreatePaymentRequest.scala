@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.domain.dto.request
 
-import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import play.api.libs.json.{Format, Json}
 
-trait BankController {
-  def getBanks(journeyId: JourneyId): Action[AnyContent]
+final case class CreatePaymentRequest(
+  amount: Long,
+  bankId: String)
+
+object CreatePaymentRequest {
+  implicit val format: Format[CreatePaymentRequest] = Json.format[CreatePaymentRequest]
 }

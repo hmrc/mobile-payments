@@ -14,52 +14,58 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.controllers.payments
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
-import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
+import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
+import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.io.Source
 
 @Singleton()
-class LiveBankController @Inject() (
+class SandboxPaymentController @Inject() (
   override val authConnector:                                   AuthConnector,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
   cc:                                                           ControllerComponents,
-  openBankingService:                                           OpenBankingService,
   shutteringService:                                            ShutteringService
 )(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
-    with BankController
-    with AccessControl
+    with PaymentController
     with ControllerChecks
-    with ErrorHandling {
+    with AccessControl
+    with ErrorHandling
+    with JsonHandler {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
-  override val app:    String                 = "Bank-Controller"
 
-  def getBanks(journeyId: JourneyId): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      implicit val hc: HeaderCarrier = fromRequest(request)
+  override def createPayment(journeyId: JourneyId): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          errorWrapper {
-            openBankingService
-              .getBanks(journeyId)
-              .map { response =>
-                Ok(Json.toJson(response))
-              }
+          withErrorWrapper {
+            withValidJson[CreatePaymentRequest] { _ =>
+              Future.successful(Ok(Json.toJson(sampleJson)))
+            }
           }
         }
       }
     }
+
+  private def sampleJson: JsValue = {
+    val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-create-payment-response.json")
+    val raw    = source.getLines.mkString
+    source.close()
+    Json.parse(raw)
+  }
+
+  override val app: String = "Sandbox Payment Controller"
 }

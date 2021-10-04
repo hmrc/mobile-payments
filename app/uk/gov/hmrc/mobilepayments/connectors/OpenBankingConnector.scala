@@ -20,7 +20,8 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, SelectBankRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import javax.inject.Singleton
@@ -28,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class OpenBankingConnector @Inject() (
-  http:                              CoreGet,
+  http:                              HttpClient,
   @Named("open-banking") serviceUrl: String
 )(implicit ex:                       ExecutionContext) {
 
@@ -36,6 +37,44 @@ class OpenBankingConnector @Inject() (
     val journey = journeyId.value
     http.GET[BanksResponse](
       url = s"$serviceUrl/banks?journeyId=$journey"
+    )
+  }
+
+  def createSession(
+    amount:                 Long,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[SessionDataResponse] = {
+    val journey = journeyId.value
+    http.POST[CreateSessionDataRequest, SessionDataResponse](
+      url = s"$serviceUrl/session?journeyId=$journey",
+      CreateSessionDataRequest(amount)
+    )
+  }
+
+  def selectBank(
+    sessionDataId:          String,
+    bankId:                 String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[HttpResponse] = {
+    val journey = journeyId.value
+    http.POST[SelectBankRequest, HttpResponse](
+      url = s"$serviceUrl/session/$sessionDataId/select-bank?journeyId=$journey",
+      SelectBankRequest(bankId)
+    )
+  }
+
+  def initiatePayment(
+    sessionDataId:          String,
+    returnUrl:              String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[InitiatePaymentResponse] = {
+    val journey = journeyId.value
+    http.POST[InitiatePaymentRequest, InitiatePaymentResponse](
+      url = s"$serviceUrl/session/$sessionDataId/initiate-payment?journeyId=$journey",
+      InitiatePaymentRequest(returnUrl)
     )
   }
 }

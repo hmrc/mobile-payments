@@ -6,7 +6,7 @@ import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import utils.BaseISpec
 
 class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
@@ -15,7 +15,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with bank data" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanks(rawBanksJson)
+      stubForGetBanks(banksResponseJson)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -23,13 +23,13 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[BanksResponse]
-      parsedResponse.data.size shouldBe 2
+      parsedResponse.data.size shouldBe 4
     }
 
     "return 500 when response from open-banking is malformed" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanks(rawBanksMalformedJson)
+      stubForGetBanks(rawMalformedJson)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -62,7 +62,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 404
     }
 
-    "return 406 when auth fails" in {
+    "return 401 when auth fails" in {
       authorisationRejected()
 
       val request: WSRequest = wsUrl(

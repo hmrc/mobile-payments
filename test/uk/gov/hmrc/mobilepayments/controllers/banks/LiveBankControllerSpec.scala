@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers
+package uk.gov.hmrc.mobilepayments.controllers.banks
 
 import org.scalamock.handlers.CallHandler
 import play.api.test.Helpers._
@@ -23,7 +23,8 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
-import uk.gov.hmrc.mobilepayments.domain.{BanksResponse, Shuttering}
+import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
@@ -31,18 +32,14 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LiveBankControllerSpec
-  extends BaseSpec
-    with AuthorisationStub
-    with MobilePaymentsTestData
-    with ShutteringMock {
+class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData with ShutteringMock {
 
   private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
 
-  implicit val mockShutteringService:  ShutteringService  = mock[ShutteringService]
-  implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  implicit val mockAuthConnector:  AuthConnector  = mock[AuthConnector]
+  implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
+  implicit val mockAuditConnector:    AuditConnector    = mock[AuditConnector]
+  implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
 
   private val sut = new LiveBankController(
     mockAuthConnector,
@@ -64,7 +61,7 @@ class LiveBankControllerSpec
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[BanksResponse]
-      response.data.size shouldBe 2
+      response.data.size shouldBe 4
     }
   }
 
@@ -128,5 +125,6 @@ class LiveBankControllerSpec
       .expects(*, *, *)
       .returning(f)
 
-  private def shutteringDisabled(): CallHandler[Future[Shuttering]] = mockShutteringResponse(Shuttering(shuttered = false))
+  private def shutteringDisabled(): CallHandler[Future[Shuttering]] =
+    mockShutteringResponse(Shuttering(shuttered = false))
 }

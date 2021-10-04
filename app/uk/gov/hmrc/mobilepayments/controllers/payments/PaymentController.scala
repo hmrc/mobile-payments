@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.config
+package uk.gov.hmrc.mobilepayments.controllers.payments
 
-import play.api.Configuration
+import play.api.libs.json.JsValue
+import play.api.mvc.Action
+import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
-import javax.inject.{Inject, Singleton}
-
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
-
-  val auditingEnabled:             Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost:                String  = config.get[String]("microservice.metrics.graphite.host")
-  val openBankingPaymentReturnUrl: String  = config.get[String]("openBankingPaymentReturnUrl")
+trait PaymentController {
+  def createPayment(journeyId: JourneyId): Action[JsValue]
 }

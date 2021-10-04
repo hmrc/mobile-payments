@@ -17,111 +17,35 @@
 package uk.gov.hmrc.mobilepayments
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
+
+import scala.io.Source
 
 trait MobilePaymentsTestData {
 
-  lazy val banksJson: JsValue = Json.parse(rawBanksJson)
+  lazy val banksResponse:     BanksResponse = Json.fromJson[BanksResponse](js("banks-response")).get
+  lazy val shutteredResponse: Shuttering    = Json.fromJson[Shuttering](js("shuttered-response")).get
 
-  lazy val banksResponse: BanksResponse = Json.fromJson[BanksResponse](banksJson).get
+  lazy val sessionDataResponse: SessionDataResponse =
+    Json.fromJson[SessionDataResponse](js("session-data-response")).get
 
-  val rawBanksJson: String = s"""
-                                |
-                                |{
-                                |  "data": [
-                                |    {
-                                |      "bank_id": "obie-mettle-production",
-                                |      "name": "Mettle",
-                                |      "friendly_name": "Mettle",
-                                |      "is_sandbox": false,
-                                |      "logo": "https://public.ecospend.com/images/banks/Mettle.svg",
-                                |      "icon": "https://public.ecospend.com/images/banks/Mettle_icon.svg",
-                                |      "standard": "obie",
-                                |      "country_iso_code": "GB",
-                                |      "group": "Mettle",
-                                |      "order": 100000,
-                                |      "service_status": true,
-                                |      "refund_supported": true,
-                                |      "abilities": {
-                                |        "domestic_payment": true,
-                                |        "domestic_scheduled_payment": true,
-                                |        "domestic_standing_order": false,
-                                |        "domestic_standing_order_installment": false,
-                                |        "international_payment": false,
-                                |        "international_scheduled_payment": false,
-                                |        "international_standing_order": false
-                                |      }
-                                |    },
-                                |    {
-                                |      "bank_id": "obie-barclays-business-mobile-production",
-                                |      "name": "Barclays Business Mobile",
-                                |      "friendly_name": "Barclays Business Mobile",
-                                |      "is_sandbox": false,
-                                |      "logo": "https://public.ecospend.com/images/banks/Barclays.svg",
-                                |      "icon": "https://public.ecospend.com/images/banks/Barclays_icon.svg",
-                                |      "standard": "obie",
-                                |      "country_iso_code": "GB",
-                                |      "division": "Business Mobile",
-                                |      "group": "Barclays",
-                                |      "order": 0,
-                                |      "service_status": true,
-                                |      "refund_supported": true,
-                                |      "abilities": {
-                                |        "domestic_payment": true,
-                                |        "domestic_scheduled_payment": true,
-                                |        "domestic_standing_order": true,
-                                |        "domestic_standing_order_installment": true,
-                                |        "international_payment": false,
-                                |        "international_scheduled_payment": false,
-                                |        "international_standing_order": false
-                                |      }
-                                |    }
-                                |  ],
-                                |  "meta": {
-                                |    "total_count": 68,
-                                |    "total_pages": 1,
-                                |    "current_page": 1
-                                |  }
-                                |}
-                                |
-          """.stripMargin
+  lazy val paymentInitiatedResponse: InitiatePaymentResponse =
+    Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get
 
-  val rawBanksMalformedJson: String = s"""
-                                         |
-                                         |{
-                                         |  "data": [
-                                         |    {
-                                         |      "bank_id": "obie-mettle-production",
-                                         |      "name": "Mettle",
-                                         |      "friendly_name": "Mettle",
-                                         |      "is_sandbox": false,
-                                         |      "logo": "https://public.ecospend.com/images/banks/Mettle.svg",
-                                         |      "icon": "https://public.ecospend.com/images/banks/Mettle_icon.svg",
-                                         |      "standard": "obie",
-                                         |      "country_iso_code": "GB",
-                                         |      "group": "Mettle",
-                                         |      "order": 100000,
-                                         |      "service_status": true,
-                                         |      "refund_supported": true,
-                                         |      "abilities": {
-                                         |        "domestic_payment": true,
-                                         |        "domestic_scheduled_payment": true,
-                                         |        "domestic_standing_order": false,
-                                         |        "domestic_standing_order_installment": false,
-                                         |        "international_payment": false,
-                                         |        "international_scheduled_payment": false,
-                                         |        "international_standing_order": false
-                                         |      }
-                                         |    }
-                                         |    }
-                                         |  ],
-                                         |  "meta": {
-                                         |    "total_count": 68,
-                                         |    "total_pages": 1,
-                                         |    "current_page": 1
-                                         |  }
-                                         |}
-                                         |
-          """.stripMargin
+  lazy val rawMalformedJson:             String = "{\"data\": [{,]}"
+  lazy val banksResponseJson:            String = json("banks-response")
+  lazy val sessionDataResponseJson:      String = json("session-data-response")
+  lazy val createPaymentRequestJson:     String = json("create-payment-request")
+  lazy val paymentInitiatedResponseJson: String = json("payment-initiated-response")
 
+  private def json(fileName: String): String = {
+    val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")
+    val raw    = source.getLines.mkString
+    source.close()
+    raw
+  }
+
+  private def js(fileName: String): JsValue =
+    Json.parse(json(fileName))
 }

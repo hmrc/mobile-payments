@@ -19,17 +19,33 @@ package uk.gov.hmrc.mobilepayments.services
 import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
+import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class OpenBankingService @Inject() (connector: OpenBankingConnector) {
+class OpenBankingService @Inject() (
+  connector:                                                         OpenBankingConnector,
+  @Named("openBankingPaymentReturnUrl") openBankingPaymentReturnUrl: String) {
 
   def getBanks(
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
   ): Future[BanksResponse] = connector.getBanks(journeyId)
+
+  def initiatePayment(
+    amount:                 Long,
+    bankId:                 String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[InitiatePaymentResponse] =
+    for {
+      sessionData <- connector.createSession(amount, journeyId)
+      _           <- connector.selectBank(sessionData.sessionDataId, bankId, journeyId)
+      response    <- connector.initiatePayment(sessionData.sessionDataId, openBankingPaymentReturnUrl, journeyId)
+    } yield response
 }
