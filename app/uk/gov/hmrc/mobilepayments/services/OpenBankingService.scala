@@ -19,7 +19,7 @@ package uk.gov.hmrc.mobilepayments.services
 import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import javax.inject.Named
@@ -42,10 +42,27 @@ class OpenBankingService @Inject() (
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[InitiatePaymentResponse] =
-    for {
+  ): Future[PaymentSessionResponse] = {
+    val initiatedPayment = for {
       sessionData <- connector.createSession(amount, journeyId)
       _           <- connector.selectBank(sessionData.sessionDataId, bankId, journeyId)
       response    <- connector.initiatePayment(sessionData.sessionDataId, openBankingPaymentReturnUrl, journeyId)
-    } yield response
+    } yield (sessionData, response)
+
+    initiatedPayment.map { data =>
+      PaymentSessionResponse(data._2.paymentUrl, data._1.sessionDataId)
+    }
+  }
+
+  def getPaymentStatus(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[PaymentStatusResponse] =
+    connector
+      .getPaymentStatus(sessionDataId, journeyId)
+      .map { t =>
+        PaymentStatusResponse(t.ecospendPaymentStatus)
+      }
 }

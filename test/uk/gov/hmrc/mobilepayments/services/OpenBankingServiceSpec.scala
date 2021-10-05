@@ -21,7 +21,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, SessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, OpenBankingPaymentStatusResponse, SessionDataResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import scala.concurrent.duration._
@@ -64,6 +64,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.initiatePayment(amount, bankId, journeyId), 0.5.seconds)
       result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+      result.sessionDataId shouldEqual sessionDataId
     }
   }
 
@@ -100,6 +101,25 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
+  "when connector getPaymentStatus returns success then" should {
+    "return banks" in {
+      mockPaymentStatus(Future successful paymentStatusOpenBankingResponse)
+
+      val result = Await.result(sut.getPaymentStatus(sessionDataId, journeyId), 0.5.seconds)
+      result.status shouldEqual "Authorised"
+    }
+  }
+
+  "when connector getPaymentStatus returns NotFoundException then" should {
+    "return an error" in {
+      mockPaymentStatus(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        await(sut.getPaymentStatus(sessionDataId, journeyId))
+      }
+    }
+  }
+
   private def mockBanks(future: Future[BanksResponse]): Unit =
     (mockConnector
       .getBanks(_: JourneyId)(_: HeaderCarrier))
@@ -122,5 +142,11 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     (mockConnector
       .initiatePayment(_: String, _: String, _: JourneyId)(_: HeaderCarrier))
       .expects(sessionDataId, returnUrl, journeyId, hc)
+      .returning(future)
+
+  private def mockPaymentStatus(future: Future[OpenBankingPaymentStatusResponse]): Unit =
+    (mockConnector
+      .getPaymentStatus(_: String, _: JourneyId)(_: HeaderCarrier))
+      .expects(sessionDataId, journeyId, hc)
       .returning(future)
 }

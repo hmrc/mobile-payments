@@ -1,6 +1,6 @@
-The Get Banks response
+Get Banks
 ----
-Fetch the BanksResponse object.
+Returns the BanksResponse object.
 
 * **URL**
 

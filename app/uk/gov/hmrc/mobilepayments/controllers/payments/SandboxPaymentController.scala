@@ -53,15 +53,36 @@ class SandboxPaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[CreatePaymentRequest] { _ =>
-              Future.successful(Ok(Json.toJson(sampleJson)))
+              Future.successful(Ok(Json.toJson(sampleCreatePaymentJson)))
             }
           }
         }
       }
     }
 
-  private def sampleJson: JsValue = {
+  def getPaymentStatus(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            Future.successful(Ok(Json.toJson(samplePaymentStatusJson)))
+          }
+        }
+      }
+    }
+
+  private def sampleCreatePaymentJson: JsValue = {
     val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-create-payment-response.json")
+    val raw    = source.getLines.mkString
+    source.close()
+    Json.parse(raw)
+  }
+
+  private def samplePaymentStatusJson: JsValue = {
+    val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-payment-status-response.json")
     val raw    = source.getLines.mkString
     source.close()
     Json.parse(raw)

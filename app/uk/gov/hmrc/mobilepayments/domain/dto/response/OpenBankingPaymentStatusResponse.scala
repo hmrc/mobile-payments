@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.payments
+package uk.gov.hmrc.mobilepayments.domain.dto.response
 
-import play.api.libs.json.JsValue
-import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import play.api.libs.json.{Format, Json}
 
-trait PaymentController {
-  def createPayment(journeyId: JourneyId): Action[JsValue]
+final case class OpenBankingPaymentStatusResponse(ecospendPaymentStatus: String)
 
-  def getPaymentStatus(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent]
+object OpenBankingPaymentStatusResponse {
+  implicit val format: Format[OpenBankingPaymentStatusResponse] = Json.format[OpenBankingPaymentStatusResponse]
 }

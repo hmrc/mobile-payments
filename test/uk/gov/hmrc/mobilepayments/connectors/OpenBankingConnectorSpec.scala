@@ -100,4 +100,20 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       }
     }
   }
+
+  "when getPaymentStatus call is successful it" should {
+    "return banks" in {
+      performSuccessfulGET(Future successful paymentStatusOpenBankingResponse)(mockHttp)
+      await(sut.getPaymentStatus(sessionDataId, journeyId)).ecospendPaymentStatus shouldEqual "Authorised"
+    }
+  }
+
+  "when getPaymentStatus call returns NotFoundException it" should {
+    "return an error" in {
+      performUnsuccessfulGET(new NotFoundException("not found"))(mockHttp)
+      intercept[NotFoundException] {
+        await(sut.getPaymentStatus(sessionDataId, journeyId))
+      }
+    }
+  }
 }

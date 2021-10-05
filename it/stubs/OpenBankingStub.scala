@@ -107,4 +107,29 @@ object OpenBankingStub {
           .withStatus(statusCode)
       )
     )
+
+  def stubForGetPaymentStatus(response: String): StubMapping =
+    stubFor(
+      get(
+        urlEqualTo(
+          s"/session/$sessionDataId/payment-status?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(200)
+          .withBody(response)
+      )
+    )
+
+  def stubForGetPaymentStatusFailure(statusCode: Int = 404): StubMapping =
+    stubFor(
+      get(
+        urlEqualTo(
+          s"/session/$sessionDataId/payment-status?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+      )
+    )
 }

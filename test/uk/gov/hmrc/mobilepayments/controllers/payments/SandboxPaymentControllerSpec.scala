@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.InitiatePaymentResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -37,6 +37,7 @@ class SandboxPaymentControllerSpec
     with ShutteringMock {
 
   private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
+  private val sessionDataId:   String          = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
@@ -48,7 +49,7 @@ class SandboxPaymentControllerSpec
     mockShutteringService
   )
 
-  "when get banks invoked and service returns success then" should {
+  "when create payment invoked and service returns success then" should {
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
@@ -64,7 +65,7 @@ class SandboxPaymentControllerSpec
     }
   }
 
-  "when get banks invoked and auth fails then" should {
+  "when create payment invoked and auth fails then" should {
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
@@ -73,6 +74,33 @@ class SandboxPaymentControllerSpec
         .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
 
       val result = sut.createPayment(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get payment status invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[PaymentStatusResponse]
+      response.status shouldEqual "Authorised"
+    }
+  }
+
+  "when get payment status invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }
