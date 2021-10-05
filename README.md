@@ -3,6 +3,8 @@ mobile-payments
 =============================================
 
 - Return the list of banks that are supported by open banking.
+- Create payment using open banking.
+- Fetch payment status.
 
 Requirements
 ------------
@@ -14,8 +16,9 @@ API
 
 | *Task* | *Supported Methods* | *Description* |
 |--------|----|----|
-| ```/mobile-payments/banks``` | GET | Fetch the list of supported banks. [More...](docs/banks.md)|
-
+| ```/banks``` | GET | Fetch the list of supported banks. [More...](docs/get-banks.md)|
+| ```/payments/:sessionDataId``` | GET | Fetch the payment status associated with a session. [More...](docs/get-payment.md)|
+| ```/payments``` | POST | Create a payment with a selected bank. [More...](docs/post-payment.md)|
 Shuttered
 ---------
 Shuttering of this service is handled by [mobile-shuttering](https://github.com/hmrc/mobile-shuttering)
