@@ -43,18 +43,18 @@ uses:
                   value: !include examples/get-banks-response-example.json
   /payments:
     /{sessionDataId}:
+      uriParameters:
+        sessionDataId:
+          description: The ID associated with the payment session.
+          type: string
+          example: 51cc67d6-21da-11ec-9621-0242ac130002
+          required: true
       get:
         displayName: Get the payment status
         description: This endpoint retrieves a status of a payment associated with a session
         is: [headers.acceptHeader]
         (annotations.scope): "read:native-apps-api-orchestration"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
-        uriParameters:
-          sessionDataId:
-            description: The ID associated with the payment session.
-            type: string
-            example: 51cc67d6-21da-11ec-9621-0242ac130002
-            required: true
         queryParameters:
           journeyId:
             type: string
