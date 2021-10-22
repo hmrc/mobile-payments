@@ -1,1 +1,4 @@
 GET        /banks        uk.gov.hmrc.mobilepayments.controllers.banks.SandboxBankController.getBanks(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+
+GET         /payments/:sessionDataId        uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.getPaymentStatus(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+POST        /payments                       uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.createPayment(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)

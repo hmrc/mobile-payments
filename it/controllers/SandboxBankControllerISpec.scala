@@ -6,6 +6,7 @@ import stubs.AuthStub._
 import stubs.ShutteringStub._
 import utils.BaseISpec
 import uk.gov.hmrc.mobilepayments.domain.Bank
+import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 
 class SandboxBankControllerISpec extends BaseISpec{
 
@@ -20,11 +21,11 @@ class SandboxBankControllerISpec extends BaseISpec{
       ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
       val response = await(request.get())
       response.status shouldBe 200
-      val parsedResponse = Json.parse(response.body).as[Bank]
-      parsedResponse.id(0) shouldBe "obie-mettle-production"
-      parsedResponse.name(1) shouldBe "Barclays Business Mobile"
-      parsedResponse.logo(2) shouldBe "https://public.ecospend.com/images/banks/UlsterNI.svg"
-      parsedResponse.icon(3) shouldBe "https://public.ecospend.com/images/banks/Barclays_icon.svg"
+      val parsedResponse = Json.parse(response.body).as[BanksResponse]
+      parsedResponse.data.head.id shouldBe "obie-mettle-production"
+      parsedResponse.data(1).name shouldBe "Barclays Business Mobile"
+      parsedResponse.data(2).icon shouldBe "https://public.ecospend.com/images/banks/UlsterNI_icon.svg"
+      parsedResponse.data.tail(66).logo shouldBe "https://public.ecospend.com/images/banks/NatWest.svg"
     }
   }
 
