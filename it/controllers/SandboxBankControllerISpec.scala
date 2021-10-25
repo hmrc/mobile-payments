@@ -5,7 +5,6 @@ import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.ShutteringStub._
 import utils.BaseISpec
-import uk.gov.hmrc.mobilepayments.domain.Bank
 import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 
 class SandboxBankControllerISpec extends BaseISpec{
