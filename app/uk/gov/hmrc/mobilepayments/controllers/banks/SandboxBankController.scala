@@ -30,13 +30,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 
 @Singleton()
-class SandboxBankController @Inject() (
-  override val authConnector:                                   AuthConnector,
-  @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents,
-  shutteringService:                                            ShutteringService
-)(implicit val executionContext:                                ExecutionContext)
-    extends BackendController(cc)
+class SandboxBankController @Inject()(
+                                       override val authConnector: AuthConnector,
+                                       @Named("controllers.confidenceLevel") override val confLevel: Int,
+                                       cc: ControllerComponents,
+                                       shutteringService: ShutteringService
+                                     )(implicit val executionContext: ExecutionContext)
+  extends BackendController(cc)
     with BankController
     with ControllerChecks
     with AccessControl {
@@ -54,7 +54,7 @@ class SandboxBankController @Inject() (
 
   private def sampleJson: JsValue = {
     val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-banks-response.json")
-    val raw    = source.getLines.mkString
+    val raw = source.getLines.mkString
     source.close()
     Json.parse(raw)
   }
