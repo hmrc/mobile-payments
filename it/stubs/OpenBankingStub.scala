@@ -13,7 +13,7 @@ object OpenBankingStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/banks?journeyId=$journeyId"
+          s"/open-banking/banks?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -26,7 +26,7 @@ object OpenBankingStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/banks?journeyId=$journeyId"
+          s"/open-banking/banks?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -38,7 +38,7 @@ object OpenBankingStub {
     stubFor(
       post(
         urlEqualTo(
-          s"/session?journeyId=$journeyId"
+          s"/open-banking/session?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -51,7 +51,7 @@ object OpenBankingStub {
     stubFor(
       post(
         urlEqualTo(
-          s"/session?journeyId=$journeyId"
+          s"/open-banking/session?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -63,7 +63,7 @@ object OpenBankingStub {
     stubFor(
       post(
         urlEqualTo(
-          s"/session/$sessionDataId/select-bank?journeyId=$journeyId"
+          s"/open-banking/session/$sessionDataId/select-bank?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -75,7 +75,7 @@ object OpenBankingStub {
     stubFor(
       post(
         urlEqualTo(
-          s"/session/$sessionDataId/select-bank?journeyId=$journeyId"
+          s"/open-banking/session/$sessionDataId/select-bank?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -87,7 +87,7 @@ object OpenBankingStub {
     stubFor(
       post(
         urlEqualTo(
-          s"/session/$sessionDataId/initiate-payment?journeyId=$journeyId"
+          s"/open-banking/session/$sessionDataId/initiate-payment?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -100,7 +100,7 @@ object OpenBankingStub {
     stubFor(
       post(
         urlEqualTo(
-          s"/session/$sessionDataId/initiate-payment?journeyId=$journeyId"
+          s"/open-banking/session/$sessionDataId/initiate-payment?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -112,7 +112,7 @@ object OpenBankingStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/session/$sessionDataId/payment-status?journeyId=$journeyId"
+          s"/open-banking/session/$sessionDataId/payment-status?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
@@ -125,7 +125,7 @@ object OpenBankingStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/session/$sessionDataId/payment-status?journeyId=$journeyId"
+          s"/open-banking/session/$sessionDataId/payment-status?journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
