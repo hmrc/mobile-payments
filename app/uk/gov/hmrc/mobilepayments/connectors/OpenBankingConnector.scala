@@ -20,7 +20,6 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.domain.Bank
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, SelectBankRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
@@ -34,9 +33,9 @@ class OpenBankingConnector @Inject() (
   @Named("open-banking") serviceUrl: String
 )(implicit ex:                       ExecutionContext) {
 
-  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[Seq[Bank]] = {
+  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[BanksResponse] = {
     val journey = journeyId.value
-    http.GET[Seq[Bank]](
+    http.GET[BanksResponse](
       url = s"$serviceUrl/open-banking/banks?journeyId=$journey"
     )
   }
