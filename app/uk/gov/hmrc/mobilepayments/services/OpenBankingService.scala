@@ -34,7 +34,7 @@ class OpenBankingService @Inject() (
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
-  ): Future[BanksResponse] = connector.getBanks(journeyId).map(banks => BanksResponse(banks))
+  ): Future[BanksResponse] = connector.getBanks(journeyId)
 
   def initiatePayment(
     amount:                 Long,
