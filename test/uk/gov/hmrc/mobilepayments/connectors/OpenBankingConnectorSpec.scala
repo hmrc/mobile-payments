@@ -36,7 +36,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   "when getBanks call is successful it" should {
     "return banks" in {
       performSuccessfulGET(Future successful banksResponse)(mockHttp)
-      await(sut.getBanks(journeyId)).data.size shouldBe 4
+      await(sut.getBanks(journeyId)).size shouldBe 19
     }
   }
 

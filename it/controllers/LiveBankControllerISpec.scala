@@ -23,7 +23,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[BanksResponse]
-      parsedResponse.data.size shouldBe 4
+      parsedResponse.data.size shouldBe 19
     }
 
     "return 500 when response from open-banking is malformed" in {

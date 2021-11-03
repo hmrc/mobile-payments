@@ -34,7 +34,11 @@ class OpenBankingService @Inject() (
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
-  ): Future[BanksResponse] = connector.getBanks(journeyId)
+  ): Future[BanksResponse] = {
+    val result = connector.getBanks(journeyId).map(banks => BanksResponse(banks))
+    println(result)
+    return result
+  }
 
   def initiatePayment(
     amount:                 Long,

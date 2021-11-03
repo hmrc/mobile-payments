@@ -16,31 +16,16 @@
 
 package uk.gov.hmrc.mobilepayments.domain
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 
 case class Bank(
-  id:   String,
-  name: String,
-  logo: String,
-  icon: String)
+  bankId:       String,
+  name:         String,
+  friendlyName: String,
+  logoUrl:      String,
+  group:        String)
 
 object Bank {
+  implicit val format: Format[Bank] = Json.format[Bank]
 
-  private val reads: Reads[Bank] = (
-    (__ \ "bank_id").read[String].orElse(Reads(_ => JsError("Could not parse bank_id value"))) and
-    (__ \ "name").read[String].orElse(Reads(_ => JsError("Could not parse name value"))) and
-    (__ \ "logo").read[String].orElse(Reads(_ => JsError("Could not parse logo value"))) and
-    (__ \ "icon").read[String].orElse(Reads(_ => JsError("Could not parse icon value")))
-  )((id, name, logo, icon) => Bank(id, name, logo, icon))
-
-  private val writes: OWrites[Bank] = (bank: Bank) =>
-    Json.obj(
-      "bank_id" -> bank.id,
-      "name"    -> bank.name,
-      "logo"    -> bank.logo,
-      "icon"    -> bank.icon
-    )
-
-  implicit val format: OFormat[Bank] = OFormat(reads, writes)
 }

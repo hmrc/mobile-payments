@@ -21,6 +21,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
+import uk.gov.hmrc.mobilepayments.domain.Bank
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, InitiatePaymentResponse, OpenBankingPaymentStatusResponse, SessionDataResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -42,7 +43,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockBanks(Future successful banksResponse)
 
       val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.data.size shouldBe 4
+      result.data.size shouldBe 19
     }
   }
 
@@ -120,7 +121,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
-  private def mockBanks(future: Future[BanksResponse]): Unit =
+  private def mockBanks(future: Future[Seq[Bank]]): Unit =
     (mockConnector
       .getBanks(_: JourneyId)(_: HeaderCarrier))
       .expects(journeyId, hc)
