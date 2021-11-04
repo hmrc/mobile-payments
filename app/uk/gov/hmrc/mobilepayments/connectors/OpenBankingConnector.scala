@@ -51,7 +51,8 @@ class OpenBankingConnector @Inject() (
     val journey = journeyId.value
     http.POST[CreateSessionDataRequest, SessionDataResponse](
       url = s"$serviceUrl/open-banking/session?journeyId=$journey",
-      CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr))
+      CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
+      Seq(("X-Session-ID", journey))
     )
   }
 
