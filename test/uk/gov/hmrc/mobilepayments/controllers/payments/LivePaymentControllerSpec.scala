@@ -21,6 +21,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
@@ -63,7 +64,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 200
@@ -79,7 +80,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("bad-key" -> 1234, "another-bad-key" -> "asd-123"))
+        .withBody(Json.obj("bad-key" -> 1234, "another-bad-key" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 400
@@ -94,7 +95,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 401
@@ -107,7 +108,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 401
@@ -122,7 +123,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 500
@@ -201,8 +202,8 @@ class LivePaymentControllerSpec
 
   private def mockInitiatePayment(future: Future[PaymentSessionResponse]) =
     (mockOpenBankingService
-      .initiatePayment(_: Long, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *, *)
+      .initiatePayment(_: Long, _: String, _: SaUtr, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *, *)
       .returning(future)
 
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =

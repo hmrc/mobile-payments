@@ -1,4 +1,5 @@
 {
   "amount": 1212,
-  "bankId": "asd-123"
+  "bankId": "asd-123",
+  "saUtr": "CS700100a"
 }
