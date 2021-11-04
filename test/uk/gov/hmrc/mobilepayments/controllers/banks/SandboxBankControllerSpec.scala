@@ -58,7 +58,7 @@ class SandboxBankControllerSpec
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[BanksResponse]
-      response.data.size shouldBe 68
+      response.data.size shouldBe 19
     }
   }
 
