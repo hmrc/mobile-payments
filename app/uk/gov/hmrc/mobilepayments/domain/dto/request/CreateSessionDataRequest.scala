@@ -17,13 +17,21 @@
 package uk.gov.hmrc.mobilepayments.domain.dto.request
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.CreateSessionDataRequest.originSa
+import uk.gov.hmrc.mobilepayments.domain.dto.request.OriginSpecificData.originSa
 
 final case class CreateSessionDataRequest(
-  amount: Long,
-  origin: String = originSa)
+  amount:             Long,
+  originSpecificData: OriginSpecificData)
 
 object CreateSessionDataRequest {
   implicit val format: Format[CreateSessionDataRequest] = Json.format[CreateSessionDataRequest]
+}
+
+final case class OriginSpecificData(
+  saUtr:  String,
+  origin: String = originSa)
+
+object OriginSpecificData {
+  implicit val format: Format[OriginSpecificData] = Json.format[OriginSpecificData]
   private val originSa = "PtaSa"
 }

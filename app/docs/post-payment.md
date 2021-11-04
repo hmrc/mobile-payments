@@ -31,7 +31,8 @@ Returns the InitiatePaymentResponse object.
 ```json
 {
   "amount": 1234, 
-  "bankId": "asd-123"
+  "bankId": "asd-123",
+  "saUtr": "CS700100a"
 }
 ```
 
