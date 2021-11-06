@@ -16,13 +16,16 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
+import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
+import play.api.mvc._
+import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentStatusResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -43,7 +46,8 @@ class SandboxPaymentController @Inject() (
     with ControllerChecks
     with AccessControl
     with ErrorHandling
-    with JsonHandler {
+    with JsonHandler
+    with FileResource {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
 
@@ -68,7 +72,7 @@ class SandboxPaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            Future.successful(Ok(Json.toJson(samplePaymentStatusJson)))
+            Future successful Ok(readData(resource= "sandbox-payment-status-response.json"))
           }
         }
       }
@@ -81,12 +85,15 @@ class SandboxPaymentController @Inject() (
     Json.parse(raw)
   }
 
-  private def samplePaymentStatusJson: JsValue = {
-    val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-payment-status-response.json")
-    val raw    = source.getLines.mkString
-    source.close()
-    Json.parse(raw)
-  }
+  private def readData(resource: String): JsValue =
+    toJson(
+      Json
+        .parse(
+          findResource(path = s"/resources/mobilepayments/$resource")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+        )
+        .as[PaymentStatusResponse]
+    )
 
   override val app: String = "Sandbox Payment Controller"
 }
