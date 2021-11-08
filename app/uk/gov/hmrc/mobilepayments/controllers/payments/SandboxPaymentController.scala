@@ -25,7 +25,7 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentStatusResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -57,7 +57,7 @@ class SandboxPaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[CreatePaymentRequest] { _ =>
-              Future.successful(Ok(Json.toJson(sampleCreatePaymentJson)))
+              Future successful Ok(sampleCreatePaymentJson(resource= "sandbox-create-payment-response.json"))
             }
           }
         }
@@ -72,20 +72,24 @@ class SandboxPaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            Future successful Ok(readData(resource= "sandbox-payment-status-response.json"))
+            Future successful Ok(samplePaymentStatusJson(resource= "sandbox-payment-status-response.json"))
           }
         }
       }
     }
 
-  private def sampleCreatePaymentJson: JsValue = {
-    val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-create-payment-response.json")
-    val raw    = source.getLines.mkString
-    source.close()
-    Json.parse(raw)
+  private def sampleCreatePaymentJson(resource: String): JsValue = {
+    toJson(
+      Json
+        .parse(
+          findResource(path = s"/resources/mobilepayments/$resource")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+        )
+        .as[PaymentSessionResponse]
+    )
   }
 
-  private def readData(resource: String): JsValue =
+  private def samplePaymentStatusJson(resource: String): JsValue =
     toJson(
       Json
         .parse(
