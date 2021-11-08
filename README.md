@@ -16,9 +16,9 @@ API
 
 | *Task* | *Supported Methods* | *Description* |
 |--------|----|----|
-| ```/banks``` | GET | Fetch the list of supported banks. [More...](docs/get-banks.md)|
-| ```/payments/:sessionDataId``` | GET | Fetch the payment status associated with a session. [More...](docs/get-payment.md)|
-| ```/payments``` | POST | Create a payment with a selected bank. [More...](docs/post-payment.md)|
+| ```/banks``` | GET | Fetch the list of supported banks. [More...](app/docs/get-banks.md)|
+| ```/payments/:sessionDataId``` | GET | Fetch the payment status associated with a session. [More...](app/docs/get-payment.md)|
+| ```/payments``` | POST | Create a payment with a selected bank. [More...](app/docs/post-payment.md)|
 Shuttered
 ---------
 Shuttering of this service is handled by [mobile-shuttering](https://github.com/hmrc/mobile-shuttering)
