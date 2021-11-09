@@ -16,11 +16,15 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.banks
 
+import play.api.Logger
+import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
+import play.api.mvc._
+import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -39,7 +43,8 @@ class SandboxBankController @Inject()(
   extends BackendController(cc)
     with BankController
     with ControllerChecks
-    with AccessControl {
+    with AccessControl
+    with FileResource {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
 
@@ -47,15 +52,18 @@ class SandboxBankController @Inject()(
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future.successful(Ok(Json.toJson(sampleJson)))
+          Future successful Ok(readData(resource="sandbox-banks-response.json"))
         }
       }
     }
 
-  private def sampleJson: JsValue = {
-    val source = Source.fromFile("app/uk/gov/hmrc/mobilepayments/resources/sandbox-banks-response.json")
-    val raw = source.getLines.mkString
-    source.close()
-    Json.parse(raw)
-  }
+  private def readData(resource: String): JsValue =
+    toJson(
+      Json
+        .parse(
+          findResource(s"/resources/mobilepayments/$resource")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+        )
+        .as[BanksResponse]
+    )
 }
