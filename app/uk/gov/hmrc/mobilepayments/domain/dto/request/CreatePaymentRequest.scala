@@ -17,10 +17,12 @@
 package uk.gov.hmrc.mobilepayments.domain.dto.request
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.domain.SaUtr
 
 final case class CreatePaymentRequest(
   amount: Long,
-  bankId: String)
+  bankId: String,
+  saUtr: SaUtr)
 
 object CreatePaymentRequest {
   implicit val format: Format[CreatePaymentRequest] = Json.format[CreatePaymentRequest]

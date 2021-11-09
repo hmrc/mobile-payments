@@ -18,9 +18,11 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, SelectBankRequest}
+import uk.gov.hmrc.mobilepayments.domain.Bank
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, OriginSpecificData, SelectBankRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -33,22 +35,24 @@ class OpenBankingConnector @Inject() (
   @Named("open-banking") serviceUrl: String
 )(implicit ex:                       ExecutionContext) {
 
-  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[BanksResponse] = {
+  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[Seq[Bank]] = {
     val journey = journeyId.value
-    http.GET[BanksResponse](
-      url = s"$serviceUrl/banks?journeyId=$journey"
+    http.GET[Seq[Bank]](
+      url = s"$serviceUrl/open-banking/banks?journeyId=$journey"
     )
   }
 
   def createSession(
     amount:                 Long,
+    saUtr:                  SaUtr,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
   ): Future[SessionDataResponse] = {
     val journey = journeyId.value
     http.POST[CreateSessionDataRequest, SessionDataResponse](
-      url = s"$serviceUrl/session?journeyId=$journey",
-      CreateSessionDataRequest(amount)
+      url = s"$serviceUrl/open-banking/session?journeyId=$journey",
+      CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
+      Seq(("X-Session-ID", journey))
     )
   }
 
@@ -60,7 +64,7 @@ class OpenBankingConnector @Inject() (
   ): Future[HttpResponse] = {
     val journey = journeyId.value
     http.POST[SelectBankRequest, HttpResponse](
-      url = s"$serviceUrl/session/$sessionDataId/select-bank?journeyId=$journey",
+      url = s"$serviceUrl/open-banking/session/$sessionDataId/select-bank?journeyId=$journey",
       SelectBankRequest(bankId)
     )
   }
@@ -73,7 +77,7 @@ class OpenBankingConnector @Inject() (
   ): Future[InitiatePaymentResponse] = {
     val journey = journeyId.value
     http.POST[InitiatePaymentRequest, InitiatePaymentResponse](
-      url = s"$serviceUrl/session/$sessionDataId/initiate-payment?journeyId=$journey",
+      url = s"$serviceUrl/open-banking/session/$sessionDataId/initiate-payment?journeyId=$journey",
       InitiatePaymentRequest(returnUrl)
     )
   }
@@ -85,7 +89,7 @@ class OpenBankingConnector @Inject() (
   ): Future[OpenBankingPaymentStatusResponse] = {
     val journey = journeyId.value
     http.GET[OpenBankingPaymentStatusResponse](
-      url = s"$serviceUrl/session/$sessionDataId/payment-status?journeyId=$journey"
+      url = s"$serviceUrl/open-banking/session/$sessionDataId/payment-status?journeyId=$journey"
     )
   }
 }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers.await
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{NotFoundException, _}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
@@ -36,7 +37,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   "when getBanks call is successful it" should {
     "return banks" in {
       performSuccessfulGET(Future successful banksResponse)(mockHttp)
-      await(sut.getBanks(journeyId)).data.size shouldBe 4
+      await(sut.getBanks(journeyId)).size shouldBe 19
     }
   }
 
@@ -52,7 +53,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   "when createSession call is successful it" should {
     "return session data" in {
       performSuccessfulPOST(Future successful sessionDataResponse)(mockHttp)
-      val result = await(sut.createSession(123L, journeyId))
+      val result = await(sut.createSession(123L, SaUtr("CS700100A"), journeyId))
       result.sessionDataId shouldEqual sessionDataId
       result.nextUrl shouldEqual "https://api.foo.com"
     }
@@ -62,7 +63,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
     "return an error" in {
       performUnsuccessfulPOST(new NotFoundException("not found"))(mockHttp)
       intercept[NotFoundException] {
-        await(sut.createSession(123L, journeyId))
+        await(sut.createSession(123L, SaUtr("CS700100A"), journeyId))
       }
     }
   }

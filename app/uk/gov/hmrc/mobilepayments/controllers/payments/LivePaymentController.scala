@@ -62,6 +62,7 @@ class LivePaymentController @Inject() (
                 .initiatePayment(
                   createPaymentRequest.amount,
                   createPaymentRequest.bankId,
+                  createPaymentRequest.saUtr,
                   journeyId
                 )
                 .map { response =>

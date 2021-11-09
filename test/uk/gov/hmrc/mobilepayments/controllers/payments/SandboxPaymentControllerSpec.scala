@@ -56,7 +56,7 @@ class SandboxPaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 200
@@ -71,7 +71,7 @@ class SandboxPaymentControllerSpec
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123"))
+        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
 
       val result = sut.createPayment(journeyId)(request)
       status(result) shouldBe 401
