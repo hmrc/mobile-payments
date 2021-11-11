@@ -25,7 +25,7 @@ import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
+import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 
@@ -38,7 +38,8 @@ class LivePaymentController @Inject() (
   @Named("controllers.confidenceLevel") override val confLevel: Int,
   cc:                                                           ControllerComponents,
   openBankingService:                                           OpenBankingService,
-  shutteringService:                                            ShutteringService
+  shutteringService:                                            ShutteringService,
+  auditService:                                                 AuditService
 )(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
     with PaymentController
@@ -66,6 +67,11 @@ class LivePaymentController @Inject() (
                   journeyId
                 )
                 .map { response =>
+                  auditService.sendPaymentEvent(
+                    createPaymentRequest.amount,
+                    createPaymentRequest.saUtr,
+                    journeyId.toString()
+                  )
                   Ok(Json.toJson(response))
                 }
             }

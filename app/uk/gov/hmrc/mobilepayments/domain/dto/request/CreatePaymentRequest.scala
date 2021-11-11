@@ -22,7 +22,7 @@ import uk.gov.hmrc.domain.SaUtr
 final case class CreatePaymentRequest(
   amount: Long,
   bankId: String,
-  saUtr: SaUtr)
+  saUtr:  SaUtr)
 
 object CreatePaymentRequest {
   implicit val format: Format[CreatePaymentRequest] = Json.format[CreatePaymentRequest]

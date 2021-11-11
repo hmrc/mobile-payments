@@ -4,10 +4,10 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.ShutteringStub._
-import utils.BaseISpec
 import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
+import utils.BaseISpec
 
-class SandboxBankControllerISpec extends BaseISpec{
+class SandboxBankControllerISpec extends BaseISpec {
 
   val sandboxHeader = "X-MOBILE-USER-ID" -> "208606423740"
 
@@ -21,11 +21,11 @@ class SandboxBankControllerISpec extends BaseISpec{
       val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[BanksResponse]
-      parsedResponse.data.head.bankId shouldBe "obie-barclays-personal"
-      parsedResponse.data.head.name shouldBe "Barclays Personal"
+      parsedResponse.data.head.bankId       shouldBe "obie-barclays-personal"
+      parsedResponse.data.head.name         shouldBe "Barclays Personal"
       parsedResponse.data.head.friendlyName shouldBe "Barclays Personal"
-      parsedResponse.data.head.logoUrl shouldBe "https://logo.com"
-      parsedResponse.data.head.group shouldBe "Barclays"
+      parsedResponse.data.head.logoUrl      shouldBe "https://logo.com"
+      parsedResponse.data.head.group        shouldBe "Barclays"
     }
   }
 

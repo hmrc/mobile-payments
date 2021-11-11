@@ -26,13 +26,13 @@ Returns the InitiatePaymentResponse object.
   a long that represents how much the payment will be for.
 
   `bankId`
-   the identifier of the chosen bank.
+  the identifier of the chosen bank.
 
 ```json
 {
   "amount": 1234, 
   "bankId": "asd-123",
-  "saUtr": "CS700100a"
+  "saUtr": "CS700100A"
 }
 ```
 
@@ -47,11 +47,12 @@ Returns the InitiatePaymentResponse object.
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002"
 }
 ```
-  `paymentUrl`
-  a URL that the client app will navigate to in order to process the payment.
 
-  `sessionDataId`
-  the session identifier that needs to be persisted by the client throughout the payment journey. 
+`paymentUrl`
+a URL that the client app will navigate to in order to process the payment.
+
+`sessionDataId`
+the session identifier that needs to be persisted by the client throughout the payment journey.
 
 * **Error Responses:**
 
