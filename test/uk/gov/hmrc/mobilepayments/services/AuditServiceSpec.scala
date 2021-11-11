@@ -21,20 +21,18 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.mocks.AuditStub
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-import java.time.Instant
-import java.util.UUID
-
 class AuditServiceSpec extends BaseSpec with AuditStub {
 
   private implicit val mockConnector: AuditConnector = mock[AuditConnector]
-  private val amount:                 Long           = 1234L
+  private val amount:                 BigDecimal     = 154.63
+  private val amountInPence:          Long           = 15463L
   private val saUtr:                  SaUtr          = SaUtr("CS700100A")
 
   private val sut = new AuditService(mockConnector, "mobile-payments")
 
   "when event triggered and stubbed it" should {
     "receive audit event" in {
-      stubPaymentEvent(amount, saUtr, journeyId.toString())
+      stubPaymentEvent(amountInPence, saUtr, journeyId.toString())
       sut.sendPaymentEvent(amount, saUtr, journeyId.toString())
     }
   }

@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.request
+package uk.gov.hmrc.mobilepayments.domain
 
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.domain.SaUtr
+import uk.gov.hmrc.mobilepayments.common.BaseSpec
 
-final case class CreatePaymentRequest(
-  amount: BigDecimal,
-  bankId: String,
-  saUtr:  SaUtr)
+class AmountInPenceSpec extends BaseSpec {
 
-object CreatePaymentRequest {
-  implicit val format: Format[CreatePaymentRequest] = Json.format[CreatePaymentRequest]
+  "when object created with amount in pounds" should {
+    "produce an amount in pence value" in {
+
+      val sut1 = AmountInPence(120)
+      sut1.value shouldBe 12000
+
+      val sut2 = AmountInPence(0)
+      sut2.value shouldBe 0
+
+      val sut3 = AmountInPence(548.65)
+      sut3.value shouldBe 54865
+    }
+  }
 }

@@ -21,10 +21,10 @@ import com.google.inject.name.Named
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.domain.Bank
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, OriginSpecificData, SelectBankRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
 
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +43,7 @@ class OpenBankingConnector @Inject() (
   }
 
   def createSession(
-    amount:                 Long,
+    amount:                 AmountInPence,
     saUtr:                  SaUtr,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier

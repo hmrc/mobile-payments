@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.request
+package uk.gov.hmrc.mobilepayments.domain
 
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.domain.SaUtr
+import play.api.libs.json.{JsNumber, Json, Reads, Writes}
 
-final case class CreatePaymentRequest(
-  amount: BigDecimal,
-  bankId: String,
-  saUtr:  SaUtr)
+final case class AmountInPence(amountInPounds: BigDecimal) {
+  def value: Long = (amountInPounds * 100).longValue()
+}
 
-object CreatePaymentRequest {
-  implicit val format: Format[CreatePaymentRequest] = Json.format[CreatePaymentRequest]
+object AmountInPence {
+  implicit val writes: Writes[AmountInPence] = Writes(t => JsNumber(BigDecimal(t.value)))
+  implicit val reads:  Reads[AmountInPence]  = Json.format[AmountInPence]
 }
