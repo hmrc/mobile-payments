@@ -23,14 +23,14 @@ Returns the InitiatePaymentResponse object.
   **Required:**
 
   `amount`
-  a long that represents how much the payment will be for.
+  a decimal that represents how much the payment will be for in pounds & pence. e.g. **£1,145.55** would be `1145.55`
 
   `bankId`
   the identifier of the chosen bank.
 
 ```json
 {
-  "amount": 1234, 
+  "amount": 1145.55, 
   "bankId": "asd-123",
   "saUtr": "CS700100A"
 }

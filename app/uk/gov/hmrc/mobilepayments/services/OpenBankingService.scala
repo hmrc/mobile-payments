@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
+import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -38,7 +39,7 @@ class OpenBankingService @Inject() (
   ): Future[BanksResponse] = connector.getBanks(journeyId).map(banks => BanksResponse(banks))
 
   def initiatePayment(
-    amount:                 Long,
+    amount:                 BigDecimal,
     bankId:                 String,
     saUtr:                  SaUtr,
     journeyId:              JourneyId
@@ -46,7 +47,7 @@ class OpenBankingService @Inject() (
     executionContext:       ExecutionContext
   ): Future[PaymentSessionResponse] = {
     val initiatedPayment = for {
-      sessionData <- connector.createSession(amount, saUtr, journeyId)
+      sessionData <- connector.createSession(AmountInPence(amount), saUtr, journeyId)
       _           <- connector.selectBank(sessionData.sessionDataId, bankId, journeyId)
       response    <- connector.initiatePayment(sessionData.sessionDataId, openBankingPaymentReturnUrl, journeyId)
     } yield (sessionData, response)

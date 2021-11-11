@@ -22,9 +22,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.Bank
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, OpenBankingPaymentStatusResponse, SessionDataResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -32,7 +32,8 @@ import scala.concurrent.{Await, Future}
 class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
-  private val amount:        Long                 = 1234L
+  private val amount:        BigDecimal           = 102.85
+  private val amountInPence: AmountInPence        = AmountInPence(amount)
   private val saUtr:         SaUtr                = SaUtr("CS700100A")
   private val bankId:        String               = "asd-123"
   private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
@@ -131,8 +132,8 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private def mockSession(future: Future[SessionDataResponse]): Unit =
     (mockConnector
-      .createSession(_: Long, _: SaUtr, _: JourneyId)(_: HeaderCarrier))
-      .expects(amount, saUtr, journeyId, hc)
+      .createSession(_: AmountInPence, _: SaUtr, _: JourneyId)(_: HeaderCarrier))
+      .expects(amountInPence, saUtr, journeyId, hc)
       .returning(future)
 
   private def mockSelectBank(future: Future[HttpResponse]): Unit =

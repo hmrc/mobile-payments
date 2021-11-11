@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.Json.obj
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.play.audit.AuditExtensions.auditHeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -33,7 +34,7 @@ class AuditService @Inject() (
   @Named("appName") val appName: String) {
 
   def sendPaymentEvent(
-    amount:           Long,
+    amount:           BigDecimal,
     saUtr:            SaUtr,
     journeyId:        String
   )(implicit hc:      HeaderCarrier,
@@ -47,7 +48,7 @@ class AuditService @Inject() (
         detail = obj(
           AuditService.journeyIdKey -> journeyId,
           AuditService.utrKey       -> saUtr.utr,
-          AuditService.amountKey    -> amount
+          AuditService.amountKey    -> AmountInPence(amount).value
         )
       )
     )

@@ -17,10 +17,11 @@
 package uk.gov.hmrc.mobilepayments.domain.dto.request
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.domain.dto.request.OriginSpecificData.originSa
 
 final case class CreateSessionDataRequest(
-  amount:             Long,
+  amount:             AmountInPence,
   originSpecificData: OriginSpecificData)
 
 object CreateSessionDataRequest {
