@@ -4,7 +4,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.ShutteringStub._
-import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.Bank
 import utils.BaseISpec
 
 class SandboxBankControllerISpec extends BaseISpec {
@@ -20,12 +20,12 @@ class SandboxBankControllerISpec extends BaseISpec {
       ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
       val response = await(request.get())
       response.status shouldBe 200
-      val parsedResponse = Json.parse(response.body).as[BanksResponse]
-      parsedResponse.data.head.bankId       shouldBe "obie-barclays-personal"
-      parsedResponse.data.head.name         shouldBe "Barclays Personal"
-      parsedResponse.data.head.friendlyName shouldBe "Barclays Personal"
-      parsedResponse.data.head.logoUrl      shouldBe "https://logo.com"
-      parsedResponse.data.head.group        shouldBe "Barclays"
+      val parsedResponse = Json.parse(response.body).as[Seq[Bank]]
+      parsedResponse.head.bankId       shouldBe "obie-barclays-personal"
+      parsedResponse.head.name         shouldBe "Barclays Personal"
+      parsedResponse.head.friendlyName shouldBe "Barclays Personal"
+      parsedResponse.head.logoUrl      shouldBe "https://logo.com"
+      parsedResponse.head.group        shouldBe "Barclays"
     }
   }
 

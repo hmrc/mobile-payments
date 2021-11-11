@@ -46,7 +46,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockBanks(Future successful banksResponse)
 
       val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.data.size shouldBe 19
+      result.size shouldBe 19
     }
   }
 

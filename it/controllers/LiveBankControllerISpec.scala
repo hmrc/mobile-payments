@@ -6,7 +6,7 @@ import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.Bank
 import utils.BaseISpec
 
 class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
@@ -22,8 +22,8 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
       ).addHttpHeaders(acceptJsonHeader)
       val response = await(request.get())
       response.status shouldBe 200
-      val parsedResponse = Json.parse(response.body).as[BanksResponse]
-      parsedResponse.data.size shouldBe 19
+      val parsedResponse = Json.parse(response.body).as[Seq[Bank]]
+      parsedResponse.size shouldBe 19
     }
 
     "return 500 when response from open-banking is malformed" in {

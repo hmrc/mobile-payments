@@ -23,9 +23,8 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
-import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.{Bank, Shuttering}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -53,15 +52,15 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockGetBanks(Future.successful(BanksResponse(banksResponse)))
+      mockGetBanks(Future successful banksResponse)
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
-      val response = contentAsJson(result).as[BanksResponse]
-      response.data.size shouldBe 19
+      val response = contentAsJson(result).as[Seq[Bank]]
+      response.size shouldBe 19
     }
   }
 
@@ -119,7 +118,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     }
   }
 
-  private def mockGetBanks(f: Future[BanksResponse]) =
+  private def mockGetBanks(f: Future[Seq[Bank]]) =
     (mockOpenBankingService
       .getBanks(_: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
       .expects(*, *, *)

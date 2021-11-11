@@ -20,9 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.AmountInPence
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentSessionResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ class OpenBankingService @Inject() (
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
-  ): Future[BanksResponse] = connector.getBanks(journeyId).map(banks => BanksResponse(banks))
+  ): Future[Seq[Bank]] = connector.getBanks(journeyId)
 
   def initiatePayment(
     amount:                 BigDecimal,

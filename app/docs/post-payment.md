@@ -30,7 +30,7 @@ Returns the InitiatePaymentResponse object.
 
 ```json
 {
-  "amount": 1145.55, 
+  "amount": 1145.55,
   "bankId": "asd-123",
   "saUtr": "CS700100A"
 }

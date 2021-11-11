@@ -22,8 +22,7 @@ import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
-import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
+import uk.gov.hmrc.mobilepayments.domain.{Bank, Shuttering}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -57,8 +56,8 @@ class SandboxBankControllerSpec
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
-      val response = contentAsJson(result).as[BanksResponse]
-      response.data.size shouldBe 19
+      val response = contentAsJson(result).as[Seq[Bank]]
+      response.size shouldBe 19
     }
   }
 
