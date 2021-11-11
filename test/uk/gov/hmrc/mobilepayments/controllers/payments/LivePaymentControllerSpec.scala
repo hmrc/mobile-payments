@@ -29,8 +29,8 @@ import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
-import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,15 +45,16 @@ class LivePaymentControllerSpec
   private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
-  implicit val mockAuditConnector:    AuditConnector    = mock[AuditConnector]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
+  implicit val mockAuditService:      AuditService      = mock[AuditService]
 
   private val sut = new LivePaymentController(
     mockAuthConnector,
     ConfidenceLevel.L200.level,
     Helpers.stubControllerComponents(),
     mockOpenBankingService,
-    mockShutteringService
+    mockShutteringService,
+    mockAuditService
   )
 
   "when create payment invoked and service returns success then" should {
@@ -61,6 +62,7 @@ class LivePaymentControllerSpec
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
       mockInitiatePayment(Future successful paymentSessionResponse)
+      stubPaymentEvent()
 
       val request = FakeRequest("POST", "/payments")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -214,4 +216,10 @@ class LivePaymentControllerSpec
       .getPaymentStatus(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returning(f)
+
+  private def stubPaymentEvent() =
+    (mockAuditService
+      .sendPaymentEvent(_: Long, _: SaUtr, _: String)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
+      .returning(Future successful Success)
 }

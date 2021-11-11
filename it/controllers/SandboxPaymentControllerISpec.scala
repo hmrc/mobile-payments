@@ -2,12 +2,11 @@ package controllers
 
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
-import utils.BaseISpec
 import stubs.AuthStub.{authorisationRejected, grantAccess}
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentSessionResponse
+import utils.BaseISpec
 
 class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
@@ -23,7 +22,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       val response = await(request.post(Json.parse(createPaymentRequestJson)))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[PaymentSessionResponse]
-      parsedResponse.paymentUrl shouldBe "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+      parsedResponse.paymentUrl    shouldBe "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
       parsedResponse.sessionDataId shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
     }
   }

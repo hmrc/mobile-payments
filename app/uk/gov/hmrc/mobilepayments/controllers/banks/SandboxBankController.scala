@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.banks
 
-import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
@@ -24,23 +23,22 @@ import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.io.Source
 
 @Singleton()
-class SandboxBankController @Inject()(
-                                       override val authConnector: AuthConnector,
-                                       @Named("controllers.confidenceLevel") override val confLevel: Int,
-                                       cc: ControllerComponents,
-                                       shutteringService: ShutteringService
-                                     )(implicit val executionContext: ExecutionContext)
-  extends BackendController(cc)
+class SandboxBankController @Inject() (
+  override val authConnector:                                   AuthConnector,
+  @Named("controllers.confidenceLevel") override val confLevel: Int,
+  cc:                                                           ControllerComponents,
+  shutteringService:                                            ShutteringService
+)(implicit val executionContext:                                ExecutionContext)
+    extends BackendController(cc)
     with BankController
     with ControllerChecks
     with AccessControl
@@ -52,7 +50,7 @@ class SandboxBankController @Inject()(
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future successful Ok(readData(resource="sandbox-banks-response.json"))
+          Future successful Ok(readData(resource = "sandbox-banks-response.json"))
         }
       }
     }

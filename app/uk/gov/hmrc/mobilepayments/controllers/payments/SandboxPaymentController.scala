@@ -25,14 +25,13 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentSessionResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.io.Source
 
 @Singleton()
 class SandboxPaymentController @Inject() (
@@ -57,7 +56,7 @@ class SandboxPaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[CreatePaymentRequest] { _ =>
-              Future successful Ok(sampleCreatePaymentJson(resource= "sandbox-create-payment-response.json"))
+              Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
             }
           }
         }
@@ -72,13 +71,13 @@ class SandboxPaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            Future successful Ok(samplePaymentStatusJson(resource= "sandbox-payment-status-response.json"))
+            Future successful Ok(samplePaymentStatusJson(resource = "sandbox-payment-status-response.json"))
           }
         }
       }
     }
 
-  private def sampleCreatePaymentJson(resource: String): JsValue = {
+  private def sampleCreatePaymentJson(resource: String): JsValue =
     toJson(
       Json
         .parse(
@@ -87,7 +86,6 @@ class SandboxPaymentController @Inject() (
         )
         .as[PaymentSessionResponse]
     )
-  }
 
   private def samplePaymentStatusJson(resource: String): JsValue =
     toJson(
