@@ -27,34 +27,195 @@ Returns the BanksResponse object.
 {
   "data": [
     {
-      "bank_id": "obie-mettle-production",
-      "name": "Mettle",
-      "friendly_name": "Mettle",
-      "is_sandbox": false,
-      "logo": "https://public.ecospend.com/images/banks/Mettle.svg",
-      "icon": "https://public.ecospend.com/images/banks/Mettle_icon.svg",
-      "standard": "obie",
-      "country_iso_code": "GB",
-      "group": "Mettle",
-      "order": 100000,
-      "service_status": true,
-      "refund_supported": true,
-      "abilities": {
-        "domestic_payment": true,
-        "domestic_scheduled_payment": true,
-        "domestic_standing_order": false,
-        "domestic_standing_order_installment": false,
-        "international_payment": false,
-        "international_scheduled_payment": false,
-        "international_standing_order": false
-      }
+      "bankGroupName": "Barclays",
+      "bankGroupNameFormatted": "Barclays",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-barclays-business",
+          "name": "Barclays Personal",
+          "friendlyName": "Barclays Personal",
+          "logoUrl": "https://logo.com",
+          "group": "Barclays"
+        },
+        {
+          "bankId": "obie-barclays-business",
+          "name": "Barclays Business",
+          "friendlyName": "Barclays Business",
+          "logoUrl": "https://logo.com",
+          "group": "Barclays"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "Lloyds",
+      "bankGroupNameFormatted": "Lloyds",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-lloyds-personal",
+          "name": "Lloyds Personal",
+          "friendlyName": "Lloyds Personal",
+          "logoUrl": "https://logo.com",
+          "group": "Lloyds"
+        },
+        {
+          "bankId": "obie-lloyds-business",
+          "name": "Lloyds Business",
+          "friendlyName": "Lloyds Business",
+          "logoUrl": "https://logo.com",
+          "group": "Lloyds"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "Monzo",
+      "bankGroupNameFormatted": "Monzo",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-monzo-personal",
+          "name": "Monzo Personal",
+          "friendlyName": "Monzo Persnal",
+          "logoUrl": "https://logo.com",
+          "group": "Monzo"
+        },
+        {
+          "bankId": "obie-monzo-business",
+          "name": "Monzo Business",
+          "friendlyName": "Monzo Business",
+          "logoUrl": "https://logo.com",
+          "group": "Monzo"
+        },
+        {
+          "bankId": "obie-monzo-special",
+          "name": "Monzo Special",
+          "friendlyName": "Monzo Special",
+          "logoUrl": "https://logo.com",
+          "group": "Monzo"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "Natwest",
+      "bankGroupNameFormatted": "Natwest",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-natwest-personal",
+          "name": "Natwest Personal",
+          "friendlyName": "Natwest Personal",
+          "logoUrl": "https://logo.com",
+          "group": "Natwest"
+        },
+        {
+          "bankId": "obie-natwest-business",
+          "name": "Natwest Business",
+          "friendlyName": "Natwest Business",
+          "logoUrl": "https://logo.com",
+          "group": "Natwest"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "HSBC",
+      "bankGroupNameFormatted": "HSBC",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-hsbc-personal",
+          "name": "HSBC Personal",
+          "friendlyName": "HSBC Personal",
+          "logoUrl": "https://logo.com",
+          "group": "HSBC"
+        },
+        {
+          "bankId": "obie-hsbc-business",
+          "name": "HSBC Business",
+          "friendlyName": "HSBC Business",
+          "logoUrl": "https://logo.com",
+          "group": "HSBC"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "Santander",
+      "bankGroupNameFormatted": "Santander",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-santander-personal",
+          "name": "Santander Personal",
+          "friendlyName": "Santander Personal",
+          "logoUrl": "https://logo.com",
+          "group": "Santander"
+        },
+        {
+          "bankId": "obie-santander-business",
+          "name": "Santander Business",
+          "friendlyName": "Santander Business",
+          "logoUrl": "https://logo.com",
+          "group": "Santander"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "Chase Bank",
+      "bankGroupNameFormatted": "Chase Bank",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-chase",
+          "name": "Chase",
+          "friendlyName": "Chase",
+          "logoUrl": "https://logo.com",
+          "group": "Chase Bank"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "RBS",
+      "bankGroupNameFormatted": "RBS",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-rbs-personal",
+          "name": "RBS Personal",
+          "friendlyName": "RBS Personal",
+          "logoUrl": "https://logo.com",
+          "group": "RBS"
+        },
+        {
+          "bankId": "obie-rbs-business",
+          "name": "RBS Business",
+          "friendlyName": "RBS Business",
+          "logoUrl": "https://logo.com",
+          "group": "RBS"
+        },
+        {
+          "bankId": "obie-rbs-bankline",
+          "name": "RBS Bankline",
+          "friendlyName": "RBS Bankline",
+          "logoUrl": "https://logo.com",
+          "group": "RBS"
+        }
+      ]
+    },
+    {
+      "bankGroupName": "M&S Bank",
+      "bankGroupNameFormatted": "M&S Bank",
+      "logoUrl": "https://logo.com",
+      "banksInGroup": [
+        {
+          "bankId": "obie-m&s",
+          "name": "M&S Bank",
+          "friendlyName": "M&S Bank",
+          "logoUrl": "https://logo.com",
+          "group": "M&S Bank"
+        }
+      ]
     }
-  ],
-  "meta": {
-    "total_count": 68,
-    "total_pages": 1,
-    "current_page": 1
-  }
+  ]
 }
 ```
 

@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.AmountInPence
+import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank, BankGroupData}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentSessionResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -36,7 +36,13 @@ class OpenBankingService @Inject() (
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
-  ): Future[BanksResponse] = connector.getBanks(journeyId).map(banks => BanksResponse(banks))
+  ): Future[BanksResponse] =
+    for {
+      rawBanks     <- connector.getBanks(journeyId)
+      groupedBanks <- groupBanks(rawBanks)
+    } yield {
+      BanksResponse(groupedBanks)
+    }
 
   def initiatePayment(
     amount:                 BigDecimal,
@@ -68,4 +74,13 @@ class OpenBankingService @Inject() (
       .map { t =>
         PaymentStatusResponse(t.ecospendPaymentStatus)
       }
+
+  private def groupBanks(banks: List[Bank])(implicit hc: HeaderCarrier): Future[List[BankGroupData]] =
+    Future successful banks
+      .groupBy(_.group)
+      .values
+      .toList
+      .map(BankGroupData.buildBankGroupData)
+      .sortWith((bankGroupData, nextBankGroupData) => bankGroupData.bankGroupName < nextBankGroupData.bankGroupName)
+
 }
