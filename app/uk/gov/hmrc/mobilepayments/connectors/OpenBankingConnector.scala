@@ -35,9 +35,9 @@ class OpenBankingConnector @Inject() (
   @Named("open-banking") serviceUrl: String
 )(implicit ex:                       ExecutionContext) {
 
-  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[Seq[Bank]] = {
+  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[List[Bank]] = {
     val journey = journeyId.value
-    http.GET[Seq[Bank]](
+    http.GET[List[Bank]](
       url = s"$serviceUrl/open-banking/banks?journeyId=$journey"
     )
   }

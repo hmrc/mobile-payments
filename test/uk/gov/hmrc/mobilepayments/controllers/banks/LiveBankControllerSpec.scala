@@ -53,7 +53,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockGetBanks(Future.successful(BanksResponse(banksResponse)))
+      mockGetBanks(Future.successful(BanksResponse(banksResponseGrouped)))
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
@@ -61,7 +61,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[BanksResponse]
-      response.data.size shouldBe 19
+      response.data.size shouldBe 9
     }
   }
 

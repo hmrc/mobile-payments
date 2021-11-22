@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
+import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
@@ -46,7 +47,8 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockBanks(Future successful banksResponse)
 
       val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      result.data.size shouldBe 19
+      println(Json.prettyPrint(Json.toJson(result.data)))
+      result.data.size shouldBe 10
     }
   }
 
@@ -124,7 +126,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
-  private def mockBanks(future: Future[Seq[Bank]]): Unit =
+  private def mockBanks(future: Future[List[Bank]]): Unit =
     (mockConnector
       .getBanks(_: JourneyId)(_: HeaderCarrier))
       .expects(journeyId, hc)

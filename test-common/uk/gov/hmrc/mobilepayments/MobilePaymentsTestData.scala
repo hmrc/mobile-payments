@@ -18,13 +18,16 @@ package uk.gov.hmrc.mobilepayments
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
-import uk.gov.hmrc.mobilepayments.domain.{Bank, Shuttering}
+import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Shuttering}
 
 import scala.io.Source
 
 trait MobilePaymentsTestData {
 
-  lazy val banksResponse: Seq[Bank] = Json.fromJson[Seq[Bank]](js("banks-response")).get
+  lazy val banksResponse: List[Bank] = Json.fromJson[List[Bank]](js("banks-response")).get
+
+  lazy val banksResponseGrouped: List[BankGroupData] =
+    Json.fromJson[List[BankGroupData]](js("banks-response-grouped")).get
 
   lazy val paymentStatusOpenBankingResponse: OpenBankingPaymentStatusResponse =
     Json.fromJson[OpenBankingPaymentStatusResponse](js("payment-status-ob-response")).get
