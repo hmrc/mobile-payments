@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class OpenBankingService @Inject() (
   connector:                                                         OpenBankingConnector,
-  @Named("open-banking-payment-return-url") openBankingPaymentReturnUrl: String) {
+  @Named("openBankingPaymentReturnUrl") openBankingPaymentReturnUrl: String) {
 
   def getBanks(
     journeyId:                 JourneyId
