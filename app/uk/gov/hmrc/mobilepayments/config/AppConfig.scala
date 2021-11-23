@@ -25,5 +25,4 @@ class AppConfig @Inject() (config: Configuration) {
 
   val auditingEnabled:             Boolean = config.get[Boolean]("auditing.enabled")
   val graphiteHost:                String  = config.get[String]("microservice.metrics.graphite.host")
-  val openBankingPaymentReturnUrl: String  = config.get[String]("openBankingPaymentReturnUrl")
 }

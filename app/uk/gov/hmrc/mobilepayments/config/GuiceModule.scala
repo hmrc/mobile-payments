@@ -41,7 +41,7 @@ class GuiceModule(
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
     bind(classOf[CorePost]).to(classOf[WSHttpImpl])
     bindConfigInt("controllers.confidenceLevel")
-    bindConfigString("openBankingPaymentReturnUrl", "openBankingPaymentReturnUrl")
+    bindConfigString("open-banking-payment-return-url", "open-banking-payment-return-url")
     bind(classOf[ApiAccess]).toInstance(
       ApiAccess(
         "PRIVATE",
