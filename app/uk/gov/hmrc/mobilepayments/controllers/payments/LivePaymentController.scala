@@ -19,11 +19,12 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreatePaymentRequest, CreateSessionRequest, UpdatePaymentRequest}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -52,28 +53,44 @@ class LivePaymentController @Inject() (
 
   override val app: String = "Payment-Controller"
 
-  def createPayment(journeyId: JourneyId): Action[JsValue] =
+  def createPayment(sessionDataId: String, journeyId: JourneyId): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            openBankingService
+              .initiatePayment(
+                sessionDataId,
+                journeyId
+              ).map( response => Ok(Json.toJson(response)))
+//              .map { response =>
+//                // TODO: need to fetch the session
+//                auditService.sendPaymentEvent(
+//                  BigDecimal.decimal(1),//createPaymentRequest.amount,
+//                  SaUtr(""),//createPaymentRequest.saUtr,
+//                  journeyId.toString()
+//                )
+//                Created
+//              }
+          }
+        }
+      }
+    }
+
+  def updatePayment(sessionDataId: String, journeyId: JourneyId): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            withValidJson[CreatePaymentRequest] { createPaymentRequest =>
+            withValidJson[UpdatePaymentRequest] { updatePaymentRequest =>
               openBankingService
-                .initiatePayment(
-                  createPaymentRequest.amount,
-                  createPaymentRequest.bankId,
-                  createPaymentRequest.saUtr,
+                .updatePayment(
+                  sessionDataId,
+                  updatePaymentRequest.paymentUrl,
                   journeyId
-                )
-                .map { response =>
-                  auditService.sendPaymentEvent(
-                    createPaymentRequest.amount,
-                    createPaymentRequest.saUtr,
-                    journeyId.toString()
-                  )
-                  Ok(Json.toJson(response))
-                }
+                ).map(response => Ok(Json.toJson(response)))
             }
           }
         }

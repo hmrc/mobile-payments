@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.banks
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
-import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
+import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.SelectBankRequest
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -43,7 +44,8 @@ class LiveBankController @Inject() (
     with BankController
     with AccessControl
     with ControllerChecks
-    with ErrorHandling {
+    with ErrorHandling
+    with JsonHandler {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
   override val app:    String                 = "Bank-Controller"
@@ -59,6 +61,29 @@ class LiveBankController @Inject() (
               .map { response =>
                 Ok(Json.toJson(response))
               }
+          }
+        }
+      }
+    }
+
+  override def selectBank(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            withValidJson[SelectBankRequest] { selectBankRequest =>
+              openBankingService
+                .selectBank(
+                  sessionDataId,
+                  selectBankRequest.bankId,
+                  journeyId
+                )
+                .map(_ => Created)
+            }
           }
         }
       }

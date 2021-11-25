@@ -24,8 +24,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.CreatePaymentRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentSessionResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -50,18 +49,20 @@ class SandboxPaymentController @Inject() (
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
 
-  override def createPayment(journeyId: JourneyId): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+  override def createPayment(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          withErrorWrapper {
-            withValidJson[CreatePaymentRequest] { _ =>
-              Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
-            }
-          }
+          Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
         }
       }
     }
+
+
+  override def updatePayment(sessionDataId: String, journeyId: JourneyId): Action[JsValue] = ???
 
   def getPaymentStatus(
     sessionDataId: String,
@@ -84,7 +85,7 @@ class SandboxPaymentController @Inject() (
           findResource(path = s"/resources/mobilepayments/$resource")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
-        .as[PaymentSessionResponse]
+        .as[InitiatePaymentResponse]
     )
 
   private def samplePaymentStatusJson(resource: String): JsValue =

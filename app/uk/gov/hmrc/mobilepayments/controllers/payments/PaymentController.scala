@@ -21,7 +21,16 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 trait PaymentController {
-  def createPayment(journeyId: JourneyId): Action[JsValue]
+
+  def createPayment(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent]
+
+  def updatePayment(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue]
 
   def getPaymentStatus(
     sessionDataId: String,

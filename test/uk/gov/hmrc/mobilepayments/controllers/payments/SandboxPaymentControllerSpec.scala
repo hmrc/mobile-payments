@@ -54,11 +54,10 @@ class SandboxPaymentControllerSpec
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
-      val request = FakeRequest("POST", "/payments")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
+      val request = FakeRequest("POST", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
 
-      val result = sut.createPayment(journeyId)(request)
+      val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[InitiatePaymentResponse]
       response.paymentUrl shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
@@ -69,11 +68,10 @@ class SandboxPaymentControllerSpec
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
-      val request = FakeRequest("POST", "/payments")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
+      val request = FakeRequest("POST", s"/payments/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
 
-      val result = sut.createPayment(journeyId)(request)
+      val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }

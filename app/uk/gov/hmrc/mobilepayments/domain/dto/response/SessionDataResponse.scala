@@ -18,9 +18,7 @@ package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
 
-final case class SessionDataResponse(
-  sessionDataId: String,
-  nextUrl:       String)
+final case class SessionDataResponse(sessionDataId: String)
 
 object SessionDataResponse {
   implicit def format: Format[SessionDataResponse] = Json.format[SessionDataResponse]

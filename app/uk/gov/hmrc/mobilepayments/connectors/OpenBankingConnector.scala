@@ -56,6 +56,17 @@ class OpenBankingConnector @Inject() (
     )
   }
 
+  def getSession(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[SessionDataResponse] = {
+    val journey = journeyId.value
+    http.GET[SessionDataResponse](
+      url = s"$serviceUrl/open-banking/session/$sessionDataId?journeyId=$journey"
+    )
+  }
+
   def selectBank(
     sessionDataId:          String,
     bankId:                 String,

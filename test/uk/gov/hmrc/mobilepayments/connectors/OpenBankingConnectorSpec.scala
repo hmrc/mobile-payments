@@ -57,7 +57,6 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       performSuccessfulPOST(Future successful sessionDataResponse)(mockHttp)
       val result = await(sut.createSession(amount, SaUtr("CS700100A"), journeyId))
       result.sessionDataId shouldEqual sessionDataId
-      result.nextUrl shouldEqual "https://api.foo.com"
     }
   }
 

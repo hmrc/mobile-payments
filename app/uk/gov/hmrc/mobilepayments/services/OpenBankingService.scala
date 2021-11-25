@@ -20,9 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank, BankGroupData}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, PaymentSessionResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank, BankGroupData}
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,24 +44,45 @@ class OpenBankingService @Inject() (
       BanksResponse(groupedBanks)
     }
 
-  def initiatePayment(
+  def createSession(
     amount:                 BigDecimal,
-    bankId:                 String,
     saUtr:                  SaUtr,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[PaymentSessionResponse] = {
-    val initiatedPayment = for {
-      sessionData <- connector.createSession(AmountInPence(amount), saUtr, journeyId)
-      _           <- connector.selectBank(sessionData.sessionDataId, bankId, journeyId)
-      response    <- connector.initiatePayment(sessionData.sessionDataId, openBankingPaymentReturnUrl, journeyId)
-    } yield (sessionData, response)
+  ): Future[SessionDataResponse] = connector.createSession(AmountInPence(amount), saUtr, journeyId)
 
-    initiatedPayment.map { data =>
-      PaymentSessionResponse(data._2.paymentUrl, data._1.sessionDataId)
-    }
-  }
+  def getSession(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[SessionDataResponse] = connector.getSession(sessionDataId, journeyId)
+
+  def selectBank(
+    sessionDataId:          String,
+    bankId:                 String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[Unit] = connector.selectBank(sessionDataId, bankId, journeyId).map(_ => ())
+
+  def initiatePayment(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[InitiatePaymentResponse] =
+    connector.initiatePayment(sessionDataId, openBankingPaymentReturnUrl, journeyId)
+
+  def updatePayment(
+    sessionDataId:          String,
+    paymentUrl:             String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[InitiatePaymentResponse] =
+    connector.initiatePayment(sessionDataId, openBankingPaymentReturnUrl, journeyId)
 
   def getPaymentStatus(
     sessionDataId:          String,

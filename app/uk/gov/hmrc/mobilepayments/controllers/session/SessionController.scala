@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.banks
+package uk.gov.hmrc.mobilepayments.controllers.session
 
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
-trait BankController {
-  def getBanks(journeyId: JourneyId): Action[AnyContent]
+trait SessionController {
+  def createSession(journeyId: JourneyId): Action[JsValue]
 
-  def selectBank(
+  def getSession(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[JsValue]
+  ): Action[AnyContent]
 }

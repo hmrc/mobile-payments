@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.response
+package uk.gov.hmrc.mobilepayments.domain.dto.request
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.domain.SaUtr
 
-final case class PaymentSessionResponse(
-  paymentUrl:    String,
-  sessionDataId: String)
+final case class CreateSessionRequest(
+  amount: BigDecimal,
+  saUtr:  SaUtr)
 
-object PaymentSessionResponse {
-  implicit val format: Format[PaymentSessionResponse] = Json.format[PaymentSessionResponse]
+object CreateSessionRequest {
+  implicit val format: Format[CreateSessionRequest] = Json.format[CreateSessionRequest]
 }

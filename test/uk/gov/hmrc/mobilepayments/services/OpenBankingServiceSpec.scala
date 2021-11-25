@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
-import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
@@ -42,17 +41,16 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val sut = new OpenBankingService(mockConnector, returnUrl)
 
-  "when connector returns success with banks then" should {
+  "when getBanks invoked and connector returns success with banks then" should {
     "return banks" in {
       mockBanks(Future successful banksResponse)
 
       val result = Await.result(sut.getBanks(journeyId), 0.5.seconds)
-      println(Json.prettyPrint(Json.toJson(result.data)))
       result.data.size shouldBe 10
     }
   }
 
-  "when connector returns NotFoundException then" should {
+  "when getBanks invoked and connector returns NotFoundException then" should {
     "return an error" in {
       mockBanks(Future failed UpstreamErrorResponse("Error", 400, 400))
 
@@ -62,52 +60,64 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
-  "when connector initiatePayment succeeds then" should {
-    "return payment response" in {
+  "when createSession invoked and connector succeeds then" should {
+    "return session data response" in {
       mockSession(Future successful sessionDataResponse)
-      mockSelectBank(Future successful HttpResponse.apply(200, ""))
-      mockInitiatePayment(Future successful paymentInitiatedResponse)
 
-      val result = Await.result(sut.initiatePayment(amount, bankId, saUtr, journeyId), 0.5.seconds)
-      result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
-      result.sessionDataId shouldEqual sessionDataId
+      val result = Await.result(sut.createSession(amount, saUtr, journeyId), 0.5.seconds)
+      result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
     }
   }
 
-  "when session fails then" should {
+  "when createSession invoked and connector fails then" should {
     "return an error" in {
       mockSession(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        await(sut.initiatePayment(amount, bankId, saUtr, journeyId))
+        Await.result(sut.createSession(amount, saUtr, journeyId), 0.5.seconds)
       }
     }
   }
 
-  "when selectBank fails then" should {
+  "when selectBank invoked and connector succeeds then" should {
+    "return unit response" in {
+      mockSelectBank(Future successful HttpResponse.apply(200, ""))
+
+      val result = Await.result(sut.selectBank(sessionDataId, bankId, journeyId), 0.5.seconds)
+      result shouldEqual ()
+    }
+  }
+
+  "when selectBank invoked and connector fails then" should {
     "return an error" in {
-      mockSession(Future successful sessionDataResponse)
       mockSelectBank(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        await(sut.initiatePayment(amount, bankId, saUtr, journeyId))
+        Await.result(sut.selectBank(sessionDataId, bankId, journeyId), 0.5.seconds)
       }
     }
   }
 
-  "when initiatePayment fails then" should {
+  "when initiatePayment invoked and connector succeeds then" should {
+    "return payment session response" in {
+      mockInitiatePayment(Future successful paymentInitiatedResponse)
+
+      val result = Await.result(sut.initiatePayment(sessionDataId, journeyId), 0.5.seconds)
+      result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+    }
+  }
+
+  "when initiatePayment invoked and connector fails then" should {
     "return an error" in {
-      mockSession(Future successful sessionDataResponse)
-      mockSelectBank(Future successful HttpResponse.apply(200, ""))
       mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        await(sut.initiatePayment(amount, bankId, saUtr, journeyId))
+        Await.result(sut.initiatePayment(sessionDataId, journeyId), 0.5.seconds)
       }
     }
   }
 
-  "when connector getPaymentStatus returns success then" should {
+  "when getPaymentStatus invoked and connector getPaymentStatus returns success then" should {
     "return banks" in {
       mockPaymentStatus(Future successful paymentStatusOpenBankingResponse)
 
@@ -116,7 +126,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
-  "when connector getPaymentStatus returns NotFoundException then" should {
+  "when getPaymentStatus invoked and connector getPaymentStatus returns NotFoundException then" should {
     "return an error" in {
       mockPaymentStatus(Future failed UpstreamErrorResponse("Error", 400, 400))
 

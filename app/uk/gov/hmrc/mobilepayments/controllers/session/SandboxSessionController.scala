@@ -14,56 +14,38 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.banks
+package uk.gov.hmrc.mobilepayments.controllers.session
 
-import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc._
-import uk.gov.hmrc.api.sandbox.FileResource
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
-import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
+import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.services.ShutteringService
+import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton()
-class SandboxBankController @Inject() (
+class SandboxSessionController @Inject()(
   override val authConnector:                                   AuthConnector,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
   cc:                                                           ControllerComponents,
   shutteringService:                                            ShutteringService
 )(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
-    with BankController
-    with ControllerChecks
+    with SessionController
     with AccessControl
-    with FileResource {
+    with ControllerChecks
+    with ErrorHandling {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
+  override val app:    String                 = "Session-Controller"
 
-  def getBanks(journeyId: JourneyId): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          Future successful Ok(readData(resource = "sandbox-banks-response.json"))
-        }
-      }
-    }
+  override def createSession(journeyId: JourneyId): Action[JsValue] = ???
 
-  override def selectBank(sessionDataId: String, journeyId: JourneyId): Action[JsValue] = ???
-
-  private def readData(resource: String): JsValue =
-    toJson(
-      Json
-        .parse(
-          findResource(s"/resources/mobilepayments/$resource")
-            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
-        )
-        .as[BanksResponse]
-    )
+  override def getSession(sessionDataId: String, journeyId: JourneyId): Action[AnyContent] = ???
 }

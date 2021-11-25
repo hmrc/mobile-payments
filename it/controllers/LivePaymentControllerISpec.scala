@@ -26,7 +26,6 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[PaymentSessionResponse]
       parsedResponse.paymentUrl    shouldBe "https://some-bank.com?param=dosomething"
-      parsedResponse.sessionDataId shouldBe sessionDataId
     }
 
     "return 500 when response from create session is malformed" in {
