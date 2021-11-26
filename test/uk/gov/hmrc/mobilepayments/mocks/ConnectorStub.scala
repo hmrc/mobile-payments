@@ -73,4 +73,28 @@ trait ConnectorStub extends MockFactory {
       )
       .expects(*, *, *, *, *, *, *)
       .returns(Future failed response)
+
+  def performSuccessfulDELETE[O](response: Future[O])(implicit http: HttpClient): Unit =
+    (
+      http
+        .DELETE[O](_: String, _: Seq[(String, String)])(
+          _: HttpReads[O],
+          _: HeaderCarrier,
+          _: ExecutionContext
+        )
+      )
+      .expects(*, *, *, *, *)
+      .returns(response)
+
+  def performUnsuccessfulDELETE[O](response: Exception)(implicit http: HttpClient): Unit =
+    (
+      http
+        .DELETE[O](_: String, _: Seq[(String, String)])(
+          _: HttpReads[O],
+          _: HeaderCarrier,
+          _: ExecutionContext
+        )
+      )
+      .expects(*, *, *, *, *)
+      .returns(Future failed response)
 }

@@ -58,7 +58,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockGetBanks(Future successful BanksResponse(banksResponseGrouped))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
@@ -74,7 +74,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockGetBanks(Future failed Upstream4xxResponse("Error", 404, 404))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 404
@@ -88,7 +88,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockGetBanks(Future failed new Upstream4xxResponse("Error", 401, 401))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 401
@@ -100,7 +100,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 401
@@ -114,7 +114,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockGetBanks(Future failed Upstream5xxResponse("Error", 502, 502))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 500
@@ -128,7 +128,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockSelectBank(Future successful Unit)
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader)
         .withBody(Json.obj("bankId" -> "12345"))
 
       val result = sut.selectBank(sessionDataId, journeyId)(request)
@@ -143,7 +143,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockSelectBank(Future failed Upstream4xxResponse("Error", 404, 404))
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader)
         .withBody(Json.obj("bankId" -> "12345"))
 
       val result = sut.selectBank(sessionDataId, journeyId)(request)
@@ -158,7 +158,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockSelectBank(Future failed Upstream4xxResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader)
         .withBody(Json.obj("bankId" -> "12345"))
 
       val result = sut.selectBank(sessionDataId, journeyId)(request)
@@ -171,7 +171,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader)
         .withBody(Json.obj("bankId" -> "12345"))
 
       val result = sut.selectBank(sessionDataId, journeyId)(request)
@@ -186,7 +186,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       mockSelectBank(Future failed Upstream5xxResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader)
         .withBody(Json.obj("bankId" -> "12345"))
 
       val result = sut.selectBank(sessionDataId, journeyId)(request)

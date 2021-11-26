@@ -35,26 +35,22 @@ class OpenBankingConnector @Inject() (
   @Named("open-banking") serviceUrl: String
 )(implicit ex:                       ExecutionContext) {
 
-  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[List[Bank]] = {
-    val journey = journeyId.value
+  def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[List[Bank]] =
     http.GET[List[Bank]](
-      url = s"$serviceUrl/open-banking/banks?journeyId=$journey"
+      url = s"$serviceUrl/open-banking/banks?journeyId=${journeyId.value}"
     )
-  }
 
   def createSession(
     amount:                 AmountInPence,
     saUtr:                  SaUtr,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[SessionDataResponse] = {
-    val journey = journeyId.value
+  ): Future[SessionDataResponse] =
     http.POST[CreateSessionDataRequest, SessionDataResponse](
-      url = s"$serviceUrl/open-banking/session?journeyId=$journey",
+      url = s"$serviceUrl/open-banking/session?journeyId=${journeyId.value}",
       CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
-      Seq(("X-Session-ID", journey))
+      Seq(("X-Session-ID", journeyId.value))
     )
-  }
 
   def getSession(
     sessionDataId:          String,
@@ -72,35 +68,47 @@ class OpenBankingConnector @Inject() (
     bankId:                 String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[HttpResponse] = {
-    val journey = journeyId.value
+  ): Future[HttpResponse] =
     http.POST[SelectBankRequest, HttpResponse](
-      url = s"$serviceUrl/open-banking/session/$sessionDataId/select-bank?journeyId=$journey",
+      url = s"$serviceUrl/open-banking/session/$sessionDataId/select-bank?journeyId=${journeyId.value}",
       SelectBankRequest(bankId)
     )
-  }
 
   def initiatePayment(
     sessionDataId:          String,
     returnUrl:              String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[InitiatePaymentResponse] = {
-    val journey = journeyId.value
+  ): Future[InitiatePaymentResponse] =
     http.POST[InitiatePaymentRequest, InitiatePaymentResponse](
-      url = s"$serviceUrl/open-banking/session/$sessionDataId/initiate-payment?journeyId=$journey",
+      url = s"$serviceUrl/open-banking/session/$sessionDataId/initiate-payment?journeyId=${journeyId.value}",
       InitiatePaymentRequest(returnUrl)
     )
-  }
 
   def getPaymentStatus(
     sessionDataId:          String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[OpenBankingPaymentStatusResponse] = {
-    val journey = journeyId.value
+  ): Future[OpenBankingPaymentStatusResponse] =
     http.GET[OpenBankingPaymentStatusResponse](
-      url = s"$serviceUrl/open-banking/session/$sessionDataId/payment-status?journeyId=$journey"
+      url = s"$serviceUrl/open-banking/session/$sessionDataId/payment-status?journeyId=${journeyId.value}"
     )
-  }
+
+  def urlConsumed(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Boolean] =
+    http.GET[Boolean](
+      s"$serviceUrl/open-banking/session/$sessionDataId/url-consumed?journeyId=${journeyId.value}"
+    )
+
+  def clearPayment(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Unit] =
+    http.DELETE[Unit](
+      s"$serviceUrl/open-banking/session/$sessionDataId/clear-payment?journeyId=${journeyId.value}"
+    )
 }

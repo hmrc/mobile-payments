@@ -67,8 +67,8 @@ class LivePaymentController @Inject() (
                 journeyId
               )
               .map(response => Ok(Json.toJson(response)))
+            // TODO: need to fetch the session to fix this
 //              .map { response =>
-//                // TODO: need to fetch the session
 //                auditService.sendPaymentEvent(
 //                  BigDecimal.decimal(1),//createPaymentRequest.amount,
 //                  SaUtr(""),//createPaymentRequest.saUtr,
@@ -100,6 +100,7 @@ class LivePaymentController @Inject() (
                 .map { response =>
                   Ok(Json.toJson(response))
                 }
+                //TODO: probably should fire the audit event here too
             }
           }
         }

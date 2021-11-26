@@ -53,7 +53,7 @@ class SandboxBankControllerSpec
       shutteringDisabled()
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
@@ -67,7 +67,7 @@ class SandboxBankControllerSpec
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 401

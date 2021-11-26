@@ -17,6 +17,7 @@
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import org.scalamock.handlers.CallHandler
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
@@ -64,7 +65,7 @@ class LivePaymentControllerSpec
 //      stubPaymentEvent()
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
@@ -80,7 +81,7 @@ class LivePaymentControllerSpec
       mockInitiatePayment(Future failed Upstream4xxResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
@@ -92,7 +93,7 @@ class LivePaymentControllerSpec
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
@@ -113,6 +114,67 @@ class LivePaymentControllerSpec
     }
   }
 
+  "when update payment invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockUpdatePayment(Future successful paymentSessionResponse)
+      //      stubPaymentEvent()
+
+      val request = FakeRequest("PUT", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("paymentUrl" -> "https://some-bank.com?param=dosomething"))
+
+      val result = sut.updatePayment(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[InitiatePaymentResponse]
+      response.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+    }
+  }
+
+  "when update payment invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockUpdatePayment(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("PUT", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("paymentUrl" -> "https://some-bank.com?param=dosomething"))
+
+      val result = sut.updatePayment(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when update payment invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("PUT", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("paymentUrl" -> "https://some-bank.com?param=dosomething"))
+
+      val result = sut.updatePayment(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when update payment invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockUpdatePayment(Future failed Upstream5xxResponse("Error", 502, 502))
+
+      val request = FakeRequest("PUT", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("paymentUrl" -> "https://some-bank.com?param=dosomething"))
+
+      val result = sut.updatePayment(sessionDataId, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
   "when get payment status invoked and service returns success then" should {
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
@@ -120,7 +182,7 @@ class LivePaymentControllerSpec
       mockGetPaymentStatus(Future successful PaymentStatusResponse("Authorised"))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
@@ -136,7 +198,7 @@ class LivePaymentControllerSpec
       mockGetPaymentStatus(Future.failed(Upstream4xxResponse("Error", 404, 404)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 404
@@ -150,7 +212,7 @@ class LivePaymentControllerSpec
       mockGetPaymentStatus(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
@@ -162,7 +224,7 @@ class LivePaymentControllerSpec
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
@@ -176,7 +238,7 @@ class LivePaymentControllerSpec
       mockGetPaymentStatus(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 500
@@ -187,6 +249,12 @@ class LivePaymentControllerSpec
     (mockOpenBankingService
       .initiatePayment(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
+      .returning(future)
+
+  private def mockUpdatePayment(future: Future[InitiatePaymentResponse]) =
+    (mockOpenBankingService
+      .updatePayment(_: String, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
       .returning(future)
 
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =

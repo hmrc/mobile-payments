@@ -38,6 +38,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
   private val bankId:        String               = "asd-123"
   private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
   private val returnUrl:     String               = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+  private val paymentUrl:    String               = "https://some-bank.com?param=dosomething"
 
   private val sut = new OpenBankingService(mockConnector, returnUrl)
 
@@ -103,7 +104,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockInitiatePayment(Future successful paymentInitiatedResponse)
 
       val result = Await.result(sut.initiatePayment(sessionDataId, journeyId), 0.5.seconds)
-      result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+      result.paymentUrl shouldEqual paymentUrl
     }
   }
 
@@ -136,6 +137,58 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
+  "when updatePayment invoked and url has not been consumed" should {
+    "return an unchanged payment session response" in {
+      mockUrlConsumed(Future successful false)
+
+      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl, journeyId),
+                                0.5.seconds)
+      result.paymentUrl shouldEqual paymentUrl
+    }
+  }
+
+  "when updatePayment invoked and url has been consumed" should {
+    "return a new payment session response and clear the payment" in {
+      mockUrlConsumed(Future successful true)
+      mockClearPayment(Future successful ())
+      mockInitiatePayment(Future successful paymentInitiatedUpdateResponse)
+
+      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl, journeyId),
+                                0.5.seconds)
+      result.paymentUrl shouldEqual "https://some-updated-bank.com?param=dosomething"
+    }
+  }
+
+  "when updatePayment invoked and url consumed fails" should {
+    "return an error" in {
+      mockUrlConsumed(Future failed UpstreamErrorResponse("Error", 400, 400))
+      intercept[UpstreamErrorResponse] {
+        await(sut.updatePayment(sessionDataId, paymentUrl, journeyId))
+      }
+    }
+  }
+
+  "when updatePayment invoked and url consumed and clear payment fails" should {
+    "return an error" in {
+      mockUrlConsumed(Future successful true)
+      mockClearPayment(Future failed UpstreamErrorResponse("Error", 400, 400))
+      intercept[UpstreamErrorResponse] {
+        await(sut.updatePayment(sessionDataId, paymentUrl, journeyId))
+      }
+    }
+  }
+
+  "when updatePayment invoked and url consumed and initiate payment fails" should {
+    "return an error" in {
+      mockUrlConsumed(Future successful true)
+      mockClearPayment(Future successful ())
+      mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 400, 400))
+      intercept[UpstreamErrorResponse] {
+        await(sut.updatePayment(sessionDataId, paymentUrl, journeyId))
+      }
+    }
+  }
+
   private def mockBanks(future: Future[List[Bank]]): Unit =
     (mockConnector
       .getBanks(_: JourneyId)(_: HeaderCarrier))
@@ -163,6 +216,18 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
   private def mockPaymentStatus(future: Future[OpenBankingPaymentStatusResponse]): Unit =
     (mockConnector
       .getPaymentStatus(_: String, _: JourneyId)(_: HeaderCarrier))
+      .expects(sessionDataId, journeyId, hc)
+      .returning(future)
+
+  private def mockUrlConsumed(future: Future[Boolean]): Unit =
+    (mockConnector
+      .urlConsumed(_: String, _: JourneyId)(_: HeaderCarrier))
+      .expects(sessionDataId, journeyId, hc)
+      .returning(future)
+
+  private def mockClearPayment(future: Future[Unit]): Unit =
+    (mockConnector
+      .clearPayment(_: String, _: JourneyId)(_: HeaderCarrier))
       .expects(sessionDataId, journeyId, hc)
       .returning(future)
 }

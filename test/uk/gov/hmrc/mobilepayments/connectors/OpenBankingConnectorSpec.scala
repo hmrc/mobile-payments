@@ -118,4 +118,40 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       }
     }
   }
+
+  "when urlConsumed call is successful it" should {
+    Seq(true, false).foreach { consumed =>
+      s"return $consumed" in {
+        performSuccessfulGET(Future successful consumed)(mockHttp)
+        val result = await(sut.urlConsumed(sessionDataId, journeyId))
+        result shouldBe consumed
+      }
+    }
+  }
+
+  "when urlConsumed call returns NotFoundException it" should {
+    "return an error" in {
+      performUnsuccessfulGET(new NotFoundException("not found"))(mockHttp)
+      intercept[NotFoundException] {
+        await(sut.urlConsumed(sessionDataId, journeyId))
+      }
+    }
+  }
+
+  "when clearPayment call is successful it" should {
+    "return unit" in {
+      performSuccessfulDELETE(Future successful ())(mockHttp)
+      val result: Unit = await(sut.clearPayment(sessionDataId, journeyId))
+      result shouldBe ()
+    }
+  }
+
+  "when clearPayment call returns NotFoundException it" should {
+    "return an error" in {
+      performUnsuccessfulDELETE(new NotFoundException("not found"))(mockHttp)
+      intercept[NotFoundException] {
+        await(sut.clearPayment(sessionDataId, journeyId))
+      }
+    }
+  }
 }

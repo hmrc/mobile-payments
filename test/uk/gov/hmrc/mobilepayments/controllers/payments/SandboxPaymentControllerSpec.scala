@@ -54,7 +54,7 @@ class SandboxPaymentControllerSpec
       shutteringDisabled()
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
@@ -68,7 +68,7 @@ class SandboxPaymentControllerSpec
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
@@ -81,7 +81,7 @@ class SandboxPaymentControllerSpec
       shutteringDisabled()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
@@ -95,7 +95,7 @@ class SandboxPaymentControllerSpec
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 401

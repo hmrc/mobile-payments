@@ -82,7 +82,13 @@ class OpenBankingService @Inject() (
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
   ): Future[InitiatePaymentResponse] =
-    connector.initiatePayment(sessionDataId, openBankingPaymentReturnUrl, journeyId)
+    connector.urlConsumed(sessionDataId, journeyId).flatMap {
+      case true =>
+        connector
+          .clearPayment(sessionDataId, journeyId)
+          .flatMap(_ => connector.initiatePayment(sessionDataId, openBankingPaymentReturnUrl, journeyId))
+      case false => Future.successful(InitiatePaymentResponse(paymentUrl))
+    }
 
   def getPaymentStatus(
     sessionDataId:          String,
@@ -103,5 +109,4 @@ class OpenBankingService @Inject() (
       .toList
       .map(BankGroupData.buildBankGroupData)
       .sortWith((bankGroupData, nextBankGroupData) => bankGroupData.bankGroupName < nextBankGroupData.bankGroupName)
-
 }

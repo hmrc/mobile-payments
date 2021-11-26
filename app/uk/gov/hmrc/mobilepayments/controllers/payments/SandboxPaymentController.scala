@@ -64,7 +64,14 @@ class SandboxPaymentController @Inject() (
   override def updatePayment(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[JsValue] = ???
+  ): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
+        }
+      }
+    }
 
   def getPaymentStatus(
     sessionDataId: String,
