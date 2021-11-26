@@ -16,18 +16,21 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.session
 
-import play.api.libs.json.JsValue
-import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
+import play.api.libs.json.Json.toJson
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc._
+import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SandboxSessionController @Inject() (
@@ -40,15 +43,33 @@ class SandboxSessionController @Inject() (
     with SessionController
     with AccessControl
     with ControllerChecks
-    with ErrorHandling {
+    with ErrorHandling
+    with FileResource {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
   override val app:    String                 = "Session-Controller"
 
-  override def createSession(journeyId: JourneyId): Action[JsValue] = ???
+  override def createSession(journeyId: JourneyId): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          Future successful Ok(sampleSessionJson)
+        }
+      }
+    }
 
   override def getSession(
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent] = ???
+
+  private def sampleSessionJson: JsValue =
+    toJson(
+      Json
+        .parse(
+          findResource(path = s"/resources/mobilepayments/sandbox-session-response.json")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+        )
+        .as[SessionDataResponse]
+    )
 }

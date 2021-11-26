@@ -15,13 +15,19 @@
  */
 
 package uk.gov.hmrc.mobilepayments.controllers.session
-
-import play.api.test.Helpers
+import org.scalamock.handlers.CallHandler
+import play.api.libs.json.Json
+import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
+import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{BanksResponse, SessionDataResponse}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
+
+import scala.concurrent.Future
 
 class SandboxSessionControllerSpec
     extends BaseSpec
@@ -41,4 +47,36 @@ class SandboxSessionControllerSpec
     Helpers.stubControllerComponents(),
     mockShutteringService
   )
+
+  "when createSession invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("POST", "/sessions")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amount" -> 1234, "saUtr" -> "CS700100A"))
+
+      val result = sut.createSession(journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[SessionDataResponse]
+      response.sessionDataId shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
+    }
+  }
+
+  "when get banks invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("POST", "/sessions")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amount" -> 1234, "saUtr" -> "CS700100A"))
+
+      val result = sut.createSession(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  private def shutteringDisabled(): CallHandler[Future[Shuttering]] =
+    mockShutteringResponse(Shuttering(shuttered = false))
 }
