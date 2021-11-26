@@ -26,11 +26,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse, SessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -132,7 +131,7 @@ class LiveSessionControllerSpec
 
   private def mockCreateSession(future: Future[SessionDataResponse]) =
     (mockOpenBankingService
-      .createSession(_: BigDecimal, _:  SaUtr, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .createSession(_: BigDecimal, _: SaUtr, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)
       .returning(future)
 

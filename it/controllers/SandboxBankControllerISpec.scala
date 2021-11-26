@@ -9,8 +9,6 @@ import utils.BaseISpec
 
 class SandboxBankControllerISpec extends BaseISpec {
 
-  val sandboxHeader = "X-MOBILE-USER-ID" -> "208606423740"
-
   "when payload valid and sandbox header present it" should {
     "return 201" in {
       grantAccess()

@@ -36,8 +36,9 @@ abstract class BaseISpec
     with FutureAwaits
     with DefaultAwaitTimeout {
 
-  override implicit lazy val app: Application = appBuilder.build()
-
+  override implicit lazy val app: Application      = appBuilder.build()
+  protected val sandboxHeader:    (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
+  protected val contentHeader:    (String, String) = "Content-Type" -> "application/json"
   protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
   val journeyId:                  JourneyId        = "27085215-69a4-4027-8f72-b04b10ec16b0"
 

@@ -61,8 +61,10 @@ class SandboxPaymentController @Inject() (
       }
     }
 
-
-  override def updatePayment(sessionDataId: String, journeyId: JourneyId): Action[JsValue] = ???
+  override def updatePayment(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] = ???
 
   def getPaymentStatus(
     sessionDataId: String,

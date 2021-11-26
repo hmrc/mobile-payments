@@ -23,14 +23,14 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
+import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton()
-class SandboxSessionController @Inject()(
+class SandboxSessionController @Inject() (
   override val authConnector:                                   AuthConnector,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
   cc:                                                           ControllerComponents,
@@ -47,5 +47,8 @@ class SandboxSessionController @Inject()(
 
   override def createSession(journeyId: JourneyId): Action[JsValue] = ???
 
-  override def getSession(sessionDataId: String, journeyId: JourneyId): Action[AnyContent] = ???
+  override def getSession(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] = ???
 }

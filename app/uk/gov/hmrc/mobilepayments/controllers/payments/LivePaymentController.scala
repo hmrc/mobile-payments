@@ -19,12 +19,11 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreatePaymentRequest, CreateSessionRequest, UpdatePaymentRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.UpdatePaymentRequest
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -53,7 +52,10 @@ class LivePaymentController @Inject() (
 
   override val app: String = "Payment-Controller"
 
-  def createPayment(sessionDataId: String, journeyId: JourneyId): Action[AnyContent] =
+  def createPayment(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -63,7 +65,8 @@ class LivePaymentController @Inject() (
               .initiatePayment(
                 sessionDataId,
                 journeyId
-              ).map( response => Ok(Json.toJson(response)))
+              )
+              .map(response => Ok(Json.toJson(response)))
 //              .map { response =>
 //                // TODO: need to fetch the session
 //                auditService.sendPaymentEvent(
@@ -78,7 +81,10 @@ class LivePaymentController @Inject() (
       }
     }
 
-  def updatePayment(sessionDataId: String, journeyId: JourneyId): Action[JsValue] =
+  def updatePayment(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -90,7 +96,10 @@ class LivePaymentController @Inject() (
                   sessionDataId,
                   updatePaymentRequest.paymentUrl,
                   journeyId
-                ).map(response => Ok(Json.toJson(response)))
+                )
+                .map { response =>
+                  Ok(Json.toJson(response))
+                }
             }
           }
         }

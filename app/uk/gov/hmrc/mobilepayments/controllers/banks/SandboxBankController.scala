@@ -55,7 +55,10 @@ class SandboxBankController @Inject() (
       }
     }
 
-  override def selectBank(sessionDataId: String, journeyId: JourneyId): Action[JsValue] = ???
+  override def selectBank(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] = ???
 
   private def readData(resource: String): JsValue =
     toJson(

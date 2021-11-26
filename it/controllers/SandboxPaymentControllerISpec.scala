@@ -10,31 +10,20 @@ import utils.BaseISpec
 
 class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
-  val sandboxHeader = "X-MOBILE-USER-ID" -> "208606423740"
+  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   "when payload valid and sandbox header present it" should {
     "return 200" in {
       grantAccess()
       stubForShutteringDisabled
+
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader, acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
-      parsedResponse.paymentUrl    shouldBe "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
-    }
-  }
-
-  "when an invalid createPaymentsRequest is made it" should {
-    "return 400" in {
-      grantAccess()
-      stubForShutteringDisabled
-      val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
-      val response = await(request.post(Json.parse("{}")))
-      response.status shouldBe 400
+      parsedResponse.paymentUrl shouldBe "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
     }
   }
 
@@ -43,9 +32,9 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       authorisationRejected()
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader, acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 401
     }
   }
@@ -55,9 +44,9 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader, acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 521
     }
   }

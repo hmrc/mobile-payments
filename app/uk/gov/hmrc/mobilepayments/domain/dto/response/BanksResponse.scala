@@ -17,7 +17,7 @@
 package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData}
+import uk.gov.hmrc.mobilepayments.domain.BankGroupData
 
 final case class BanksResponse(data: List[BankGroupData])
 
