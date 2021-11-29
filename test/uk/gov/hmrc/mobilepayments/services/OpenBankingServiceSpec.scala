@@ -65,7 +65,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   "when createSession invoked and connector succeeds then" should {
     "return session data response" in {
-      mockSession(Future successful sessionDataResponse)
+      mockSession(Future successful createSessionDataResponse)
 
       val result = Await.result(sut.createSession(amount, saUtr, journeyId), 0.5.seconds)
       result.sessionDataId.value shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"

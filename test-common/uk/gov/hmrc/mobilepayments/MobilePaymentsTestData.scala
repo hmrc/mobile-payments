@@ -17,6 +17,7 @@
 package uk.gov.hmrc.mobilepayments
 
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Shuttering}
@@ -38,8 +39,8 @@ trait MobilePaymentsTestData {
 
   lazy val shutteredResponse: Shuttering = Json.fromJson[Shuttering](js("shuttered-response")).get
 
-  lazy val sessionDataResponse: CreateSessionDataResponse =
-    Json.fromJson[CreateSessionDataResponse](js("session-data-response")).get
+  lazy val createSessionDataResponse: CreateSessionDataResponse =
+    Json.fromJson[CreateSessionDataResponse](js("create-session-data-response")).get
 
   lazy val paymentInitiatedResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get
@@ -50,9 +51,13 @@ trait MobilePaymentsTestData {
   lazy val paymentSessionResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-session-response")).get
 
+  lazy val sessionDataResponse: SessionData[OriginSpecificSessionData] =
+    Json.fromJson[SessionData[OriginSpecificSessionData]](js("session-data-response")).get
+
   lazy val rawMalformedJson:                   String = "{\"data\": [{,]}"
   lazy val banksResponseJson:                  String = json("banks-response")
   lazy val sessionDataResponseJson:            String = json("session-data-response")
+  lazy val createSessionDataResponseJson:      String = json("create-session-data-response")
   lazy val createPaymentRequestJson:           String = json("create-payment-request")
   lazy val paymentInitiatedResponseJson:       String = json("payment-initiated-response")
   lazy val paymentInitiatedUpdateResponseJson: String = json("payment-initiated-update-response")

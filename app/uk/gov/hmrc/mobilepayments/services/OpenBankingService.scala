@@ -59,7 +59,10 @@ class OpenBankingService @Inject() (
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[SessionData[OriginSpecificSessionData]] = connector.getSession(sessionDataId, journeyId)
+  ): Future[SessionData[OriginSpecificSessionData]] = {
+    //TODO: this is where we should transform into our own data model
+    connector.getSession(sessionDataId, journeyId)
+  }
 
   def selectBank(
     sessionDataId:          String,

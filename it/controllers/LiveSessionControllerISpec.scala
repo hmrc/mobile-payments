@@ -15,7 +15,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 when payload is valid" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(response = sessionDataResponseJson)
+      stubForCreateSession(response = createSessionDataResponseJson)
 
       val request: WSRequest = wsUrl(
         s"/sessions?journeyId=$journeyId"

@@ -73,5 +73,20 @@ class LiveSessionController @Inject() (
   override def getSession(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[AnyContent] = ???
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            openBankingService
+              .getSession(
+                sessionDataId,
+                journeyId
+              )
+              .map(response => Ok(Json.toJson(response)))
+          }
+        }
+      }
+    }
 }

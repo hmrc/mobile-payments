@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.mobilepayments.connectors
 
+import openbanking.cor.model.{PtaSaSessionData, SessionInitiated}
 import org.scalatest.concurrent.ScalaFutures
+import payapi.corcommon.model.Origins.PtaSa
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{NotFoundException, _}
@@ -25,6 +27,7 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData with ScalaFutures {
@@ -54,7 +57,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when createSession call is successful it" should {
     "return session data" in {
-      performSuccessfulPOST(Future successful sessionDataResponse)(mockHttp)
+      performSuccessfulPOST(Future successful createSessionDataResponse)(mockHttp)
       val result = await(sut.createSession(amount, SaUtr("CS700100A"), journeyId))
       result.sessionDataId.value shouldEqual sessionDataId
     }
@@ -151,6 +154,27 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       performUnsuccessfulDELETE(new NotFoundException("not found"))(mockHttp)
       intercept[NotFoundException] {
         await(sut.clearPayment(sessionDataId, journeyId))
+      }
+    }
+  }
+
+  "when getSession call is successful it" should {
+    "return session" in {
+      performSuccessfulGET(Future successful sessionDataResponse)(mockHttp)
+      val result = await(sut.getSession(sessionDataId, journeyId))
+      result._id.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
+      result.sessionId.value shouldBe "a-session-id"
+      result.amount.value shouldBe 12500
+      result.sessionState shouldBe SessionInitiated
+      result.createdOn shouldBe LocalDateTime.parse("2021-11-03T10:15:30")
+    }
+  }
+
+  "when getSession call returns NotFoundException it" should {
+    "return an error" in {
+      performUnsuccessfulGET(new NotFoundException("not found"))(mockHttp)
+      intercept[NotFoundException] {
+        await(sut.getSession(sessionDataId, journeyId))
       }
     }
   }

@@ -59,7 +59,7 @@ class LiveSessionControllerSpec
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockCreateSession(Future successful sessionDataResponse)
+      mockCreateSession(Future successful createSessionDataResponse)
 
       val request = FakeRequest("POST", "/sessions")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
