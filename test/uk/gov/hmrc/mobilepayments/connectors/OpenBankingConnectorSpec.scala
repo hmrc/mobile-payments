@@ -56,7 +56,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
     "return session data" in {
       performSuccessfulPOST(Future successful sessionDataResponse)(mockHttp)
       val result = await(sut.createSession(amount, SaUtr("CS700100A"), journeyId))
-      result.sessionDataId shouldEqual sessionDataId
+      result.sessionDataId.value shouldEqual sessionDataId
     }
   }
 
@@ -90,7 +90,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
     "return payment url" in {
       performSuccessfulPOST(Future successful paymentInitiatedResponse)(mockHttp)
       val result = await(sut.initiatePayment(sessionDataId, returnUrl, journeyId))
-      result.paymentUrl shouldEqual "https://some-bank.com?param=dosomething"
+      result.paymentUrl.toString() shouldEqual "https://some-bank.com?param=dosomething"
     }
   }
 

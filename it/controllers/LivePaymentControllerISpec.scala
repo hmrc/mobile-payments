@@ -1,12 +1,13 @@
 package controllers
 
+import openbanking.cor.model.response.InitiatePaymentResponse
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentStatusResponse
 import utils.BaseISpec
 
 class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
@@ -25,7 +26,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
-      parsedResponse.paymentUrl shouldBe "https://some-bank.com?param=dosomething"
+      parsedResponse.paymentUrl.toString() shouldBe "https://some-bank.com?param=dosomething"
     }
 
     "return 500 when request from payment is malformed" in {
@@ -111,7 +112,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.put(Json.obj("paymentUrl" -> paymentUrl)))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
-      parsedResponse.paymentUrl shouldBe paymentUrl
+      parsedResponse.paymentUrl.toString() shouldBe paymentUrl
     }
 
     "return 200 with the same payment url when URL consumed" in {
@@ -127,7 +128,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.put(Json.obj("paymentUrl" -> paymentUrl)))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
-      parsedResponse.paymentUrl shouldBe "https://some-updated-bank.com?param=dosomething"
+      parsedResponse.paymentUrl.toString() shouldBe "https://some-updated-bank.com?param=dosomething"
     }
 
     "return 500 when request from payment is malformed" in {

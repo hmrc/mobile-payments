@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.session
 
+import openbanking.cor.model.response.CreateSessionDataResponse
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.Json
 import play.api.test.Helpers._
@@ -26,7 +27,6 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
@@ -68,7 +68,7 @@ class LiveSessionControllerSpec
       val result = sut.createSession(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[CreateSessionDataResponse]
-      response.sessionDataId shouldEqual sessionDataId
+      response.sessionDataId.value shouldEqual sessionDataId
     }
   }
 

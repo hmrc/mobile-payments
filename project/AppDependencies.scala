@@ -8,6 +8,7 @@ object AppDependencies {
   private val flexmarkAllVersion     = "0.36.8"
   private val refinedVersion         = "0.9.26"
   private val domainVersion          = "6.2.0-play-28"
+  private val openBankingVersion     = "0.109.0"
 
   private val pegdownVersion       = "1.6.0"
   private val wireMockVersion      = "2.20.0"
@@ -19,7 +20,8 @@ object AppDependencies {
     "uk.gov.hmrc" %% "bootstrap-backend-play-28" % bootstrapPlay28Version,
     "uk.gov.hmrc" %% "play-hmrc-api"             % playHmrcApiVersion,
     "eu.timepit"  %% "refined"                   % refinedVersion,
-    "uk.gov.hmrc" %% "domain"                    % domainVersion
+    "uk.gov.hmrc" %% "domain"                    % domainVersion,
+    "uk.gov.hmrc" %% "open-banking-cor"          % openBankingVersion
   )
 
   val test = Seq(

@@ -16,15 +16,17 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
+import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, OpenBankingPaymentStatusResponse, CreateSessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.OpenBankingPaymentStatusResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
+import akka.http.scaladsl.model.Uri
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -38,7 +40,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
   private val bankId:        String               = "asd-123"
   private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
   private val returnUrl:     String               = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
-  private val paymentUrl:    String               = "https://some-bank.com?param=dosomething"
+  private val paymentUrl:    Uri                  = "https://some-bank.com?param=dosomething"
 
   private val sut = new OpenBankingService(mockConnector, returnUrl)
 
@@ -66,7 +68,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockSession(Future successful sessionDataResponse)
 
       val result = Await.result(sut.createSession(amount, saUtr, journeyId), 0.5.seconds)
-      result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+      result.sessionDataId.value shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
     }
   }
 
@@ -141,7 +143,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return an unchanged payment session response" in {
       mockUrlConsumed(Future successful false)
 
-      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl, journeyId),
+      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId),
                                 0.5.seconds)
       result.paymentUrl shouldEqual paymentUrl
     }
@@ -153,9 +155,9 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockClearPayment(Future successful ())
       mockInitiatePayment(Future successful paymentInitiatedUpdateResponse)
 
-      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl, journeyId),
+      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId),
                                 0.5.seconds)
-      result.paymentUrl shouldEqual "https://some-updated-bank.com?param=dosomething"
+      result.paymentUrl.toString() shouldEqual "https://some-updated-bank.com?param=dosomething"
     }
   }
 
@@ -163,7 +165,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return an error" in {
       mockUrlConsumed(Future failed UpstreamErrorResponse("Error", 400, 400))
       intercept[UpstreamErrorResponse] {
-        await(sut.updatePayment(sessionDataId, paymentUrl, journeyId))
+        await(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId))
       }
     }
   }
@@ -173,7 +175,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockUrlConsumed(Future successful true)
       mockClearPayment(Future failed UpstreamErrorResponse("Error", 400, 400))
       intercept[UpstreamErrorResponse] {
-        await(sut.updatePayment(sessionDataId, paymentUrl, journeyId))
+        await(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId))
       }
     }
   }
@@ -184,7 +186,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockClearPayment(Future successful ())
       mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 400, 400))
       intercept[UpstreamErrorResponse] {
-        await(sut.updatePayment(sessionDataId, paymentUrl, journeyId))
+        await(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId))
       }
     }
   }

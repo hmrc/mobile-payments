@@ -18,6 +18,8 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
@@ -56,9 +58,9 @@ class OpenBankingConnector @Inject() (
     sessionDataId:          String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[CreateSessionDataResponse] = {
+  ): Future[SessionData[OriginSpecificSessionData]] = {
     val journey = journeyId.value
-    http.GET[CreateSessionDataResponse](
+    http.GET[SessionData[OriginSpecificSessionData]](
       url = s"$serviceUrl/open-banking/session/$sessionDataId?journeyId=$journey"
     )
   }

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments
 
+import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Shuttering}

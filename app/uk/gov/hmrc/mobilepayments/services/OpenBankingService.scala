@@ -17,6 +17,8 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
+import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
@@ -57,7 +59,7 @@ class OpenBankingService @Inject() (
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[CreateSessionDataResponse] = connector.getSession(sessionDataId, journeyId)
+  ): Future[SessionData[OriginSpecificSessionData]] = connector.getSession(sessionDataId, journeyId)
 
   def selectBank(
     sessionDataId:          String,

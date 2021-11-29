@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
+import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -23,7 +24,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentStatusResponse
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -59,7 +60,7 @@ class SandboxPaymentControllerSpec
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[InitiatePaymentResponse]
-      response.paymentUrl shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+      response.paymentUrl.toString() shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
     }
   }
 

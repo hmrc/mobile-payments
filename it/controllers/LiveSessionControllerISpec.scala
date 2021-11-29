@@ -1,12 +1,12 @@
 package controllers
 
+import openbanking.cor.model.response.CreateSessionDataResponse
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse, CreateSessionDataResponse}
 import utils.BaseISpec
 
 class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
@@ -23,7 +23,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.post(Json.obj("amount" -> 1200, "saUtr" -> "CS700100A")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[CreateSessionDataResponse]
-      parsedResponse.sessionDataId shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
+      parsedResponse.sessionDataId.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
     }
 
     "return 500 when request from session is malformed" in {

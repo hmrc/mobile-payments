@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.session
 
+import openbanking.cor.model.response.CreateSessionDataResponse
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
@@ -24,7 +25,6 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
-import uk.gov.hmrc.mobilepayments.domain.dto.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
