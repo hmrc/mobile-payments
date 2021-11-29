@@ -37,8 +37,8 @@ trait MobilePaymentsTestData {
 
   lazy val shutteredResponse: Shuttering = Json.fromJson[Shuttering](js("shuttered-response")).get
 
-  lazy val sessionDataResponse: SessionDataResponse =
-    Json.fromJson[SessionDataResponse](js("session-data-response")).get
+  lazy val sessionDataResponse: CreateSessionDataResponse =
+    Json.fromJson[CreateSessionDataResponse](js("session-data-response")).get
 
   lazy val paymentInitiatedResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get

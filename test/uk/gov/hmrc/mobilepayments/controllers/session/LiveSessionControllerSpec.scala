@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
@@ -67,7 +67,7 @@ class LiveSessionControllerSpec
 
       val result = sut.createSession(journeyId)(request)
       status(result) shouldBe 200
-      val response = contentAsJson(result).as[SessionDataResponse]
+      val response = contentAsJson(result).as[CreateSessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
     }
   }
@@ -129,7 +129,7 @@ class LiveSessionControllerSpec
     }
   }
 
-  private def mockCreateSession(future: Future[SessionDataResponse]) =
+  private def mockCreateSession(future: Future[CreateSessionDataResponse]) =
     (mockOpenBankingService
       .createSession(_: BigDecimal, _: SaUtr, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)

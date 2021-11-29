@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, OpenBankingPaymentStatusResponse, SessionDataResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, OpenBankingPaymentStatusResponse, CreateSessionDataResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
 
@@ -195,7 +195,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       .expects(journeyId, hc)
       .returning(future)
 
-  private def mockSession(future: Future[SessionDataResponse]): Unit =
+  private def mockSession(future: Future[CreateSessionDataResponse]): Unit =
     (mockConnector
       .createSession(_: AmountInPence, _: SaUtr, _: JourneyId)(_: HeaderCarrier))
       .expects(amountInPence, saUtr, journeyId, hc)

@@ -45,8 +45,8 @@ class OpenBankingConnector @Inject() (
     saUtr:                  SaUtr,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[SessionDataResponse] =
-    http.POST[CreateSessionDataRequest, SessionDataResponse](
+  ): Future[CreateSessionDataResponse] =
+    http.POST[CreateSessionDataRequest, CreateSessionDataResponse](
       url = s"$serviceUrl/open-banking/session?journeyId=${journeyId.value}",
       CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
       Seq(("X-Session-ID", journeyId.value))
@@ -56,9 +56,9 @@ class OpenBankingConnector @Inject() (
     sessionDataId:          String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[SessionDataResponse] = {
+  ): Future[CreateSessionDataResponse] = {
     val journey = journeyId.value
-    http.GET[SessionDataResponse](
+    http.GET[CreateSessionDataResponse](
       url = s"$serviceUrl/open-banking/session/$sessionDataId?journeyId=$journey"
     )
   }

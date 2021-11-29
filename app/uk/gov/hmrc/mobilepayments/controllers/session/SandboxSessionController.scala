@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
-import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -70,6 +70,6 @@ class SandboxSessionController @Inject() (
           findResource(path = s"/resources/mobilepayments/sandbox-session-response.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
-        .as[SessionDataResponse]
+        .as[CreateSessionDataResponse]
     )
 }

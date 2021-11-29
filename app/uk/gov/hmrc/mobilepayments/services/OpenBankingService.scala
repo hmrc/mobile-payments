@@ -50,14 +50,14 @@ class OpenBankingService @Inject() (
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[SessionDataResponse] = connector.createSession(AmountInPence(amount), saUtr, journeyId)
+  ): Future[CreateSessionDataResponse] = connector.createSession(AmountInPence(amount), saUtr, journeyId)
 
   def getSession(
     sessionDataId:          String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[SessionDataResponse] = connector.getSession(sessionDataId, journeyId)
+  ): Future[CreateSessionDataResponse] = connector.getSession(sessionDataId, journeyId)
 
   def selectBank(
     sessionDataId:          String,
