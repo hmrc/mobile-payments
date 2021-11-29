@@ -103,7 +103,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with the same payment url when URL not consumed" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForUrlConsumed(response = Json.toJson(false).toString())
+      stubForUrlConsumed(response     = Json.toJson(false).toString())
       stubForInitiatePayment(response = paymentInitiatedResponseJson)
 
       val request: WSRequest = wsUrl(

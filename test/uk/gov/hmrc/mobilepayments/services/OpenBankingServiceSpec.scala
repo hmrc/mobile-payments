@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
+import akka.http.scaladsl.model.Uri
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
@@ -26,7 +27,6 @@ import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
 import uk.gov.hmrc.mobilepayments.domain.dto.response.OpenBankingPaymentStatusResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
-import akka.http.scaladsl.model.Uri
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -143,8 +143,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return an unchanged payment session response" in {
       mockUrlConsumed(Future successful false)
 
-      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId),
-                                0.5.seconds)
+      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId), 0.5.seconds)
       result.paymentUrl shouldEqual paymentUrl
     }
   }
@@ -155,8 +154,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockClearPayment(Future successful ())
       mockInitiatePayment(Future successful paymentInitiatedUpdateResponse)
 
-      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId),
-                                0.5.seconds)
+      val result = Await.result(sut.updatePayment(sessionDataId, paymentUrl.toString(), journeyId), 0.5.seconds)
       result.paymentUrl.toString() shouldEqual "https://some-updated-bank.com?param=dosomething"
     }
   }

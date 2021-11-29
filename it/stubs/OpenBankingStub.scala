@@ -9,7 +9,10 @@ object OpenBankingStub {
   val journeyId:     JourneyId = "27085215-69a4-4027-8f72-b04b10ec16b0"
   val sessionDataId: String    = "51cc67d6-21da-11ec-9621-0242ac130002"
 
-  def stubForGetBanks(statusCode: Int = 200, response: String = "{}"): StubMapping =
+  def stubForGetBanks(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
     stubFor(
       get(
         urlEqualTo(
@@ -22,7 +25,10 @@ object OpenBankingStub {
       )
     )
 
-  def stubForCreateSession(statusCode: Int = 200, response: String = "{}"): StubMapping =
+  def stubForCreateSession(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
     stubFor(
       post(
         urlEqualTo(
@@ -47,7 +53,10 @@ object OpenBankingStub {
       )
     )
 
-  def stubForInitiatePayment(statusCode: Int = 200, response: String = "{}"): StubMapping =
+  def stubForInitiatePayment(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
     stubFor(
       post(
         urlEqualTo(
@@ -60,7 +69,10 @@ object OpenBankingStub {
       )
     )
 
-  def stubForGetPaymentStatus(statusCode: Int = 200, response: String = "{}"): StubMapping =
+  def stubForGetPaymentStatus(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
     stubFor(
       get(
         urlEqualTo(
@@ -73,7 +85,10 @@ object OpenBankingStub {
       )
     )
 
-  def stubForUrlConsumed(statusCode: Int = 200, response: String = "{}"): StubMapping =
+  def stubForUrlConsumed(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
     stubFor(
       get(
         urlEqualTo(

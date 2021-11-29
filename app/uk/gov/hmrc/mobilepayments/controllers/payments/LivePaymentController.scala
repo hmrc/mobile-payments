@@ -100,7 +100,7 @@ class LivePaymentController @Inject() (
                 .map { response =>
                   Ok(Json.toJson(response))
                 }
-                //TODO: probably should fire the audit event here too
+            //TODO: probably should fire the audit event here too
             }
           }
         }
