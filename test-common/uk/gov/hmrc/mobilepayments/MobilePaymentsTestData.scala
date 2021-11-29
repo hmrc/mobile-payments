@@ -42,6 +42,9 @@ trait MobilePaymentsTestData {
   lazy val createSessionDataResponse: CreateSessionDataResponse =
     Json.fromJson[CreateSessionDataResponse](js("create-session-data-response")).get
 
+  lazy val sessionDataResponse: SessionDataResponse =
+    Json.fromJson[SessionDataResponse](js("session-data-response")).get
+
   lazy val paymentInitiatedResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-initiated-response")).get
 
@@ -57,14 +60,15 @@ trait MobilePaymentsTestData {
   lazy val sessionBankSelectedDataResponse: SessionData[OriginSpecificSessionData] =
     Json.fromJson[SessionData[OriginSpecificSessionData]](js("session-data-bank-selected-response")).get
 
-  lazy val rawMalformedJson:                   String = "{\"data\": [{,]}"
-  lazy val banksResponseJson:                  String = json("banks-response")
-  lazy val sessionDataResponseJson:            String = json("session-data-initiated-response")
-  lazy val createSessionDataResponseJson:      String = json("create-session-data-response")
-  lazy val createPaymentRequestJson:           String = json("create-payment-request")
-  lazy val paymentInitiatedResponseJson:       String = json("payment-initiated-response")
-  lazy val paymentInitiatedUpdateResponseJson: String = json("payment-initiated-update-response")
-  lazy val paymentStatusResponseJson:          String = json("payment-status-ob-response")
+  lazy val rawMalformedJson:                    String = "{\"data\": [{,]}"
+  lazy val banksResponseJson:                   String = json("banks-response")
+  lazy val sessionDataResponseJson:             String = json("session-data-initiated-response")
+  lazy val createSessionDataResponseJson:       String = json("create-session-data-response")
+  lazy val sessionDataBankSelectedResponseJson: String = json("session-data-bank-selected-response")
+  lazy val createPaymentRequestJson:            String = json("create-payment-request")
+  lazy val paymentInitiatedResponseJson:        String = json("payment-initiated-response")
+  lazy val paymentInitiatedUpdateResponseJson:  String = json("payment-initiated-update-response")
+  lazy val paymentStatusResponseJson:           String = json("payment-status-ob-response")
 
   private def json(fileName: String): String = {
     val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")

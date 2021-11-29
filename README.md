@@ -4,7 +4,9 @@ mobile-payments
 - Fetch the list of supported banks.
 - Select a bank for a given session ID.
 - Fetch the payment status for a given session ID.
-- Create a payment for a given session ID.
+- Create a payment URL for a given session ID.
+- Update a payment URL for a given session ID.
+- Fetch the payment URL consumed status for a given session ID.
 - Create a session.
 - Fetch a session for a given session ID.
 
@@ -23,6 +25,8 @@ API
 | ```/banks/:sessionDataId``` | POST | Select a bank for a given session ID. [More...](app/docs/post-bank.md)|
 | ```/payments/:sessionDataId``` | GET | Fetch the payment status for a given session ID. [More...](app/docs/get-payment.md)|
 | ```/payments/:sessionDataId``` | POST | Create a payment for a given session ID. [More...](app/docs/post-payment.md)|
+| ```/payments/:sessionDataId``` | PUT | Update a payment for a given session ID. [More...](app/docs/put-payment.md)|
+| ```/payments/:sessionDataId/url-consumed``` | GET | Fetch the payment URL consumed status for a given session ID. [More...](app/docs/get-payment-url-consumed.md)|
 | ```/sessions``` | POST | Create a session. [More...](app/docs/post-session.md)|
 | ```/sessions/:sessionDataId``` | GET | Fetch a session for a given session ID. [More...](app/docs/get-session.md)|
 

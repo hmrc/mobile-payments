@@ -1,13 +1,13 @@
-Post Session
+Update Payment
 ----
-### Create a session.
+### Update a payment URL for a given session ID.
 * **URL**
 
-  `/sessions/:sessionDataId`
+  `/payments`
 
 * **Method:**
 
-  `POST`
+  `PUT`
 
 * **URL Params**
 
@@ -17,22 +17,19 @@ Post Session
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Body**
+* **Success Responses:**
 
-  **Required:**
-
-  `bankId`
-  the identifier of the chosen bank.
+    * **Code:** 200 <br />
+      **Content:** Payment URL data
 
 ```json
 {
-  "bankId": "asd-123"
+  "paymentUrl": "https://some-bank.com?param=dosomething"
 }
 ```
 
-* **Success Responses:**
-
-    * **Code:** 201
+`paymentUrl`
+a URL that the client app will navigate to in order to process the payment.
 
 * **Error Responses:**
 

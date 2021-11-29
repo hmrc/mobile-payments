@@ -78,7 +78,7 @@ class OpenBankingService @Inject() (
           amount        = BigDecimal.exact(data.amount.formatInDecimal),
           bankId        = bankId,
           createdOn     = data.createdOn,
-          saUtr         = ptaSa.saUtr
+          saUtr         = SaUtr(ptaSa.saUtr.value)
         )
       }
 

@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
@@ -63,7 +63,8 @@ class LivePaymentControllerSpec
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
       mockInitiatePayment(Future successful paymentSessionResponse)
-//      stubPaymentEvent()
+      mockGetSession(Future successful sessionDataResponse)
+      stubPaymentEvent()
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader)
@@ -344,4 +345,10 @@ class LivePaymentControllerSpec
       .urlConsumed(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returning(f)
+
+  private def mockGetSession(future: Future[SessionDataResponse]) =
+    (mockOpenBankingService
+      .getSession(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returning(future)
 }

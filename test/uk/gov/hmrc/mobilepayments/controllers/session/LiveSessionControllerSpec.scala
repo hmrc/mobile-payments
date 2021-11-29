@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
@@ -129,10 +130,75 @@ class LiveSessionControllerSpec
     }
   }
 
+  "when get session invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetSession(Future successful sessionDataResponse)
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[SessionDataResponse]
+      response.sessionDataId shouldEqual sessionDataId
+      response.amount shouldEqual 125.64
+      response.bankId shouldEqual Some("some-bank-id")
+      response.saUtr.value shouldEqual "CS700100A"
+    }
+  }
+
+  "when get session invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetSession(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get session invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get session invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetSession(Future failed Upstream5xxResponse("Error", 502, 502))
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
   private def mockCreateSession(future: Future[CreateSessionDataResponse]) =
     (mockOpenBankingService
       .createSession(_: BigDecimal, _: SaUtr, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)
+      .returning(future)
+
+  private def mockGetSession(future: Future[SessionDataResponse]) =
+    (mockOpenBankingService
+      .getSession(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
       .returning(future)
 
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =

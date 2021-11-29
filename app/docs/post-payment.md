@@ -1,6 +1,6 @@
 Create Payment
 ----
-
+### Create a payment URL for a given session ID.
 * **URL**
 
   `/payments`

@@ -1,13 +1,14 @@
-Post Session
+Get Banks
 ----
-### Create a session.
+### Fetch a session for a given session ID.
+
 * **URL**
 
-  `/sessions/:sessionDataId`
+  `/banks`
 
 * **Method:**
 
-  `POST`
+  `GET`
 
 * **URL Params**
 
@@ -17,22 +18,29 @@ Post Session
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Body**
+* **Path Variables**
 
   **Required:**
 
-  `bankId`
-  the identifier of the chosen bank.
+  `/:sessionDataId`
+
+  the ID of the current session
+* 
+* **Success Responses:**
+
+    * **Code:** 200 <br />
+      **Content:** Bank data
 
 ```json
 {
-  "bankId": "asd-123"
+  "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
+  "amount": 125.64,
+  "state": "BankSelected",
+  "bankId": "some-bank-id",
+  "createdOn" : "2021-11-03T10:15:30",
+  "saUtr": "CS700100A"
 }
 ```
-
-* **Success Responses:**
-
-    * **Code:** 201
 
 * **Error Responses:**
 

@@ -21,9 +21,11 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
+import uk.gov.hmrc.http.{Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -48,13 +50,13 @@ class SandboxSessionControllerSpec
     mockShutteringService
   )
 
-  "when createSession invoked and service returns success then" should {
+  "when create session invoked and service returns success then" should {
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("POST", "/sessions")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader, sandboxHeader)
         .withBody(Json.obj("amount" -> 1234, "saUtr" -> "CS700100A"))
 
       val result = sut.createSession(journeyId)(request)
@@ -64,15 +66,45 @@ class SandboxSessionControllerSpec
     }
   }
 
-  "when get banks invoked and auth fails then" should {
+  "when create session invoked and auth fails then" should {
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("POST", "/sessions")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withHeaders(acceptJsonHeader, contentHeader, sandboxHeader)
         .withBody(Json.obj("amount" -> 1234, "saUtr" -> "CS700100A"))
 
       val result = sut.createSession(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get session invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders(acceptJsonHeader, sandboxHeader)
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[SessionDataResponse]
+      response.sessionDataId shouldEqual sessionDataId
+      response.amount shouldEqual 125.64
+      response.bankId shouldEqual Some("some-bank-id")
+      response.saUtr.value shouldEqual "CS700100A"
+    }
+  }
+
+  "when get session invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders(acceptJsonHeader, sandboxHeader)
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }

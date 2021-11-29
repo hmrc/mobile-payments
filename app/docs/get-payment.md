@@ -1,5 +1,6 @@
 Get Payment Status
 ----
+### Fetch the payment status for a given session ID. 
 
 * **URL**
 

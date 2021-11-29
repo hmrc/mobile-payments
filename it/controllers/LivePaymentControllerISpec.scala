@@ -19,6 +19,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       grantAccess()
       stubForShutteringDisabled
       stubForInitiatePayment(response = paymentInitiatedResponseJson)
+      stubForGetSession(response = sessionDataBankSelectedResponseJson)
 
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
@@ -60,21 +60,11 @@ class LivePaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            openBankingService
-              .initiatePayment(
-                sessionDataId,
-                journeyId
-              )
-              .map(response => Ok(Json.toJson(response)))
-            // TODO: need to fetch the session to fix this
-//              .map { response =>
-//                auditService.sendPaymentEvent(
-//                  BigDecimal.decimal(1),//createPaymentRequest.amount,
-//                  SaUtr(""),//createPaymentRequest.saUtr,
-//                  journeyId.toString()
-//                )
-//                Created
-//              }
+            for {
+              response <- openBankingService.initiatePayment(sessionDataId, journeyId)
+              session  <- openBankingService.getSession(sessionDataId, journeyId)
+              _        <- auditService.sendPaymentEvent(session.amount, session.saUtr, journeyId.value)
+            } yield Ok(Json.toJson(response))
           }
         }
       }
@@ -97,7 +87,6 @@ class LivePaymentController @Inject() (
               .map { response =>
                 Ok(Json.toJson(response))
               }
-            //TODO: probably should fire the audit event here too
           }
         }
       }

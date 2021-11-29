@@ -112,4 +112,20 @@ object OpenBankingStub {
           .withStatus(statusCode)
       )
     )
+
+  def stubForGetSession(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
+    stubFor(
+      get(
+        urlEqualTo(
+          s"/open-banking/session/$sessionDataId?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
 }

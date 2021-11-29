@@ -1,8 +1,7 @@
 {
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
   "amount": 125.64,
-  "state": "BankSelected",
   "bankId": "some-bank-id",
-  "createdOn" : "2021-11-03T10:15:30",
+  "createdOn": "2021-11-03T10:15:30",
   "saUtr": "CS700100A"
 }

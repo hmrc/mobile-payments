@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.mobilepayments.domain.dto.response
 
-import payapi.corcommon.model.taxes.sa.SaUtr
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.domain.SaUtr
 
 import java.time.LocalDateTime
 

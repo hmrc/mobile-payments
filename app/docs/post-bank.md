@@ -1,9 +1,10 @@
 Post Bank
 ----
+### Select a bank for a given session ID.
 
 * **URL**
 
-  `/mobile-payments/banks/:sessionDataId`
+  `/banks/:sessionDataId`
 
 * **Method:**
 

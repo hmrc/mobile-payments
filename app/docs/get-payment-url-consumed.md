@@ -1,13 +1,14 @@
-Post Session
+Get Payment URL consumed status
 ----
-### Create a session.
+### Fetch the payment URL consumed status for a given session ID.
+
 * **URL**
 
-  `/sessions/:sessionDataId`
+  `/payments/:sessionDataId/url-consumed`
 
 * **Method:**
 
-  `POST`
+  `GET`
 
 * **URL Params**
 
@@ -17,22 +18,27 @@ Post Session
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Body**
+* **Path Variables**
 
   **Required:**
 
-  `bankId`
-  the identifier of the chosen bank.
+  `/:sessionDataId`
 
-```json
-{
-  "bankId": "asd-123"
-}
-```
+  the ID of the current session
 
 * **Success Responses:**
 
-    * **Code:** 201
+    * **Code:** 200 <br />
+      **Content:** Payment URL data
+
+```json
+{
+  "consumed": true
+}
+```
+
+`consumed`
+a boolean status that indicates whether the payment URL for a given session is still valid.
 
 * **Error Responses:**
 
