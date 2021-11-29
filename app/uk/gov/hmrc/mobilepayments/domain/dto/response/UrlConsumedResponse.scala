@@ -14,30 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.payments
+package uk.gov.hmrc.mobilepayments.domain.dto.response
 
-import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import play.api.libs.json.{Format, Json}
 
-trait PaymentController {
+final case class UrlConsumedResponse(consumed: Boolean)
 
-  def createPayment(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent]
-
-  def updatePayment(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent]
-
-  def urlConsumed(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent]
-
-  def getPaymentStatus(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent]
+object UrlConsumedResponse {
+  implicit val format: Format[UrlConsumedResponse] = Json.format[UrlConsumedResponse]
 }

@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentStatusResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -99,6 +99,33 @@ class SandboxPaymentControllerSpec
         .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get url consumed invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.urlConsumed(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[UrlConsumedResponse]
+      response.consumed shouldEqual true
+    }
+  }
+
+  "when get url consumed invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.urlConsumed(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }

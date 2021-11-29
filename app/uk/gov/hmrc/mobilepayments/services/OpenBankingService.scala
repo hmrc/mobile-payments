@@ -17,8 +17,8 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
+import openbanking.cor.model._
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
@@ -59,10 +59,28 @@ class OpenBankingService @Inject() (
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[SessionData[OriginSpecificSessionData]] = {
-    //TODO: this is where we should transform into our own data model
-    connector.getSession(sessionDataId, journeyId)
-  }
+  ): Future[SessionDataResponse] =
+    connector
+      .getSession(sessionDataId, journeyId)
+      .map { data =>
+        val ptaSa = data.originSpecificData.asInstanceOf[PtaSaSessionData]
+
+        val bankId: Option[String] = data.sessionState match {
+          case SessionInitiated => None
+          case t: BankSelected     => Some(t.bankId.value)
+          case t: PaymentInitiated => Some(t.bankId.value)
+          case t: PaymentFinished  => Some(t.bankId.value)
+          case t: PaymentFinalised => Some(t.bankId.value)
+        }
+
+        SessionDataResponse(
+          sessionDataId = data._id.value,
+          amount        = BigDecimal.exact(data.amount.formatInDecimal),
+          bankId        = bankId,
+          createdOn     = data.createdOn,
+          saUtr         = ptaSa.saUtr
+        )
+      }
 
   def selectBank(
     sessionDataId:          String,
@@ -82,18 +100,23 @@ class OpenBankingService @Inject() (
 
   def updatePayment(
     sessionDataId:          String,
-    paymentUrl:             String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
   ): Future[InitiatePaymentResponse] =
-    connector.urlConsumed(sessionDataId, journeyId).flatMap {
-      case true =>
-        connector
-          .clearPayment(sessionDataId, journeyId)
-          .flatMap(_ => connector.initiatePayment(sessionDataId, openBankingPaymentReturnUrl, journeyId))
-      case false => Future.successful(InitiatePaymentResponse(paymentUrl))
-    }
+    connector
+      .clearPayment(sessionDataId, journeyId)
+      .flatMap(_ => connector.initiatePayment(sessionDataId, openBankingPaymentReturnUrl, journeyId))
+
+  def urlConsumed(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[UrlConsumedResponse] =
+    connector
+      .urlConsumed(sessionDataId, journeyId)
+      .map(t => UrlConsumedResponse(consumed = t))
 
   def getPaymentStatus(
     sessionDataId:          String,

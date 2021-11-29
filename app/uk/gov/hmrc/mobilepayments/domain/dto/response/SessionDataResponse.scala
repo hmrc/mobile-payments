@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.request
+package uk.gov.hmrc.mobilepayments.domain.dto.response
 
+import payapi.corcommon.model.taxes.sa.SaUtr
 import play.api.libs.json.{Format, Json}
 
-final case class UpdatePaymentRequest(paymentUrl: String)
+import java.time.LocalDateTime
 
-object UpdatePaymentRequest {
-  implicit val format: Format[UpdatePaymentRequest] = Json.format[UpdatePaymentRequest]
+final case class SessionDataResponse(
+  sessionDataId: String,
+  amount:        BigDecimal,
+  bankId:        Option[String],
+  createdOn:     LocalDateTime,
+  saUtr:         SaUtr)
+
+object SessionDataResponse {
+  implicit val format: Format[SessionDataResponse] = Json.format[SessionDataResponse]
 }

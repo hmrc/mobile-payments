@@ -25,7 +25,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.PaymentStatusResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -65,11 +65,23 @@ class SandboxPaymentController @Inject() (
   override def updatePayment(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
+        }
+      }
+    }
+
+  override def urlConsumed(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          Future successful Ok(toJson(UrlConsumedResponse(true)))
         }
       }
     }

@@ -41,7 +41,8 @@ object AppDependencies {
 
         override lazy val test: Seq[ModuleID] = testCommon(scope) ++ Seq(
             "uk.gov.hmrc"   %% "bootstrap-test-play-28" % bootstrapPlay28Version,
-            "org.scalamock" %% "scalamock"              % scalaMockVersion % scope
+            "org.scalamock" %% "scalamock"              % scalaMockVersion % scope,
+            "uk.gov.hmrc"   %% "open-banking-cor"       % openBankingVersion
           )
       }.test
   }

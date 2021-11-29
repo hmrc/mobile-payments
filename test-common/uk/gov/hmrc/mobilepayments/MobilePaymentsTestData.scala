@@ -51,12 +51,15 @@ trait MobilePaymentsTestData {
   lazy val paymentSessionResponse: InitiatePaymentResponse =
     Json.fromJson[InitiatePaymentResponse](js("payment-session-response")).get
 
-  lazy val sessionDataResponse: SessionData[OriginSpecificSessionData] =
-    Json.fromJson[SessionData[OriginSpecificSessionData]](js("session-data-response")).get
+  lazy val sessionInitiatedDataResponse: SessionData[OriginSpecificSessionData] =
+    Json.fromJson[SessionData[OriginSpecificSessionData]](js("session-data-initiated-response")).get
+
+  lazy val sessionBankSelectedDataResponse: SessionData[OriginSpecificSessionData] =
+    Json.fromJson[SessionData[OriginSpecificSessionData]](js("session-data-bank-selected-response")).get
 
   lazy val rawMalformedJson:                   String = "{\"data\": [{,]}"
   lazy val banksResponseJson:                  String = json("banks-response")
-  lazy val sessionDataResponseJson:            String = json("session-data-response")
+  lazy val sessionDataResponseJson:            String = json("session-data-initiated-response")
   lazy val createSessionDataResponseJson:      String = json("create-session-data-response")
   lazy val createPaymentRequestJson:           String = json("create-payment-request")
   lazy val paymentInitiatedResponseJson:       String = json("payment-initiated-response")

@@ -25,6 +25,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -53,7 +54,7 @@ class SandboxSessionController @Inject() (
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future successful Ok(sampleSessionJson)
+          Future successful Ok(sampleCreateSessionJson)
         }
       }
     }
@@ -61,7 +62,24 @@ class SandboxSessionController @Inject() (
   override def getSession(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[AnyContent] = ???
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          Future successful Ok(sampleSessionJson)
+        }
+      }
+    }
+
+  private def sampleCreateSessionJson: JsValue =
+    toJson(
+      Json
+        .parse(
+          findResource(path = s"/resources/mobilepayments/sandbox-create-session-response.json")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+        )
+        .as[CreateSessionDataResponse]
+    )
 
   private def sampleSessionJson: JsValue =
     toJson(
@@ -70,6 +88,6 @@ class SandboxSessionController @Inject() (
           findResource(path = s"/resources/mobilepayments/sandbox-session-response.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
-        .as[CreateSessionDataResponse]
+        .as[SessionDataResponse]
     )
 }

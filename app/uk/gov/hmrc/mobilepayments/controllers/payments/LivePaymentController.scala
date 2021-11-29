@@ -23,7 +23,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.UpdatePaymentRequest
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -84,24 +83,43 @@ class LivePaymentController @Inject() (
   def updatePayment(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            withValidJson[UpdatePaymentRequest] { updatePaymentRequest =>
-              openBankingService
-                .updatePayment(
-                  sessionDataId,
-                  updatePaymentRequest.paymentUrl,
-                  journeyId
-                )
-                .map { response =>
-                  Ok(Json.toJson(response))
-                }
+            openBankingService
+              .updatePayment(
+                sessionDataId,
+                journeyId
+              )
+              .map { response =>
+                Ok(Json.toJson(response))
+              }
             //TODO: probably should fire the audit event here too
-            }
+          }
+        }
+      }
+    }
+
+  def urlConsumed(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            openBankingService
+              .urlConsumed(
+                sessionDataId,
+                journeyId
+              )
+              .map { response =>
+                Ok(Json.toJson(response))
+              }
           }
         }
       }
