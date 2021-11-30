@@ -17,6 +17,7 @@
 package uk.gov.hmrc.mobilepayments.controllers.banks
 
 import org.scalamock.handlers.CallHandler
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
@@ -39,6 +40,8 @@ class SandboxBankControllerSpec
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
+
+  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   private val sut = new SandboxBankController(
     mockAuthConnector,
@@ -70,6 +73,33 @@ class SandboxBankControllerSpec
         .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when select bank invoked then" should {
+    "return 201" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader, sandboxHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
+      status(result) shouldBe 201
+    }
+  }
+
+  "when select bank invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader, sandboxHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }
