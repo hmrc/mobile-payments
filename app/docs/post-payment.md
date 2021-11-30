@@ -5,7 +5,7 @@ Create Payment
 
 * **URL**
 
-  `/payments`
+  `/payments/:sessionDataId	`
 
 * **Method:**
 
@@ -18,6 +18,14 @@ Create Payment
   `journeyId=[String]`
 
   a string which is included for journey tracking purposes but has no functional impact
+  
+* **Path Variables**
+
+  **Required:**
+
+  `/:sessionDataId`
+
+  the ID of the current session
 
 * **Success Responses:**
 
