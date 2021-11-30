@@ -1,5 +1,6 @@
 Get Banks
 ----
+
 ### Fetch the list of supported banks.
 
 * **URL**

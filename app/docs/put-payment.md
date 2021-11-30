@@ -1,6 +1,8 @@
 Update Payment
 ----
+
 ### Update a payment URL for a given session ID.
+
 * **URL**
 
   `/payments`

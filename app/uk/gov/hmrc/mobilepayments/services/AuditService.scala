@@ -39,7 +39,7 @@ class AuditService @Inject() (
     journeyId:        String
   )(implicit hc:      HeaderCarrier,
     executionContext: ExecutionContext
-  ): Future[AuditResult] = {
+  ): Future[AuditResult] =
     auditConnector.sendExtendedEvent(
       ExtendedDataEvent(
         appName,
@@ -52,7 +52,6 @@ class AuditService @Inject() (
         )
       )
     )
-  }
 
   object AuditService {
     val paymentPath      = "/payment"

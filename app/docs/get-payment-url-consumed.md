@@ -1,5 +1,6 @@
 Get Payment URL consumed status
 ----
+
 ### Fetch the payment URL consumed status for a given session ID.
 
 * **URL**

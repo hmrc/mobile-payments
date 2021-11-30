@@ -1,6 +1,8 @@
 Post Session
 ----
+
 ### Create a session.
+
 * **URL**
 
   `/sessions/:sessionDataId`

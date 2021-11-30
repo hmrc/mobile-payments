@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.mobilepayments.connectors
 
-import openbanking.cor.model.{PtaSaSessionData, SessionInitiated}
+import openbanking.cor.model.SessionInitiated
 import org.scalatest.concurrent.ScalaFutures
-import payapi.corcommon.model.Origins.PtaSa
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{NotFoundException, _}
@@ -162,11 +161,11 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
     "return session" in {
       performSuccessfulGET(Future successful sessionInitiatedDataResponse)(mockHttp)
       val result = await(sut.getSession(sessionDataId, journeyId))
-      result._id.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
+      result._id.value       shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
       result.sessionId.value shouldBe "a-session-id"
-      result.amount.value shouldBe 12564
-      result.sessionState shouldBe SessionInitiated
-      result.createdOn shouldBe LocalDateTime.parse("2021-11-03T10:15:30")
+      result.amount.value    shouldBe 12564
+      result.sessionState    shouldBe SessionInitiated
+      result.createdOn       shouldBe LocalDateTime.parse("2021-11-03T10:15:30")
     }
   }
 

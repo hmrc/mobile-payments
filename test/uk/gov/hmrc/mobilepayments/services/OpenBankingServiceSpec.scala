@@ -17,8 +17,8 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import akka.http.scaladsl.model.Uri
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}

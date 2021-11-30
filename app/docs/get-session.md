@@ -1,5 +1,6 @@
 Get Banks
 ----
+
 ### Fetch a session for a given session ID.
 
 * **URL**
@@ -25,7 +26,7 @@ Get Banks
   `/:sessionDataId`
 
   the ID of the current session
-* 
+*
 * **Success Responses:**
 
     * **Code:** 200 <br />
