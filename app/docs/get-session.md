@@ -1,11 +1,11 @@
-Get Banks
+Get Session
 ----
 
 ### Fetch a session for a given session ID.
 
 * **URL**
 
-  `/banks`
+  `/session/:sessionDataId`
 
 * **Method:**
 
