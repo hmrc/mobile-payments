@@ -28,7 +28,8 @@ Post Session
 
 ```json
 {
-  "bankId": "asd-123"
+  "amount": 322.75,
+  "saUtr": "CS700100A"
 }
 ```
 
