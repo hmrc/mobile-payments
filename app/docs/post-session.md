@@ -35,7 +35,13 @@ Post Session
 
 * **Success Responses:**
 
-    * **Code:** 201
+    * **Code:** 200
+
+```json
+{
+  "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002"
+}
+```
 
 * **Error Responses:**
 
