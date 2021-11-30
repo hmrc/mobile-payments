@@ -24,8 +24,7 @@ uses:
 /mobile/payments:
   /banks:
     get:
-      displayName: Get a list of available banks
-      description: This endpoint retrieves a list of banks for the user to select from to make a payment
+      displayName: Fetch the list of supported banks.
       is: [headers.acceptHeader]
       (annotations.scope): "read:native-apps-api-orchestration"
       securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
@@ -41,6 +40,30 @@ uses:
               examples:
                 example-1:
                   value: !include examples/get-banks-response-example.json
+    /{sessionDataId}:
+      uriParameters:
+        sessionDataId:
+          description: The ID associated with the payment session.
+          type: string
+          example: 51cc67d6-21da-11ec-9621-0242ac130002
+          required: true
+      post:
+        displayName: Select a bank for a given session ID
+        is: [headers.acceptHeader]
+        (annotations.scope): "read:native-apps-api-orchestration"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+        queryParameters:
+          journeyId:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-1:
+                    value: !include examples/get-banks-response-example.json
   /payments:
     /{sessionDataId}:
       uriParameters:
@@ -50,8 +73,7 @@ uses:
           example: 51cc67d6-21da-11ec-9621-0242ac130002
           required: true
       get:
-        displayName: Get the payment status
-        description: This endpoint retrieves a status of a payment associated with a session
+        displayName: Fetch the payment status for a given session ID.
         is: [headers.acceptHeader]
         (annotations.scope): "read:native-apps-api-orchestration"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
@@ -67,26 +89,102 @@ uses:
                 examples:
                   example-2:
                     value: !include examples/get-payment-status-response-example.json
+      post:
+        displayName: Create a payment for a given session ID.
+        is: [headers.acceptHeader]
+        (annotations.scope): "read:native-apps-api-orchestration"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+        queryParameters:
+          journeyId:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-3:
+                    value: !include examples/post-payment-response-example.json
+      put:
+        displayName: Update a payment for a given session ID.
+        is: [headers.acceptHeader]
+        (annotations.scope): "read:native-apps-api-orchestration"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+        queryParameters:
+          journeyId:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-4:
+                    value: !include examples/put-payment-response-example.json
+    /url-consumed:
+      get:
+        displayName: Fetch the payment URL consumed status for a given session ID.
+        is: [headers.acceptHeader]
+        (annotations.scope): "read:native-apps-api-orchestration"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+        queryParameters:
+          journeyId:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-5:
+                    value: !include examples/get-payment-url-consumed-response-example.json
+  /session:
     post:
-      displayName: Creates a payment
-      description: This endpoint initiates an open banking payment and returns a payment URL.
+      displayName: Create a payment for a given session ID.
       is: [headers.acceptHeader]
       (annotations.scope): "read:native-apps-api-orchestration"
       securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
       body:
         application/json:
           example:
-            example-3:
-              value: !include examples/post-payment-request-example.json
-      queryParameters:
-        journeyId:
+            example-6:
+              value: !include examples/post-session-request-example.json
+        queryParameters:
+          journeyId:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-7:
+                    value: !include examples/post-session-response-example.json
+    /{sessionDataId}:
+      uriParameters:
+        sessionDataId:
+          description: The ID associated with the payment session.
           type: string
-          example: 27085215-69a4-4027-8f72-b04b10ec16b0
+          example: 51cc67d6-21da-11ec-9621-0242ac130002
           required: true
-      responses:
-        200:
-          body:
-            application/json:
-              examples:
-                example-4:
-                  value: !include examples/post-payment-response-example.json
+      get:
+        displayName: Fetch a session for a given session ID.
+        is: [headers.acceptHeader]
+        (annotations.scope): "read:native-apps-api-orchestration"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+        queryParameters:
+          journeyId:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-8:
+                    value: !include examples/get-session-response-example.json
