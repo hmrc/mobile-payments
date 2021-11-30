@@ -1,15 +1,15 @@
-Get Payment Status
+Update Payment
 ----
 
-### Fetch the payment status for a given session ID.
+### Update a payment URL for a given session ID.
 
 * **URL**
 
-  `/payments/:sessionDataId`
+  `/payments`
 
 * **Method:**
 
-  `GET`
+  `PUT`
 
 * **URL Params**
 
@@ -19,24 +19,19 @@ Get Payment Status
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Path Variables**
-
-  **Required:**
-
-  `/:sessionDataId`
-
-  the ID of the current session
-
 * **Success Responses:**
 
     * **Code:** 200 <br />
-      **Content:** Payment status data
+      **Content:** Payment URL data
 
 ```json
 {
-  "status": "Authorised"
+  "paymentUrl": "https://some-bank.com?param=dosomething"
 }
 ```
+
+`paymentUrl`
+a URL that the client app will navigate to in order to process the payment.
 
 * **Error Responses:**
 

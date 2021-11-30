@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.response
+package uk.gov.hmrc.mobilepayments.controllers.session
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
-final case class PaymentSessionResponse(
-  paymentUrl:    String,
-  sessionDataId: String)
+trait SessionController {
+  def createSession(journeyId: JourneyId): Action[JsValue]
 
-object PaymentSessionResponse {
-  implicit val format: Format[PaymentSessionResponse] = Json.format[PaymentSessionResponse]
+  def getSession(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent]
 }

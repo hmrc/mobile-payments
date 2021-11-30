@@ -23,6 +23,8 @@ import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
+import uk.gov.hmrc.mobilepayments.controllers.errors.JsonHandler
+import uk.gov.hmrc.mobilepayments.domain.dto.request.SelectBankRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
@@ -42,7 +44,8 @@ class SandboxBankController @Inject() (
     with BankController
     with ControllerChecks
     with AccessControl
-    with FileResource {
+    with FileResource
+    with JsonHandler {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
 
@@ -51,6 +54,20 @@ class SandboxBankController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           Future successful Ok(readData(resource = "sandbox-banks-response.json"))
+        }
+      }
+    }
+
+  override def selectBank(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withValidJson[SelectBankRequest] { _ =>
+            Future successful Created
+          }
         }
       }
     }

@@ -33,4 +33,8 @@ trait BaseSpec extends AnyWordSpec with MockFactory with Matchers with DefaultAw
   implicit lazy val system: ActorSystem      = ActorSystem()
 
   val journeyId: JourneyId = "13345a9d-0958-4931-ae83-5a36e4ccd979"
+
+  protected val sandboxHeader:    (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
+  protected val contentHeader:    (String, String) = "Content-Type"     -> "application/json"
+  protected val acceptJsonHeader: (String, String) = "Accept"           -> "application/vnd.hmrc.1.0+json"
 }

@@ -15,7 +15,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with bank data" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanks(banksResponseJson)
+      stubForGetBanks(response = banksResponseJson)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -29,7 +29,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 500 when response from open-banking is malformed" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanks(rawMalformedJson)
+      stubForGetBanks(response = rawMalformedJson)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -41,7 +41,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 401 when a 401 is returned from open-banking" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanksFailure(401)
+      stubForGetBanks(401)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -53,7 +53,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 404 when a 404 is returned from open-banking" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanksFailure()
+      stubForGetBanks(404)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -75,7 +75,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 500 when unknown error is returned from open-banking" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetBanksFailure(500)
+      stubForGetBanks(500)
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"

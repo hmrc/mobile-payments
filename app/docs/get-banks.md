@@ -1,10 +1,11 @@
 Get Banks
 ----
-Returns the BanksResponse object.
+
+### Fetch the list of supported banks.
 
 * **URL**
 
-  `/mobile-payments/banks`
+  `/banks`
 
 * **Method:**
 

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.payments
+package uk.gov.hmrc.mobilepayments.controllers.session
 
-import openbanking.cor.model.response.InitiatePaymentResponse
+import openbanking.cor.model.response.CreateSessionDataResponse
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
@@ -24,8 +24,8 @@ import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
-import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -34,91 +34,60 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class SandboxPaymentController @Inject() (
+class SandboxSessionController @Inject() (
   override val authConnector:                                   AuthConnector,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
   cc:                                                           ControllerComponents,
   shutteringService:                                            ShutteringService
 )(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
-    with PaymentController
-    with ControllerChecks
+    with SessionController
     with AccessControl
+    with ControllerChecks
     with ErrorHandling
-    with JsonHandler
     with FileResource {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
+  override val app:    String                 = "Session-Controller"
 
-  override def createPayment(
+  override def createSession(journeyId: JourneyId): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          Future successful Ok(sampleCreateSessionJson)
+        }
+      }
+    }
+
+  override def getSession(
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
+          Future successful Ok(sampleSessionJson)
         }
       }
     }
 
-  override def updatePayment(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
-        }
-      }
-    }
-
-  override def urlConsumed(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          Future successful Ok(toJson(UrlConsumedResponse(true)))
-        }
-      }
-    }
-
-  def getPaymentStatus(
-    sessionDataId: String,
-    journeyId:     JourneyId
-  ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          withErrorWrapper {
-            Future successful Ok(samplePaymentStatusJson(resource = "sandbox-payment-status-response.json"))
-          }
-        }
-      }
-    }
-
-  private def sampleCreatePaymentJson(resource: String): JsValue =
+  private def sampleCreateSessionJson: JsValue =
     toJson(
       Json
         .parse(
-          findResource(path = s"/resources/mobilepayments/$resource")
+          findResource(path = s"/resources/mobilepayments/sandbox-create-session-response.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
-        .as[InitiatePaymentResponse]
+        .as[CreateSessionDataResponse]
     )
 
-  private def samplePaymentStatusJson(resource: String): JsValue =
+  private def sampleSessionJson: JsValue =
     toJson(
       Json
         .parse(
-          findResource(path = s"/resources/mobilepayments/$resource")
+          findResource(path = s"/resources/mobilepayments/sandbox-session-response.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
-        .as[PaymentStatusResponse]
+        .as[SessionDataResponse]
     )
-
-  override val app: String = "Sandbox Payment Controller"
 }

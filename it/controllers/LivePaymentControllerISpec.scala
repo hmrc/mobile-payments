@@ -1,67 +1,68 @@
 package controllers
 
+import openbanking.cor.model.response.InitiatePaymentResponse
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentSessionResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
 
 class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
+
+  private val paymentUrl: String = "https://some-bank.com?param=dosomething"
 
   "POST /payments" should {
     "return 200 with payment url" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBank()
-      stubForInitiatePayment(paymentInitiatedResponseJson)
+      stubForInitiatePayment(response = paymentInitiatedResponseJson)
+      stubForGetSession(response      = sessionDataBankSelectedResponseJson)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 200
-      val parsedResponse = Json.parse(response.body).as[PaymentSessionResponse]
-      parsedResponse.paymentUrl    shouldBe "https://some-bank.com?param=dosomething"
-      parsedResponse.sessionDataId shouldBe sessionDataId
+      val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
+      parsedResponse.paymentUrl.toString() shouldBe "https://some-bank.com?param=dosomething"
     }
 
-    "return 500 when response from create session is malformed" in {
+    "return 500 when request from payment is malformed" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(rawMalformedJson)
+      stubForInitiatePayment(response = rawMalformedJson)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 500
     }
 
-    "return 401 when a 401 is returned from create session" in {
+    "return 401 when a 401 is returned from payment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSessionFailure(401)
+      stubForInitiatePayment(401)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 401
     }
 
-    "return 404 when a 404 is returned from create session" in {
+    "return 404 when a 404 is returned from payment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSessionFailure()
+      stubForInitiatePayment(404)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 404
     }
 
@@ -69,21 +70,21 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       authorisationRejected()
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 401
     }
 
-    "return 500 when unknown error is returned from create session" in {
+    "return 500 when unknown error is returned from payment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSessionFailure(500)
+      stubForInitiatePayment(500)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 500
     }
 
@@ -92,145 +93,88 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForShutteringEnabled
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 521
     }
+  }
 
-    "return 401 when a 401 is returned from select bank" in {
+  "PUT /payments" should {
+    "return 200 with the payment url" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBankFailure(401)
-      stubForInitiatePaymentFailure(401)
+      stubForInitiatePayment(response = paymentInitiatedResponseJson)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
-      response.status shouldBe 401
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.obj("paymentUrl" -> paymentUrl)))
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
+      parsedResponse.paymentUrl.toString() shouldBe paymentUrl
     }
 
-    "return 404 when a 404 is returned from select bank" in {
+    "return 500 when request from payment is malformed" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBankFailure()
-      stubForInitiatePaymentFailure()
+      stubForClearPayment()
+      stubForInitiatePayment(response = rawMalformedJson)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
-      response.status shouldBe 404
-    }
-
-    "return 500 when unknown error is returned from select bank" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBankFailure(500)
-      stubForInitiatePaymentFailure(500)
-
-      val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 500
+    }
+
+    "return 404 when a 401 is returned from clear payment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForClearPayment(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
+      response.status shouldBe 404
     }
 
     "return 401 when a 401 is returned from initiate payment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBank()
-      stubForInitiatePaymentFailure(401)
+      stubForClearPayment()
+      stubForInitiatePayment(401)
 
       val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 401
+    }
+
+    "return 404 when a 404 is returned from clear payment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForClearPayment(404)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
+      response.status shouldBe 404
     }
 
     "return 404 when a 404 is returned from initiate payment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBank()
-      stubForInitiatePaymentFailure()
-
-      val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
-      response.status shouldBe 404
-    }
-
-    "return 500 when unknown error is returned from initiate payment" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForCreateSession(sessionDataResponseJson)
-      stubForSelectBank()
-      stubForInitiatePaymentFailure(500)
-
-      val request: WSRequest = wsUrl(
-        s"/payments?journeyId=$journeyId"
-      ).addHttpHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-      val response = await(request.post(Json.parse(createPaymentRequestJson)))
-      response.status shouldBe 500
-    }
-  }
-
-  "GET /payments" should {
-    "return 200 with status" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForGetPaymentStatus(paymentStatusResponseJson)
+      stubForClearPayment()
+      stubForInitiatePayment(404)
 
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
-      response.status shouldBe 200
-      val parsedResponse = Json.parse(response.body).as[PaymentStatusResponse]
-      parsedResponse.status shouldEqual "Authorised"
-    }
-
-    "return 500 when response from status json is malformed" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForGetPaymentStatus(rawMalformedJson)
-
-      val request: WSRequest = wsUrl(
-        s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
-      response.status shouldBe 500
-    }
-
-    "return 401 when a 401 is returned from open-banking" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForGetPaymentStatusFailure(401)
-
-      val request: WSRequest = wsUrl(
-        s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
-      response.status shouldBe 401
-    }
-
-    "return 404 when a 404 is returned from open-banking" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForGetPaymentStatusFailure()
-
-      val request: WSRequest = wsUrl(
-        s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 404
     }
 
@@ -239,20 +183,33 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 401
     }
 
-    "return 500 when unknown error is returned from open-banking" in {
+    "return 404 when unknown error 500 returned from clear payment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetPaymentStatusFailure(500)
+      stubForClearPayment(500)
 
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
+      response.status shouldBe 404
+    }
+
+    "return 500 when unknown error 500 returned from initiate payment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForClearPayment()
+      stubForInitiatePayment(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 500
     }
 
@@ -262,9 +219,171 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get())
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 521
+    }
+  }
+
+  "GET /payments/:sessionDataId/url-consumed" should {
+    Seq(true, false).foreach { consumed =>
+      s"return 200 with the consumed flag equal to $consumed" in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForUrlConsumed(response = Json.toJson(consumed).toString())
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get)
+        response.status shouldBe 200
+        val parsedResponse = Json.parse(response.body).as[UrlConsumedResponse]
+        parsedResponse.consumed shouldBe consumed
+      }
+    }
+
+    "return 401 when a 401 is returned from url consumed" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForUrlConsumed(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 401
+    }
+
+    "return 404 when a 404 is returned from url consumed" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForUrlConsumed(404)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 404
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 401
+    }
+
+    "return 500 when unknown error 500 returned from url consumed" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForUrlConsumed(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 521
+    }
+  }
+
+  "GET /payments" should {
+    "GET /payments" should {
+      "return 200 with status" in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(response = paymentStatusResponseJson)
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 200
+        val parsedResponse = Json.parse(response.body).as[PaymentStatusResponse]
+        parsedResponse.status shouldEqual "Authorised"
+      }
+
+      "return 500 when response from status json is malformed" in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(response = rawMalformedJson)
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 500
+      }
+
+      "return 401 when a 401 is returned from open-banking" in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(401)
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 401
+      }
+
+      "return 404 when a 404 is returned from open-banking" in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(404)
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 404
+      }
+
+      "return 401 when auth fails" in {
+        authorisationRejected()
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 401
+      }
+
+      "return 500 when unknown error is returned from open-banking" in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(500)
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 500
+      }
+
+      "return 521 when shuttered" in {
+        grantAccess()
+        stubForShutteringEnabled
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 521
+      }
     }
   }
 }

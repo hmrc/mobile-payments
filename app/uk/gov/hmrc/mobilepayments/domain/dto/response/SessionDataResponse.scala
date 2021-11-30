@@ -17,11 +17,17 @@
 package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.domain.SaUtr
+
+import java.time.LocalDateTime
 
 final case class SessionDataResponse(
   sessionDataId: String,
-  nextUrl:       String)
+  amount:        BigDecimal,
+  bankId:        Option[String],
+  createdOn:     LocalDateTime,
+  saUtr:         SaUtr)
 
 object SessionDataResponse {
-  implicit def format: Format[SessionDataResponse] = Json.format[SessionDataResponse]
+  implicit val format: Format[SessionDataResponse] = Json.format[SessionDataResponse]
 }

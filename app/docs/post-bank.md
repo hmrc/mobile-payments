@@ -1,15 +1,15 @@
-Get Payment Status
+Post Bank
 ----
 
-### Fetch the payment status for a given session ID.
+### Select a bank for a given session ID.
 
 * **URL**
 
-  `/payments/:sessionDataId`
+  `/banks/:sessionDataId`
 
 * **Method:**
 
-  `GET`
+  `POST`
 
 * **URL Params**
 
@@ -19,24 +19,22 @@ Get Payment Status
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Path Variables**
+* **Body**
 
   **Required:**
 
-  `/:sessionDataId`
-
-  the ID of the current session
-
-* **Success Responses:**
-
-    * **Code:** 200 <br />
-      **Content:** Payment status data
+  `bankId`
+  the identifier of the chosen bank.
 
 ```json
 {
-  "status": "Authorised"
+  "bankId": "asd-123"
 }
 ```
+
+* **Success Responses:**
+
+    * **Code:** 201
 
 * **Error Responses:**
 

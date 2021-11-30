@@ -18,8 +18,8 @@ package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
 
-final case class InitiatePaymentResponse(paymentUrl: String)
+final case class UrlConsumedResponse(consumed: Boolean)
 
-object InitiatePaymentResponse {
-  implicit val format: Format[InitiatePaymentResponse] = Json.format[InitiatePaymentResponse]
+object UrlConsumedResponse {
+  implicit val format: Format[UrlConsumedResponse] = Json.format[UrlConsumedResponse]
 }

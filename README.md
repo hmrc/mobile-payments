@@ -1,15 +1,20 @@
-
 mobile-payments
 =============================================
 
-- Return the list of banks that are supported by open banking.
-- Create payment using open banking.
-- Fetch payment status.
+- Fetch the list of supported banks.
+- Select a bank for a given session ID.
+- Fetch the payment status for a given session ID.
+- Create a payment URL for a given session ID.
+- Update a payment URL for a given session ID.
+- Fetch the payment URL consumed status for a given session ID.
+- Create a session.
+- Fetch a session for a given session ID.
 
 Requirements
 ------------
 
-Please note it is mandatory to supply an `Accept` HTTP header to all below services with the value ```application/vnd.hmrc.1.0+json```.
+Please note it is mandatory to supply an `Accept` HTTP header to all below services with the
+value ```application/vnd.hmrc.1.0+json```.
 
 API
 ---
@@ -17,8 +22,14 @@ API
 | *Task* | *Supported Methods* | *Description* |
 |--------|----|----|
 | ```/banks``` | GET | Fetch the list of supported banks. [More...](app/docs/get-banks.md)|
-| ```/payments/:sessionDataId``` | GET | Fetch the payment status associated with a session. [More...](app/docs/get-payment.md)|
-| ```/payments``` | POST | Create a payment with a selected bank. [More...](app/docs/post-payment.md)|
+| ```/banks/:sessionDataId``` | POST | Select a bank for a given session ID. [More...](app/docs/post-bank.md)|
+| ```/payments/:sessionDataId``` | GET | Fetch the payment status for a given session ID. [More...](app/docs/get-payment.md)|
+| ```/payments/:sessionDataId``` | POST | Create a payment URL for a given session ID. [More...](app/docs/post-payment.md)|
+| ```/payments/:sessionDataId``` | PUT | Update a payment URL for a given session ID. [More...](app/docs/put-payment.md)|
+| ```/payments/:sessionDataId/url-consumed``` | GET | Fetch the payment URL consumed status for a given session ID. [More...](app/docs/get-payment-url-consumed.md)|
+| ```/sessions``` | POST | Create a session. [More...](app/docs/post-session.md)|
+| ```/sessions/:sessionDataId``` | GET | Fetch a session for a given session ID. [More...](app/docs/get-session.md)|
+
 Shuttered
 ---------
 Shuttering of this service is handled by [mobile-shuttering](https://github.com/hmrc/mobile-shuttering)
@@ -34,9 +45,11 @@ To test different scenarios, add a header "SANDBOX-CONTROL" with one of the foll
 |--------|----|
 
 # Definition
-API definition for the service will be available under `/api/definition` endpoint.
-See definition in `/conf/api-definition.json` for the format.
+
+API definition for the service will be available under `/api/definition` endpoint. See definition
+in `/conf/api-definition.json` for the format.
 
 ### License
 
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
+This code is open source software licensed under
+the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")

@@ -1,11 +1,11 @@
-Get Payment Status
+Get Payment URL consumed status
 ----
 
-### Fetch the payment status for a given session ID.
+### Fetch the payment URL consumed status for a given session ID.
 
 * **URL**
 
-  `/payments/:sessionDataId`
+  `/payments/:sessionDataId/url-consumed`
 
 * **Method:**
 
@@ -30,13 +30,16 @@ Get Payment Status
 * **Success Responses:**
 
     * **Code:** 200 <br />
-      **Content:** Payment status data
+      **Content:** Payment URL data
 
 ```json
 {
-  "status": "Authorised"
+  "consumed": true
 }
 ```
+
+`consumed`
+a boolean status that indicates whether the payment URL for a given session is still valid.
 
 * **Error Responses:**
 

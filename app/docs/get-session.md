@@ -1,11 +1,11 @@
-Get Payment Status
+Get Banks
 ----
 
-### Fetch the payment status for a given session ID.
+### Fetch a session for a given session ID.
 
 * **URL**
 
-  `/payments/:sessionDataId`
+  `/banks`
 
 * **Method:**
 
@@ -26,15 +26,20 @@ Get Payment Status
   `/:sessionDataId`
 
   the ID of the current session
-
+*
 * **Success Responses:**
 
     * **Code:** 200 <br />
-      **Content:** Payment status data
+      **Content:** Bank data
 
 ```json
 {
-  "status": "Authorised"
+  "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
+  "amount": 125.64,
+  "state": "BankSelected",
+  "bankId": "some-bank-id",
+  "createdOn" : "2021-11-03T10:15:30",
+  "saUtr": "CS700100A"
 }
 ```
 

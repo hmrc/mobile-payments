@@ -1,4 +1,10 @@
-GET        /banks        uk.gov.hmrc.mobilepayments.controllers.banks.SandboxBankController.getBanks(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /banks                                       uk.gov.hmrc.mobilepayments.controllers.banks.SandboxBankController.getBanks(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+POST        /banks/:sessionDataId                        uk.gov.hmrc.mobilepayments.controllers.banks.SandboxBankController.selectBank(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 
-GET         /payments/:sessionDataId        uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.getPaymentStatus(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
-POST        /payments                       uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.createPayment(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.getPaymentStatus(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /payments/:sessionDataId/url-consumed        uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.urlConsumed(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+POST        /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.createPayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+PUT         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.updatePayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+
+POST        /session                                     uk.gov.hmrc.mobilepayments.controllers.session.SandboxSessionController.createSession(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /session/:sessionDataId                      uk.gov.hmrc.mobilepayments.controllers.session.SandboxSessionController.getSession(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)

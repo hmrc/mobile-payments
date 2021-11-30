@@ -17,6 +17,7 @@
 package uk.gov.hmrc.mobilepayments.controllers.banks
 
 import org.scalamock.handlers.CallHandler
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
@@ -36,6 +37,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
+  private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuditConnector:    AuditConnector    = mock[AuditConnector]
@@ -53,10 +55,10 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockGetBanks(Future.successful(BanksResponse(banksResponseGrouped)))
+      mockGetBanks(Future successful BanksResponse(banksResponseGrouped))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 200
@@ -69,10 +71,10 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 404" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockGetBanks(Future.failed(Upstream4xxResponse("Error", 404, 404)))
+      mockGetBanks(Future failed Upstream4xxResponse("Error", 404, 404))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 404
@@ -83,10 +85,10 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 401" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockGetBanks(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+      mockGetBanks(Future failed new Upstream4xxResponse("Error", 401, 401))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 401
@@ -98,7 +100,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
       status(result) shouldBe 401
@@ -109,12 +111,85 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 500" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockGetBanks(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
+      mockGetBanks(Future failed Upstream5xxResponse("Error", 502, 502))
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
+  "when select banks invoked and service returns success then" should {
+    "return 201" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSelectBank(Future successful Unit)
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
+      status(result) shouldBe 201
+    }
+  }
+
+  "when select banks invoked and service returns NotFoundException then" should {
+    "return 404" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSelectBank(Future failed Upstream4xxResponse("Error", 404, 404))
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
+      status(result) shouldBe 404
+    }
+  }
+
+  "when select banks invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSelectBank(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when select banks invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when select banks invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSelectBank(Future failed Upstream5xxResponse("Error", 502, 502))
+
+      val request = FakeRequest("POST", s"/banks/$sessionDataId")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("bankId" -> "12345"))
+
+      val result = sut.selectBank(sessionDataId, journeyId)(request)
       status(result) shouldBe 500
     }
   }
@@ -123,6 +198,12 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     (mockOpenBankingService
       .getBanks(_: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
       .expects(*, *, *)
+      .returning(f)
+
+  private def mockSelectBank(f: Future[Unit]) =
+    (mockOpenBankingService
+      .selectBank(_: String, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
       .returning(f)
 
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =

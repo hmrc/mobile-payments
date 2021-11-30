@@ -1,0 +1,11 @@
+{
+  "_id": "51cc67d6-21da-11ec-9621-0242ac130002",
+  "sessionId": "a-session-id",
+  "amount": 12564,
+  "sessionState": "SessionInitiated",
+  "createdOn": "2021-11-03T10:15:30",
+  "originSpecificData": {
+    "saUtr": "CS700100A",
+    "origin": "PtaSa"
+  }
+}

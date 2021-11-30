@@ -1,6 +1,7 @@
 Create Payment
 ----
-Returns the InitiatePaymentResponse object.
+
+### Create a payment URL for a given session ID.
 
 * **URL**
 
@@ -18,24 +19,6 @@ Returns the InitiatePaymentResponse object.
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Body**
-
-  **Required:**
-
-  `amount`
-  a decimal that represents how much the payment will be for in pounds & pence. e.g. **£1,145.55** would be `1145.55`
-
-  `bankId`
-  the identifier of the chosen bank.
-
-```json
-{
-  "amount": 1145.55, 
-  "bankId": "asd-123",
-  "saUtr": "CS700100A"
-}
-```
-
 * **Success Responses:**
 
     * **Code:** 200 <br />
@@ -43,16 +26,12 @@ Returns the InitiatePaymentResponse object.
 
 ```json
 {
-  "paymentUrl": "https://some-bank.com?param=dosomething",
-  "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002"
+  "paymentUrl": "https://some-bank.com?param=dosomething"
 }
 ```
 
 `paymentUrl`
 a URL that the client app will navigate to in order to process the payment.
-
-`sessionDataId`
-the session identifier that needs to be persisted by the client throughout the payment journey.
 
 * **Error Responses:**
 

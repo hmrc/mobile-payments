@@ -22,11 +22,11 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.play.audit.AuditExtensions.auditHeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 import javax.inject.Named
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuditService @Inject() (
@@ -39,7 +39,7 @@ class AuditService @Inject() (
     journeyId:        String
   )(implicit hc:      HeaderCarrier,
     executionContext: ExecutionContext
-  ): Unit = {
+  ): Future[AuditResult] =
     auditConnector.sendExtendedEvent(
       ExtendedDataEvent(
         appName,
@@ -52,8 +52,6 @@ class AuditService @Inject() (
         )
       )
     )
-    ()
-  }
 
   object AuditService {
     val paymentPath      = "/payment"

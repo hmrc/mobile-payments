@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
+import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
-import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{InitiatePaymentResponse, PaymentStatusResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -54,14 +54,13 @@ class SandboxPaymentControllerSpec
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
-      val request = FakeRequest("POST", "/payments")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
+      val request = FakeRequest("POST", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader)
 
-      val result = sut.createPayment(journeyId)(request)
+      val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[InitiatePaymentResponse]
-      response.paymentUrl shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+      response.paymentUrl.toString() shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
     }
   }
 
@@ -69,11 +68,10 @@ class SandboxPaymentControllerSpec
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
-      val request = FakeRequest("POST", "/payments")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amount" -> 1234, "bankId" -> "asd-123", "saUtr" -> "CS700100A"))
+      val request = FakeRequest("POST", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader)
 
-      val result = sut.createPayment(journeyId)(request)
+      val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }
@@ -84,7 +82,7 @@ class SandboxPaymentControllerSpec
       shutteringDisabled()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
@@ -98,9 +96,36 @@ class SandboxPaymentControllerSpec
       stubAuthorisationWithAuthorisationException()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get url consumed invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.urlConsumed(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[UrlConsumedResponse]
+      response.consumed shouldEqual true
+    }
+  }
+
+  "when get url consumed invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.urlConsumed(sessionDataId, journeyId)(request)
       status(result) shouldBe 401
     }
   }
