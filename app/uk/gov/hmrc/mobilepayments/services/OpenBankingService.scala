@@ -75,7 +75,7 @@ class OpenBankingService @Inject() (
 
         SessionDataResponse(
           sessionDataId = data._id.value,
-          amount        = BigDecimal.exact(data.amount.formatInDecimal),
+          amount        = data.amount.inPounds,
           bankId        = bankId,
           createdOn     = data.createdOn,
           saUtr         = SaUtr(ptaSa.saUtr.value)
