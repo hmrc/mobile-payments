@@ -5,7 +5,7 @@ Post Session
 
 * **URL**
 
-  `/sessions/:sessionDataId`
+  `/sessions`
 
 * **Method:**
 
