@@ -152,18 +152,18 @@ uses:
           example:
             example-6:
               value: !include examples/post-session-request-example.json
-        queryParameters:
-          journeyId:
-            type: string
-            example: 27085215-69a4-4027-8f72-b04b10ec16b0
-            required: true
-        responses:
-          200:
-            body:
-              application/json:
-                examples:
-                  example-7:
-                    value: !include examples/post-session-response-example.json
+      queryParameters:
+        journeyId:
+          type: string
+          example: 27085215-69a4-4027-8f72-b04b10ec16b0
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                example-7:
+                  value: !include examples/post-session-response-example.json
     /{sessionDataId}:
       uriParameters:
         sessionDataId:
