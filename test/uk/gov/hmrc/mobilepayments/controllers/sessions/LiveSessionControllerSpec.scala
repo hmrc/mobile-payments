@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.session
+package uk.gov.hmrc.mobilepayments.controllers.sessions
 
 import openbanking.cor.model.response.CreateSessionDataResponse
 import org.scalamock.handlers.CallHandler

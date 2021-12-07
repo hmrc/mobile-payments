@@ -141,7 +141,7 @@ uses:
                 examples:
                   example-5:
                     value: !include examples/get-payment-url-consumed-response-example.json
-  /session:
+  /sessions:
     post:
       displayName: Create a payment for a given session ID.
       is: [headers.acceptHeader]
@@ -149,7 +149,7 @@ uses:
       securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
       body:
         application/json:
-          example:
+          examples:
             example-6:
               value: !include examples/post-session-request-example.json
       queryParameters:

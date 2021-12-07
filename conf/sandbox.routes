@@ -6,5 +6,5 @@ GET         /payments/:sessionDataId/url-consumed        uk.gov.hmrc.mobilepayme
 POST        /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.createPayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 PUT         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.SandboxPaymentController.updatePayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 
-POST        /session                                     uk.gov.hmrc.mobilepayments.controllers.session.SandboxSessionController.createSession(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
-GET         /session/:sessionDataId                      uk.gov.hmrc.mobilepayments.controllers.session.SandboxSessionController.getSession(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+POST        /sessions                                     uk.gov.hmrc.mobilepayments.controllers.session.SandboxSessionController.createSession(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /sessions/:sessionDataId                      uk.gov.hmrc.mobilepayments.controllers.session.SandboxSessionController.getSession(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)

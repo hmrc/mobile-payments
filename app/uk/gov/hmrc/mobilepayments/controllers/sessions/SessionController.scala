@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.controllers.session
+package uk.gov.hmrc.mobilepayments.controllers.sessions
 
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, AnyContent}
