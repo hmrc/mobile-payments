@@ -58,12 +58,7 @@ uses:
             example: 27085215-69a4-4027-8f72-b04b10ec16b0
             required: true
         responses:
-          200:
-            body:
-              application/json:
-                examples:
-                  example-1:
-                    value: !include examples/get-banks-response-example.json
+          201
   /payments:
     /{sessionDataId}:
       uriParameters:
