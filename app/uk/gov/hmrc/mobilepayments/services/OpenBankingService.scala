@@ -73,10 +73,19 @@ class OpenBankingService @Inject() (
           case t: PaymentFinalised => Some(t.bankId.value)
         }
 
+        val state: String = data.sessionState match {
+          case SessionInitiated => "SessionInitiated"
+          case _: BankSelected     => "BankSelected"
+          case _: PaymentInitiated => "PaymentInitiated"
+          case _: PaymentFinished  => "PaymentFinished"
+          case _: PaymentFinalised => "PaymentFinalised"
+        }
+
         SessionDataResponse(
           sessionDataId = data._id.value,
           amount        = data.amount.inPounds,
           bankId        = bankId,
+          state         = state,
           createdOn     = data.createdOn,
           saUtr         = SaUtr(ptaSa.saUtr.value)
         )

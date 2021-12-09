@@ -25,6 +25,7 @@ final case class SessionDataResponse(
   sessionDataId: String,
   amount:        BigDecimal,
   bankId:        Option[String],
+  state:         String,
   createdOn:     LocalDateTime,
   saUtr:         SaUtr)
 

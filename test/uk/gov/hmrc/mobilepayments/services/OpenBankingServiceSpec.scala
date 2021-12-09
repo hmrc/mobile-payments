@@ -188,6 +188,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amount shouldEqual BigDecimal.valueOf(125.64)
       result.bankId shouldEqual None
+      result.state shouldEqual "SessionInitiated"
       result.saUtr.value shouldEqual "CS700100A"
     }
   }
@@ -200,6 +201,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amount shouldEqual BigDecimal.valueOf(125.64)
       result.bankId shouldEqual Some("a-bank-id")
+      result.state shouldEqual "BankSelected"
       result.saUtr.value shouldEqual "CS700100A"
     }
   }
