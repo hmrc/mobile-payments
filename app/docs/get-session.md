@@ -42,7 +42,14 @@ Get Session
   "saUtr": "CS700100A"
 }
 ```
+### Possible State Values
+* SessionInitiated
+* BankSelected
+* PaymentInitiated
+* PaymentFinished
+* PaymentFinalised
 
+<br /><br />
 * **Error Responses:**
 
     * **Code:** 401 UNAUTHORIZED <br/>

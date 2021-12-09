@@ -38,6 +38,17 @@ Get Payment Status
 }
 ```
 
+### Possible Status Values
+* Initial 
+* AwaitingAuthorization
+* Authorised
+* Verified
+* Completed
+* Canceled
+* Failed
+* Rejected
+* Abandoned
+<br /><br />
 * **Error Responses:**
 
     * **Code:** 401 UNAUTHORIZED <br/>
