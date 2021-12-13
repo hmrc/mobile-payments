@@ -30,20 +30,20 @@ Get Banks
     {
       "bankGroupName": "Barclays",
       "bankGroupNameFormatted": "Barclays",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-barclays-business",
           "name": "Barclays Personal",
           "friendlyName": "Barclays Personal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Barclays"
         },
         {
           "bankId": "obie-barclays-business",
           "name": "Barclays Business",
           "friendlyName": "Barclays Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Barclays"
         }
       ]
@@ -51,20 +51,20 @@ Get Banks
     {
       "bankGroupName": "Lloyds",
       "bankGroupNameFormatted": "Lloyds",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-lloyds-personal",
           "name": "Lloyds Personal",
           "friendlyName": "Lloyds Personal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Lloyds"
         },
         {
           "bankId": "obie-lloyds-business",
           "name": "Lloyds Business",
           "friendlyName": "Lloyds Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Lloyds"
         }
       ]
@@ -72,27 +72,27 @@ Get Banks
     {
       "bankGroupName": "Monzo",
       "bankGroupNameFormatted": "Monzo",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-monzo-personal",
           "name": "Monzo Personal",
           "friendlyName": "Monzo Persnal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Monzo"
         },
         {
           "bankId": "obie-monzo-business",
           "name": "Monzo Business",
           "friendlyName": "Monzo Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Monzo"
         },
         {
           "bankId": "obie-monzo-special",
           "name": "Monzo Special",
           "friendlyName": "Monzo Special",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Monzo"
         }
       ]
@@ -100,20 +100,20 @@ Get Banks
     {
       "bankGroupName": "Natwest",
       "bankGroupNameFormatted": "Natwest",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-natwest-personal",
           "name": "Natwest Personal",
           "friendlyName": "Natwest Personal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Natwest"
         },
         {
           "bankId": "obie-natwest-business",
           "name": "Natwest Business",
           "friendlyName": "Natwest Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Natwest"
         }
       ]
@@ -121,20 +121,20 @@ Get Banks
     {
       "bankGroupName": "HSBC",
       "bankGroupNameFormatted": "HSBC",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-hsbc-personal",
           "name": "HSBC Personal",
           "friendlyName": "HSBC Personal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "HSBC"
         },
         {
           "bankId": "obie-hsbc-business",
           "name": "HSBC Business",
           "friendlyName": "HSBC Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "HSBC"
         }
       ]
@@ -142,20 +142,20 @@ Get Banks
     {
       "bankGroupName": "Santander",
       "bankGroupNameFormatted": "Santander",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-santander-personal",
           "name": "Santander Personal",
           "friendlyName": "Santander Personal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Santander"
         },
         {
           "bankId": "obie-santander-business",
           "name": "Santander Business",
           "friendlyName": "Santander Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Santander"
         }
       ]
@@ -163,13 +163,13 @@ Get Banks
     {
       "bankGroupName": "Chase Bank",
       "bankGroupNameFormatted": "Chase Bank",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-chase",
           "name": "Chase",
           "friendlyName": "Chase",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "Chase Bank"
         }
       ]
@@ -177,27 +177,27 @@ Get Banks
     {
       "bankGroupName": "RBS",
       "bankGroupNameFormatted": "RBS",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-rbs-personal",
           "name": "RBS Personal",
           "friendlyName": "RBS Personal",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "RBS"
         },
         {
           "bankId": "obie-rbs-business",
           "name": "RBS Business",
           "friendlyName": "RBS Business",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "RBS"
         },
         {
           "bankId": "obie-rbs-bankline",
           "name": "RBS Bankline",
           "friendlyName": "RBS Bankline",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "RBS"
         }
       ]
@@ -205,13 +205,13 @@ Get Banks
     {
       "bankGroupName": "M&S Bank",
       "bankGroupNameFormatted": "M&S Bank",
-      "logoUrl": "https://logo.com",
+      "iconUrl": "https://logo.com",
       "banksInGroup": [
         {
           "bankId": "obie-m&s",
           "name": "M&S Bank",
           "friendlyName": "M&S Bank",
-          "logoUrl": "https://logo.com",
+          "iconUrl": "https://logo.com",
           "group": "M&S Bank"
         }
       ]
