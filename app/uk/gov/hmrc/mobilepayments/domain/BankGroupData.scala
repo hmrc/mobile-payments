@@ -22,7 +22,7 @@ final case class BankGroupData(
   bankGroupName:          String,
   bankGroupNameFormatted: String,
   banksInGroup:           List[Bank],
-  logoUrl:                String)
+  iconUrl:                String)
 
 object BankGroupData {
   implicit val format: OFormat[BankGroupData] = Json.format[BankGroupData]
@@ -32,7 +32,7 @@ object BankGroupData {
       bankGroupName          = banks.headOption.fold("Unknown Bank")(_.group),
       bankGroupNameFormatted = banks.headOption.fold("Unknown Bank")(_.group).replaceAll("[ &!@£$*()^*]", "-"),
       banksInGroup           = sortBanksInGroup(banks),
-      logoUrl                = banks.headOption.fold("Unknown Bank Logo Url")(_.logoUrl.toString)
+      iconUrl                = banks.headOption.fold("Unknown Bank Logo Url")(_.iconUrl)
     )
 
   def sortBanksInGroup(banksInGroup: List[Bank]): List[Bank] = {

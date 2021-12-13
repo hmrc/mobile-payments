@@ -22,7 +22,7 @@ case class Bank(
   bankId:       String,
   name:         String,
   friendlyName: String,
-  logoUrl:      String,
+  iconUrl:      String,
   group:        String)
 
 object Bank {
