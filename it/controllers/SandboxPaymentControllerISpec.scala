@@ -24,7 +24,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       val response = await(request.post(Json.parse("{}")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
-      parsedResponse.paymentUrl.toString() shouldBe "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+      parsedResponse.paymentUrl.toString() shouldBe "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
     }
 
     "return 401 when request authorisation fails it" in {
@@ -59,7 +59,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       val response = await(request.put(Json.parse("{}")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[InitiatePaymentResponse]
-      parsedResponse.paymentUrl.toString() shouldBe "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+      parsedResponse.paymentUrl.toString() shouldBe "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
     }
 
     "return 401 when request authorisation fails it" in {
