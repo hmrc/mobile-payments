@@ -45,6 +45,7 @@ class SandboxPaymentControllerSpec
   private val sut = new SandboxPaymentController(
     mockAuthConnector,
     ConfidenceLevel.L200.level,
+    "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking",
     Helpers.stubControllerComponents(),
     mockShutteringService
   )
@@ -60,7 +61,7 @@ class SandboxPaymentControllerSpec
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[InitiatePaymentResponse]
-      response.paymentUrl.toString() shouldEqual "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+      response.paymentUrl.toString() shouldEqual "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
     }
   }
 

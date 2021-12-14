@@ -35,11 +35,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SandboxPaymentController @Inject() (
-  override val authConnector:                                   AuthConnector,
-  @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents,
-  shutteringService:                                            ShutteringService
-)(implicit val executionContext:                                ExecutionContext)
+  override val authConnector:                                          AuthConnector,
+  @Named("controllers.confidenceLevel") override val confLevel:        Int,
+  @Named("sandboxOpenBankingPaymentUrl") sandboxOpenBankingPaymentUrl: String,
+  cc:                                                                  ControllerComponents,
+  shutteringService:                                                   ShutteringService
+)(implicit val executionContext:                                       ExecutionContext)
     extends BackendController(cc)
     with PaymentController
     with ControllerChecks
@@ -53,26 +54,12 @@ class SandboxPaymentController @Inject() (
   override def createPayment(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
-        }
-      }
-    }
+  ): Action[AnyContent] = paymentUrl(journeyId)
 
   override def updatePayment(
     sessionDataId: String,
     journeyId:     JourneyId
-  ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          Future successful Ok(sampleCreatePaymentJson(resource = "sandbox-create-payment-response.json"))
-        }
-      }
-    }
+  ): Action[AnyContent] = paymentUrl(journeyId)
 
   override def urlConsumed(
     sessionDataId: String,
@@ -100,15 +87,14 @@ class SandboxPaymentController @Inject() (
       }
     }
 
-  private def sampleCreatePaymentJson(resource: String): JsValue =
-    toJson(
-      Json
-        .parse(
-          findResource(path = s"/resources/mobilepayments/$resource")
-            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
-        )
-        .as[InitiatePaymentResponse]
-    )
+  private def paymentUrl(journeyId: JourneyId) =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          Future successful Ok(toJson(InitiatePaymentResponse(paymentUrl = sandboxOpenBankingPaymentUrl)))
+        }
+      }
+    }
 
   private def samplePaymentStatusJson(resource: String): JsValue =
     toJson(
