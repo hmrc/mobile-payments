@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.errors
 
-import play.api.libs.json.Json.toJson
 import play.api.mvc.Result
 import play.api.{Logger, mvc}
 import uk.gov.hmrc.api.controllers._
@@ -26,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendBaseController
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MalformedRequestException(message: String) extends HttpException(message, 400)
+class MalformedRequestException(message: String = "") extends HttpException(message, 400)
 
 case object ErrorUnauthorizedUpstream
     extends ErrorResponse(401, "UNAUTHORIZED", "Upstream service such as auth returned 401")
@@ -46,18 +45,18 @@ trait ErrorHandling {
     func.recover {
       case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 =>
         logger.warn("Upstream service returned 401")
-        Status(ErrorUnauthorizedUpstream.httpStatusCode)(toJson(ErrorUnauthorizedUpstream.asInstanceOf[ErrorResponse]))
+        Status(ErrorUnauthorizedUpstream.httpStatusCode)
 
       case ex: Upstream4xxResponse if ex.upstreamResponseCode == 404 =>
         logger.warn("Resource not found!")
-        Status(ErrorNotFound.httpStatusCode)(toJson(ErrorNotFound.asInstanceOf[ErrorResponse]))
+        Status(ErrorNotFound.httpStatusCode)
 
       case ex: MalformedRequestException =>
         logger.warn("Malformed JSON")
-        Status(ErrorMalformedRequest.httpStatusCode)(toJson(ErrorMalformedRequest.asInstanceOf[ErrorResponse]))
+        Status(ErrorMalformedRequest.httpStatusCode)
 
       case e: Exception =>
         logger.warn(s"Native Error - $app Internal server error 2: ${e.getMessage}", e)
-        Status(ErrorInternalServerError.httpStatusCode)(toJson(ErrorInternalServerError.asInstanceOf[ErrorResponse]))
+        Status(ErrorInternalServerError.httpStatusCode)
     }
 }
