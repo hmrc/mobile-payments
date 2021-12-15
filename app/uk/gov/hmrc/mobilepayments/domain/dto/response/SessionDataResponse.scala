@@ -19,7 +19,7 @@ package uk.gov.hmrc.mobilepayments.domain.dto.response
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.domain.SaUtr
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime}
 
 final case class SessionDataResponse(
   sessionDataId: String,
@@ -27,6 +27,7 @@ final case class SessionDataResponse(
   bankId:        Option[String],
   state:         String,
   createdOn:     LocalDateTime,
+  paymentDate:   Option[LocalDate],
   saUtr:         SaUtr)
 
 object SessionDataResponse {

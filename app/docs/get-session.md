@@ -32,24 +32,43 @@ Get Session
     * **Code:** 200 <br />
       **Content:** Bank data
 
+##### BankSelected state example
 ```json
 {
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
   "amount": 125.64,
   "state": "BankSelected",
   "bankId": "some-bank-id",
-  "createdOn" : "2021-11-03T10:15:30",
+  "createdOn": "2021-11-03T10:15:30",
   "saUtr": "CS700100A"
 }
 ```
-### Possible State Values
-* SessionInitiated
-* BankSelected
-* PaymentInitiated
-* PaymentFinished
-* PaymentFinalised
 
-<br /><br />
+##### PaymentFinalised state example
+```json
+{
+  "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
+  "amount": 125.64,
+  "state": "PaymentFinalised",
+  "bankId": "some-bank-id",
+  "paymentDate": "2021-12-01",
+  "createdOn": "2021-11-03T10:15:30",
+  "saUtr": "CS700100A"
+}
+```
+
+### Possible State Values
+
+| *State* | *Notes* |
+  |--------|----|
+| `SessionInitiated` | Response won't contain `paymentDate` |
+| `BankSelected` | Response won't contain `paymentDate` |
+| `PaymentInitiated` | Response won't contain `paymentDate` |
+| `PaymentFinished` | Response will contain `paymentDate` equal to the current date |
+| `PaymentFinalised` | Response will contain `paymentDate` as provided by Ecospend |
+
+<br />
+
 * **Error Responses:**
 
     * **Code:** 401 UNAUTHORIZED <br/>

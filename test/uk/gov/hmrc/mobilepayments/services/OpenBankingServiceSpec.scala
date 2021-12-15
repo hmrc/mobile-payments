@@ -29,6 +29,7 @@ import uk.gov.hmrc.mobilepayments.domain.dto.response.OpenBankingPaymentStatusRe
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
 
+import java.time.LocalDate
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
@@ -189,6 +190,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       result.amount shouldEqual BigDecimal.valueOf(125.64)
       result.bankId shouldEqual None
       result.state shouldEqual "SessionInitiated"
+      result.paymentDate shouldEqual None
       result.saUtr.value shouldEqual "CS700100A"
     }
   }
@@ -202,6 +204,35 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       result.amount shouldEqual BigDecimal.valueOf(125.64)
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "BankSelected"
+      result.paymentDate shouldEqual None
+      result.saUtr.value shouldEqual "CS700100A"
+    }
+  }
+
+  "when getSession invoked and status is payment finished and connector getSession returns success then" should {
+    "return session" in {
+      mockSession(Future successful sessionPaymentFinishedDataResponse)
+
+      val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
+      result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+      result.amount shouldEqual BigDecimal.valueOf(125.64)
+      result.bankId shouldEqual Some("a-bank-id")
+      result.state shouldEqual "PaymentFinished"
+      result.paymentDate shouldEqual Some(LocalDate.now())
+      result.saUtr.value shouldEqual "CS700100A"
+    }
+  }
+
+  "when getSession invoked and status is payment finalised and connector getSession returns success then" should {
+    "return session" in {
+      mockSession(Future successful sessionPaymentFinalisedDataResponse)
+
+      val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
+      result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+      result.amount shouldEqual BigDecimal.valueOf(125.64)
+      result.bankId shouldEqual Some("a-bank-id")
+      result.state shouldEqual "PaymentFinalised"
+      result.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
       result.saUtr.value shouldEqual "CS700100A"
     }
   }
