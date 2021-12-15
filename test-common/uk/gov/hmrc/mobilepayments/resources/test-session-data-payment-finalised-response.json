@@ -1,0 +1,17 @@
+{
+  "_id": "51cc67d6-21da-11ec-9621-0242ac130002",
+  "sessionId": "a-session-id",
+  "amount": 12564,
+  "sessionState": {
+    "bankId": "a-bank-id",
+    "paymentId": "89731289321893218923",
+    "paymentUrl": "https://url.com",
+    "status": "Completed",
+    "dateFinalised": "2021-12-01"
+  },
+  "createdOn": "2021-11-03T10:15:30",
+  "originSpecificData": {
+    "saUtr": "CS700100A",
+    "origin": "PtaSa"
+  }
+}

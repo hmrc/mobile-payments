@@ -32,6 +32,7 @@ import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class LiveSessionControllerSpec
@@ -130,7 +131,7 @@ class LiveSessionControllerSpec
     }
   }
 
-  "when get session invoked and service returns success then" should {
+  "when get session invoked for bank selected state and service returns success then" should {
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
@@ -145,6 +146,27 @@ class LiveSessionControllerSpec
       response.sessionDataId shouldEqual sessionDataId
       response.amount shouldEqual 125.64
       response.bankId shouldEqual Some("some-bank-id")
+      response.paymentDate shouldEqual None
+      response.saUtr.value shouldEqual "CS700100A"
+    }
+  }
+
+  "when get session invoked for payment finalised state and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetSession(Future successful sessionDataPaymentFinalisedResponse)
+
+      val request = FakeRequest("Get", s"/sessions/$sessionDataId")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+
+      val result = sut.getSession(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[SessionDataResponse]
+      response.sessionDataId shouldEqual sessionDataId
+      response.amount shouldEqual 125.64
+      response.bankId shouldEqual Some("some-bank-id")
+      response.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
       response.saUtr.value shouldEqual "CS700100A"
     }
   }

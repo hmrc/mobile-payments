@@ -7,7 +7,10 @@ import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import utils.BaseISpec
+
+import java.time.LocalDate
 
 class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
@@ -92,6 +95,95 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/sessions?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader)
       val response = await(request.post(Json.obj("amount" -> 1200, "saUtr" -> "CS700100A")))
+      response.status shouldBe 521
+    }
+  }
+
+  "GET /sessions/:sessionDataId" should {
+    "return 200 when payload is valid" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetSession(response = sessionDataPaymentFinalisedResponseJson)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[SessionDataResponse]
+      parsedResponse.sessionDataId shouldEqual sessionDataId
+      parsedResponse.amount shouldEqual 125.64
+      parsedResponse.bankId shouldEqual Some("a-bank-id")
+      parsedResponse.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
+      parsedResponse.saUtr.value shouldEqual "CS700100A"
+    }
+
+    "return 500 when request from session is malformed" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetSession(response = rawMalformedJson)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 500
+    }
+
+    "return 401 when a 401 is returned from session" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetSession(401)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 401
+    }
+
+    "return 404 when a 404 is returned from session" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetSession(404)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 404
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 401
+    }
+
+    "return 500 when unknown error is returned from session" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetSession(500)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
       response.status shouldBe 521
     }
   }

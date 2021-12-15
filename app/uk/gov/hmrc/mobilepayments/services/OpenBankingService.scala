@@ -26,6 +26,7 @@ import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank, BankGroupData}
 
+import java.time.LocalDate
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -73,6 +74,14 @@ class OpenBankingService @Inject() (
           case t: PaymentFinalised => Some(t.bankId.value)
         }
 
+        val paymentDate: Option[LocalDate] = data.sessionState match {
+          case SessionInitiated => None
+          case _: BankSelected     => None
+          case _: PaymentInitiated => None
+          case _: PaymentFinished  => Some(LocalDate.now())
+          case t: PaymentFinalised => Some(t.dateFinalised)
+        }
+
         val state: String = data.sessionState match {
           case SessionInitiated => "SessionInitiated"
           case _: BankSelected     => "BankSelected"
@@ -87,6 +96,7 @@ class OpenBankingService @Inject() (
           bankId        = bankId,
           state         = state,
           createdOn     = data.createdOn,
+          paymentDate   = paymentDate,
           saUtr         = SaUtr(ptaSa.saUtr.value)
         )
       }
