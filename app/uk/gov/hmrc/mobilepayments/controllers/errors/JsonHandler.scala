@@ -30,6 +30,6 @@ trait JsonHandler {
   ): Future[Result] =
     request.body.validate[T] match {
       case JsSuccess(t, _) => func(t)
-      case JsError(errors) => Future failed new MalformedRequestException(errors.toString())
+      case JsError(errors) => Future failed new MalformedRequestException()
     }
 }
