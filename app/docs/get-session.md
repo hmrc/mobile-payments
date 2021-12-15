@@ -5,7 +5,7 @@ Get Session
 
 * **URL**
 
-  `/session/:sessionDataId`
+  `/sessions/:sessionDataId`
 
 * **Method:**
 
