@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,15 +44,12 @@ class SandboxBankControllerSpec
   private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   private val sut = new SandboxBankController(
-    mockAuthConnector,
-    ConfidenceLevel.L200.level,
     Helpers.stubControllerComponents(),
     mockShutteringService
   )
 
   "when get banks invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("GET", "/banks")
@@ -66,20 +63,17 @@ class SandboxBankControllerSpec
   }
 
   "when get banks invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("GET", "/banks")
-        .withHeaders(acceptJsonHeader)
 
       val result = sut.getBanks(journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 
   "when select bank invoked then" should {
     "return 201" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
@@ -92,15 +86,14 @@ class SandboxBankControllerSpec
   }
 
   "when select bank invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
-        .withHeaders(acceptJsonHeader, contentHeader, sandboxHeader)
+        .withHeaders(contentHeader, sandboxHeader)
         .withBody(Json.obj("bankId" -> "12345"))
 
       val result = sut.selectBank(sessionDataId, journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 

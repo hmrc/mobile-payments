@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,9 @@ import openbanking.cor.model.response.InitiatePaymentResponse
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.api.sandbox.FileResource
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
-import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
@@ -35,8 +34,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SandboxPaymentController @Inject() (
-  override val authConnector:                                          AuthConnector,
-  @Named("controllers.confidenceLevel") override val confLevel:        Int,
   @Named("sandboxOpenBankingPaymentUrl") sandboxOpenBankingPaymentUrl: String,
   cc:                                                                  ControllerComponents,
   shutteringService:                                                   ShutteringService
@@ -44,7 +41,7 @@ class SandboxPaymentController @Inject() (
     extends BackendController(cc)
     with PaymentController
     with ControllerChecks
-    with AccessControl
+    with HeaderValidator
     with ErrorHandling
     with JsonHandler
     with FileResource {
@@ -65,7 +62,7 @@ class SandboxPaymentController @Inject() (
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           Future successful Ok(toJson(UrlConsumedResponse(true)))
@@ -77,7 +74,7 @@ class SandboxPaymentController @Inject() (
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
@@ -88,7 +85,7 @@ class SandboxPaymentController @Inject() (
     }
 
   private def paymentUrl(journeyId: JourneyId) =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           Future successful Ok(toJson(InitiatePaymentResponse(paymentUrl = sandboxOpenBankingPaymentUrl)))

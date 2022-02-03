@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,6 @@ class SandboxPaymentControllerSpec
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
 
   private val sut = new SandboxPaymentController(
-    mockAuthConnector,
-    ConfidenceLevel.L200.level,
     "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking",
     Helpers.stubControllerComponents(),
     mockShutteringService
@@ -52,7 +50,6 @@ class SandboxPaymentControllerSpec
 
   "when create payment invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
@@ -66,20 +63,17 @@ class SandboxPaymentControllerSpec
   }
 
   "when create payment invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
-        .withHeaders(acceptJsonHeader)
 
       val result = sut.createPayment(sessionDataId, journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 
   "when get payment status invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
@@ -93,20 +87,17 @@ class SandboxPaymentControllerSpec
   }
 
   "when get payment status invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId?journeyId=$journeyId")
-        .withHeaders(acceptJsonHeader)
 
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 
   "when get url consumed invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
@@ -120,14 +111,12 @@ class SandboxPaymentControllerSpec
   }
 
   "when get url consumed invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
-        .withHeaders(acceptJsonHeader)
 
       val result = sut.urlConsumed(sessionDataId, journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 

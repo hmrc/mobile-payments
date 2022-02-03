@@ -15,7 +15,6 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
 
   "POST /payments" should {
     "return 200 when payload valid and sandbox header present it" in {
-      grantAccess()
       stubForShutteringDisabled
 
       val request: WSRequest = wsUrl(
@@ -27,18 +26,16 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       parsedResponse.paymentUrl.toString() shouldBe "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
     }
 
-    "return 401 when request authorisation fails it" in {
-      authorisationRejected()
+    "return 406 when request authorisation fails it" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(sandboxHeader, acceptJsonHeader, contentHeader)
+      ).addHttpHeaders(sandboxHeader, contentHeader)
       val response = await(request.post(Json.parse("{}")))
-      response.status shouldBe 401
+      response.status shouldBe 406
     }
 
     "return 521 when service is shuttered" in {
-      grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
@@ -50,7 +47,6 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
 
   "PUT /payments" should {
     "return 200 when payload valid and sandbox header present it" in {
-      grantAccess()
       stubForShutteringDisabled
 
       val request: WSRequest = wsUrl(
@@ -62,18 +58,16 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       parsedResponse.paymentUrl.toString() shouldBe "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
     }
 
-    "return 401 when request authorisation fails it" in {
-      authorisationRejected()
+    "return 406 when request authorisation fails it" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(sandboxHeader, acceptJsonHeader, contentHeader)
+      ).addHttpHeaders(sandboxHeader, contentHeader)
       val response = await(request.put(Json.parse("{}")))
-      response.status shouldBe 401
+      response.status shouldBe 406
     }
 
     "return 521 when service is shuttered" in {
-      grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
@@ -85,7 +79,6 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
 
   "GET /payments" should {
     "return 200 when sandbox header present it" in {
-      grantAccess()
       stubForShutteringDisabled
 
       val request: WSRequest = wsUrl(
@@ -97,18 +90,16 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       parsedResponse.status shouldBe "Authorised"
     }
 
-    "return 401 when request authorisation fails it" in {
-      authorisationRejected()
+    "return 406 when request authorisation fails it" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(sandboxHeader, acceptJsonHeader)
+      ).addHttpHeaders(sandboxHeader)
       val response = await(request.get())
-      response.status shouldBe 401
+      response.status shouldBe 406
     }
 
     "return 521 when service is shuttered" in {
-      grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
@@ -120,7 +111,6 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
 
   "GET /payments/:sessionDataId/url-consumed" should {
     "return 200 when sandbox header present it" in {
-      grantAccess()
       stubForShutteringDisabled
 
       val request: WSRequest = wsUrl(
@@ -132,18 +122,16 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       parsedResponse.consumed shouldBe true
     }
 
-    "return 401 when request authorisation fails it" in {
-      authorisationRejected()
+    "return 406 when request authorisation fails it" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
-      ).addHttpHeaders(sandboxHeader, acceptJsonHeader)
+      ).addHttpHeaders(sandboxHeader)
       val response = await(request.get())
-      response.status shouldBe 401
+      response.status shouldBe 406
     }
 
     "return 521 when service is shuttered" in {
-      grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId"
