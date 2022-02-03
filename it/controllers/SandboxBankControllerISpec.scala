@@ -13,7 +13,6 @@ class SandboxBankControllerISpec extends BaseISpec {
 
   "when payload valid and sandbox header present it" should {
     "return 200" in {
-      grantAccess()
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -33,20 +32,18 @@ class SandboxBankControllerISpec extends BaseISpec {
   }
 
   "when request authorisation fails it" should {
-    "return 401" in {
-      authorisationRejected()
+    "return 406" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, sandboxHeader)
+      ).addHttpHeaders(sandboxHeader)
       val response = await(request.get())
-      response.status shouldBe 401
+      response.status shouldBe 406
     }
   }
 
   "when service is shuttered it" should {
     "return 521" in {
-      grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
@@ -58,7 +55,6 @@ class SandboxBankControllerISpec extends BaseISpec {
 
   "when select bank and sandbox header present it" should {
     "return 201" in {
-      grantAccess()
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/banks/$sessionDataId?journeyId=$journeyId"
@@ -69,20 +65,18 @@ class SandboxBankControllerISpec extends BaseISpec {
   }
 
   "when select bank and request authorisation fails it" should {
-    "return 401" in {
-      authorisationRejected()
+    "return 406" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
         s"/banks/$sessionDataId?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, sandboxHeader, contentHeader)
+      ).addHttpHeaders(sandboxHeader, contentHeader)
       val response = await(request.post(Json.obj("bankId" -> "12345")))
-      response.status shouldBe 401
+      response.status shouldBe 406
     }
   }
 
   "when select bank and service is shuttered it" should {
     "return 521" in {
-      grantAccess()
       stubForShutteringEnabled
       val request: WSRequest = wsUrl(
         s"/banks/$sessionDataId?journeyId=$journeyId"
