@@ -30,11 +30,7 @@ import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
 import scala.concurrent.Future
 
-class SandboxSessionControllerSpec
-    extends BaseSpec
-    with AuthorisationStub
-    with MobilePaymentsTestData
-    with ShutteringMock {
+class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData with ShutteringMock {
 
   private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
   private val sessionDataId:   String          = "51cc67d6-21da-11ec-9621-0242ac130002"
@@ -43,15 +39,12 @@ class SandboxSessionControllerSpec
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
 
   private val sut = new SandboxSessionController(
-    mockAuthConnector,
-    ConfidenceLevel.L200.level,
     Helpers.stubControllerComponents(),
     mockShutteringService
   )
 
   "when create session invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("POST", "/sessions")
@@ -66,21 +59,19 @@ class SandboxSessionControllerSpec
   }
 
   "when create session invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("POST", "/sessions")
-        .withHeaders(acceptJsonHeader, contentHeader, sandboxHeader)
+        .withHeaders(contentHeader, sandboxHeader)
         .withBody(Json.obj("amount" -> 1234, "saUtr" -> "CS700100A"))
 
       val result = sut.createSession(journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 
   "when get session invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
       val request = FakeRequest("Get", s"/sessions/$sessionDataId")
@@ -97,14 +88,13 @@ class SandboxSessionControllerSpec
   }
 
   "when get session invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
+    "return 406" in {
 
       val request = FakeRequest("Get", s"/sessions/$sessionDataId")
-        .withHeaders(acceptJsonHeader, sandboxHeader)
+        .withHeaders(sandboxHeader)
 
       val result = sut.getSession(sessionDataId, journeyId)(request)
-      status(result) shouldBe 401
+      status(result) shouldBe 406
     }
   }
 

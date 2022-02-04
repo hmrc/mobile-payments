@@ -20,6 +20,7 @@ import openbanking.cor.model.response.CreateSessionDataResponse
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
@@ -35,14 +36,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SandboxSessionController @Inject() (
-  override val authConnector:                                   AuthConnector,
-  @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents,
-  shutteringService:                                            ShutteringService
-)(implicit val executionContext:                                ExecutionContext)
+  cc:                            ControllerComponents,
+  shutteringService:             ShutteringService
+)(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with SessionController
-    with AccessControl
+    with HeaderValidator
     with ControllerChecks
     with ErrorHandling
     with FileResource {
@@ -51,7 +50,7 @@ class SandboxSessionController @Inject() (
   override val app:    String                 = "Session-Controller"
 
   override def createSession(journeyId: JourneyId): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+    validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           Future successful Ok(sampleCreateSessionJson)
@@ -63,7 +62,7 @@ class SandboxSessionController @Inject() (
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           Future successful Ok(sampleSessionJson)
