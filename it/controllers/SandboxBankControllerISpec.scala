@@ -2,7 +2,6 @@ package controllers
 
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
-import stubs.AuthStub._
 import stubs.ShutteringStub._
 import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import utils.BaseISpec

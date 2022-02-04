@@ -3,7 +3,6 @@ package controllers
 import openbanking.cor.model.response.InitiatePaymentResponse
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
-import stubs.AuthStub.{authorisationRejected, grantAccess}
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
