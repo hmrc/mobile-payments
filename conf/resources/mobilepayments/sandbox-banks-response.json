@@ -3,20 +3,20 @@
     {
       "bankGroupName": "Barclays",
       "bankGroupNameFormatted": "Barclays",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/Barclays_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-barclays-personal",
           "name": "Barclays Personal",
           "friendlyName": "Barclays Personal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Barclays_icon.svg",
           "group": "Barclays"
         },
         {
           "bankId": "obie-barclays-business",
           "name": "Barclays Business",
           "friendlyName": "Barclays Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Barclays_icon.svg",
           "group": "Barclays"
         }
       ]
@@ -24,20 +24,20 @@
     {
       "bankGroupName": "Lloyds",
       "bankGroupNameFormatted": "Lloyds",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/Lloyds_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-lloyds-personal",
           "name": "Lloyds Personal",
           "friendlyName": "Lloyds Personal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Lloyds_icon.svg",
           "group": "Lloyds"
         },
         {
           "bankId": "obie-lloyds-business",
           "name": "Lloyds Business",
           "friendlyName": "Lloyds Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Lloyds_icon.svg",
           "group": "Lloyds"
         }
       ]
@@ -45,27 +45,27 @@
     {
       "bankGroupName": "Monzo",
       "bankGroupNameFormatted": "Monzo",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-monzo-personal",
           "name": "Monzo Personal",
           "friendlyName": "Monzo Persnal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
           "group": "Monzo"
         },
         {
           "bankId": "obie-monzo-business",
           "name": "Monzo Business",
           "friendlyName": "Monzo Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
           "group": "Monzo"
         },
         {
           "bankId": "obie-monzo-special",
           "name": "Monzo Special",
           "friendlyName": "Monzo Special",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
           "group": "Monzo"
         }
       ]
@@ -73,20 +73,20 @@
     {
       "bankGroupName": "Natwest",
       "bankGroupNameFormatted": "Natwest",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/NatWest_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-natwest-personal",
           "name": "Natwest Personal",
           "friendlyName": "Natwest Personal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/NatWest_icon.svg",
           "group": "Natwest"
         },
         {
           "bankId": "obie-natwest-business",
           "name": "Natwest Business",
           "friendlyName": "Natwest Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/NatWest_icon.svg",
           "group": "Natwest"
         }
       ]
@@ -94,20 +94,20 @@
     {
       "bankGroupName": "HSBC",
       "bankGroupNameFormatted": "HSBC",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/HSBC_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-hsbc-personal",
           "name": "HSBC Personal",
           "friendlyName": "HSBC Personal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/HSBC_icon.svg",
           "group": "HSBC"
         },
         {
           "bankId": "obie-hsbc-business",
           "name": "HSBC Business",
           "friendlyName": "HSBC Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/HSBC_icon.svg",
           "group": "HSBC"
         }
       ]
@@ -115,20 +115,20 @@
     {
       "bankGroupName": "Santander",
       "bankGroupNameFormatted": "Santander",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/Santander_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-santander-personal",
           "name": "Santander Personal",
           "friendlyName": "Santander Personal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Santander_icon.svg",
           "group": "Santander"
         },
         {
           "bankId": "obie-santander-business",
           "name": "Santander Business",
           "friendlyName": "Santander Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Santander_icon.svg",
           "group": "Santander"
         }
       ]
@@ -136,13 +136,13 @@
     {
       "bankGroupName": "Chase Bank",
       "bankGroupNameFormatted": "Chase Bank",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/Chase-Bank_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-chase",
           "name": "Chase",
           "friendlyName": "Chase",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/Chase-Bank_icon.svg",
           "group": "Chase Bank"
         }
       ]
@@ -150,27 +150,27 @@
     {
       "bankGroupName": "RBS",
       "bankGroupNameFormatted": "RBS",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-rbs-personal",
           "name": "RBS Personal",
           "friendlyName": "RBS Personal",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
           "group": "RBS"
         },
         {
           "bankId": "obie-rbs-business",
           "name": "RBS Business",
           "friendlyName": "RBS Business",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
           "group": "RBS"
         },
         {
           "bankId": "obie-rbs-bankline",
           "name": "RBS Bankline",
           "friendlyName": "RBS Bankline",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
           "group": "RBS"
         }
       ]
@@ -178,13 +178,13 @@
     {
       "bankGroupName": "M&S Bank",
       "bankGroupNameFormatted": "M&S Bank",
-      "iconUrl": "https://logo.com",
+      "iconUrl": "https://public.ecospend.com/images/banks/M&S_icon.svg",
       "banksInGroup": [
         {
           "bankId": "obie-m&s",
           "name": "M&S Bank",
           "friendlyName": "M&S Bank",
-          "iconUrl": "https://logo.com",
+          "iconUrl": "https://public.ecospend.com/images/banks/M&S_icon.svg",
           "group": "M&S Bank"
         }
       ]
