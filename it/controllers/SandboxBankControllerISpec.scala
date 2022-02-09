@@ -21,11 +21,11 @@ class SandboxBankControllerISpec extends BaseISpec {
       val parsedResponse = Json.parse(response.body).as[BanksResponse]
       parsedResponse.data.head.bankGroupName                  shouldBe "Barclays"
       parsedResponse.data.head.bankGroupNameFormatted         shouldBe "Barclays"
-      parsedResponse.data.head.iconUrl                        shouldBe "https://logo.com"
+      parsedResponse.data.head.iconUrl                        shouldBe "https://public.ecospend.com/images/banks/Barclays_icon.svg"
       parsedResponse.data.head.banksInGroup.head.bankId       shouldBe "obie-barclays-personal"
       parsedResponse.data.head.banksInGroup.head.name         shouldBe "Barclays Personal"
       parsedResponse.data.head.banksInGroup.head.friendlyName shouldBe "Barclays Personal"
-      parsedResponse.data.head.banksInGroup.head.iconUrl      shouldBe "https://logo.com"
+      parsedResponse.data.head.banksInGroup.head.iconUrl      shouldBe "https://public.ecospend.com/images/banks/Barclays_icon.svg"
       parsedResponse.data.head.banksInGroup.head.group        shouldBe "Barclays"
     }
   }
