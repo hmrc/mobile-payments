@@ -82,7 +82,7 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
       response.amount shouldEqual 125.64
-      response.bankId shouldEqual Some("some-bank-id")
+      response.bankId shouldEqual Some("obie-barclays-personal")
       response.saUtr.value shouldEqual "1555369056"
     }
   }
