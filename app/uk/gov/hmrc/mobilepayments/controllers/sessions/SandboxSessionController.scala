@@ -89,4 +89,12 @@ class SandboxSessionController @Inject() (
         )
         .as[SessionDataResponse]
     )
+
+  override def setEmail(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] =
+    validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      Future successful Created
+    }
 }

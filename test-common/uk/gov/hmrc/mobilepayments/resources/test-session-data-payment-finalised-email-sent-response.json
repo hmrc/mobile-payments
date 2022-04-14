@@ -4,11 +4,12 @@
   "amount": 12564,
   "sessionState": {
     "bankId": "a-bank-id",
+    "email": "test@test.com",
     "paymentId": "89731289321893218923",
     "paymentUrl": "https://url.com",
     "status": "Completed",
     "dateFinalised": "2021-12-01",
-    "email": "test@test.com"
+    "emailSent": true
   },
   "createdOn": "2021-11-03T10:15:30",
   "originSpecificData": {

@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.response
+package uk.gov.hmrc.mobilepayments.domain.dto.request
 
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.domain.SaUtr
+import play.api.libs.json.{Json, OFormat}
 
-import java.time.{LocalDate, LocalDateTime}
+final case class SetEmailRequest(email: String)
 
-final case class SessionDataResponse(
-  sessionDataId: String,
-  amount:        BigDecimal,
-  bankId:        Option[String],
-  state:         String,
-  createdOn:     LocalDateTime,
-  paymentDate:   Option[LocalDate],
-  saUtr:         SaUtr,
-  email:         Option[String],
-  emailSent:     Option[Boolean])
-
-object SessionDataResponse {
-  implicit val format: Format[SessionDataResponse] = Json.format[SessionDataResponse]
+object SetEmailRequest {
+  implicit val format: OFormat[SetEmailRequest] = Json.format[SetEmailRequest]
 }

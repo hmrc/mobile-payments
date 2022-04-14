@@ -18,10 +18,14 @@ package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
 import openbanking.cor.model._
+import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import play.api.libs.json.JsValue
+import play.api.mvc.Result
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, NotFoundException, UnauthorizedException, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
+import uk.gov.hmrc.mobilepayments.domain.dto.request.SetEmailRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank, BankGroupData}
@@ -63,7 +67,7 @@ class OpenBankingService @Inject() (
   ): Future[SessionDataResponse] =
     connector
       .getSession(sessionDataId, journeyId)
-      .map { data =>
+      .map { data: SessionData[OriginSpecificSessionData] =>
         val ptaSa = data.originSpecificData.asInstanceOf[PtaSaSessionData]
 
         val bankId: Option[String] = data.sessionState match {
@@ -90,6 +94,22 @@ class OpenBankingService @Inject() (
           case _: PaymentFinalised => "PaymentFinalised"
         }
 
+        val email: Option[String] = data.sessionState match {
+          case SessionInitiated => None
+          case _: BankSelected     => None
+          case t: PaymentInitiated => t.email.map(_.value)
+          case t: PaymentFinished  => t.email.map(_.value)
+          case t: PaymentFinalised => t.email.map(_.value)
+        }
+
+        val emailSent: Option[Boolean] = data.sessionState match {
+          case SessionInitiated => None
+          case _: BankSelected     => None
+          case _: PaymentInitiated => None
+          case t: PaymentFinished  => t.emailSent
+          case t: PaymentFinalised => t.emailSent
+        }
+
         SessionDataResponse(
           sessionDataId = data._id.value,
           amount        = data.amount.inPounds,
@@ -97,7 +117,9 @@ class OpenBankingService @Inject() (
           state         = state,
           createdOn     = data.createdOn,
           paymentDate   = paymentDate,
-          saUtr         = SaUtr(ptaSa.saUtr.value)
+          saUtr         = SaUtr(ptaSa.saUtr.value),
+          email         = email,
+          emailSent     = emailSent
         )
       }
 
@@ -149,6 +171,14 @@ class OpenBankingService @Inject() (
         PaymentStatusResponse(t.ecospendPaymentStatus)
       }
 
+  def setEmail(
+    sessionDataId:          String,
+    email:                  String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[SetEmailRequest] = connector.setEmail(sessionDataId, email, journeyId)
+
   private def groupBanks(banks: List[Bank])(implicit hc: HeaderCarrier): Future[List[BankGroupData]] =
     Future successful banks
       .groupBy(_.group)
@@ -156,4 +186,15 @@ class OpenBankingService @Inject() (
       .toList
       .map(BankGroupData.buildBankGroupData)
       .sortWith((bankGroupData, nextBankGroupData) => bankGroupData.bankGroupName < nextBankGroupData.bankGroupName)
+
+  def sendEmail(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[Unit] =
+    for {
+      _ <- connector.sendEmail(sessionDataId, journeyId)
+      _ <- connector.setEmailSentFlag(sessionDataId, journeyId)
+    } yield ()
 }

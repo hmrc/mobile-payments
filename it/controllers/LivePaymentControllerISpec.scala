@@ -302,10 +302,13 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
   "GET /payments" should {
     "GET /payments" should {
-      "return 200 with status" in {
+      "return 200 with status and trigger sending of email if payment status Verified or Complete " in {
         grantAccess()
         stubForShutteringDisabled
         stubForGetPaymentStatus(response = paymentStatusResponseJson)
+        stubForGetSession(response       = sessionDataPaymentFinalisedResponseJson)
+        stubForSendEmail()
+        stubForSetEmailSentFlag()
 
         val request: WSRequest = wsUrl(
           s"/payments/$sessionDataId?journeyId=$journeyId"
@@ -313,8 +316,28 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         val response = await(request.get())
         response.status shouldBe 200
         val parsedResponse = Json.parse(response.body).as[PaymentStatusResponse]
-        parsedResponse.status shouldEqual "Authorised"
+        parsedResponse.status shouldEqual "Verified"
+        verifyEmailSent(sessionDataId)
       }
+
+      "return 200 with status and do not trigger sending of email if emailSent = true " in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(response = paymentStatusResponseJson)
+        stubForGetSession(response       = sessionDataPaymentFinalisedEmailSentResponseJson)
+        stubForSendEmail()
+        stubForSetEmailSentFlag()
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 200
+        val parsedResponse = Json.parse(response.body).as[PaymentStatusResponse]
+        parsedResponse.status shouldEqual "Verified"
+        verifyEmailNotSend(sessionDataId)
+      }
+
 
       "return 500 when response from status json is malformed" in {
         grantAccess()

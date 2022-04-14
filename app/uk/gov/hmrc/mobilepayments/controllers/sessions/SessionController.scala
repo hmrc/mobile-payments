@@ -27,4 +27,9 @@ trait SessionController {
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent]
+
+  def setEmail(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue]
 }

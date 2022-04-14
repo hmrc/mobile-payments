@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.CreateSessionRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionRequest, SetEmailRequest}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -85,6 +85,29 @@ class LiveSessionController @Inject() (
                 journeyId
               )
               .map(response => Ok(Json.toJson(response)))
+          }
+        }
+      }
+    }
+
+  override def setEmail(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            withValidJson[SetEmailRequest] { setEmailRequest =>
+              openBankingService
+                .setEmail(
+                  sessionDataId,
+                  setEmailRequest.email,
+                  journeyId
+                )
+                .map(response => Ok(Json.toJson(response)))
+            }
           }
         }
       }

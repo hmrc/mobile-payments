@@ -98,6 +98,30 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
     }
   }
 
+  "when set email invoked then" should {
+    "return 201" in {
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(acceptJsonHeader, sandboxHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 201
+    }
+  }
+
+  "when set email invoked and auth fails then" should {
+    "return 406" in {
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(sandboxHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 406
+    }
+  }
+
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =
     mockShutteringResponse(Shuttering(shuttered = false))
 }

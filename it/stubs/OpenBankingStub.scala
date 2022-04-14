@@ -3,6 +3,11 @@ package stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import eu.timepit.refined.auto._
+import openbanking.cor.model.SessionDataId
+import openbanking.cor.model.request.InitiateEmailSendRequest
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.{Assertion, Assertions}
+import play.api.libs.json.Json
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 object OpenBankingStub {
@@ -128,4 +133,69 @@ object OpenBankingStub {
           .withBody(response)
       )
     )
+
+  def stubForSetEmail(
+    statusCode: Int    = 201,
+    response:   String = "{}"
+  ): StubMapping =
+    stubFor(
+      post(
+        urlEqualTo(
+          s"/open-banking/session/$sessionDataId/set-email?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
+
+  def stubForSendEmail(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
+    stubFor(
+      post(
+        urlEqualTo(
+          s"/open-banking/session/$sessionDataId/send-email?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
+
+  def stubForSetEmailSentFlag(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
+    stubFor(
+      post(
+        urlEqualTo(
+          s"/open-banking/session/$sessionDataId/set-email-sent-flag?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
+
+  def verifyEmailSent(sessionDataId: String): Assertion = {
+    import scala.collection.JavaConverters._
+    val emailUrlString = s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
+    verify(postRequestedFor(urlEqualTo(emailUrlString)))
+    findAll(postRequestedFor(urlEqualTo(emailUrlString))).asScala.toList.headOption match {
+      case None => Assertions.fail("Expecting an email request")
+      case Some(request) =>
+        val requestBody = Json.parse(request.getBodyAsString)
+        requestBody shouldBe Json.toJson(InitiateEmailSendRequest("en", "Self Assessment"))
+    }
+  }
+
+  def verifyEmailNotSend(sessionDataId: String): Unit = {
+    val emailUrlString = s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
+    verify(0, postRequestedFor(urlEqualTo(emailUrlString)))
+  }
 }

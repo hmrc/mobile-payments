@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
+import openbanking.cor.model.ecospend.EcospendFinalStatuses.Completed
+import openbanking.cor.model.ecospend.EcospendFinishedStatuses.Verified
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -123,11 +125,18 @@ class LivePaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            openBankingService
-              .getPaymentStatus(sessionDataId, journeyId)
-              .map { response =>
-                Ok(Json.toJson(response))
+
+            for {
+              response <- openBankingService.getPaymentStatus(sessionDataId, journeyId)
+              session  <- openBankingService.getSession(sessionDataId, journeyId)
+            } yield {
+              if ((response.status == Verified.toString || response.status == Completed.toString) &&
+                  !session.emailSent
+                    .getOrElse(false)) {
+                openBankingService.sendEmail(sessionDataId, journeyId)
               }
+              Ok(Json.toJson(response))
+            }
           }
         }
       }
