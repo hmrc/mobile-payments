@@ -116,6 +116,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       parsedResponse.bankId shouldEqual Some("a-bank-id")
       parsedResponse.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
       parsedResponse.saUtr.value shouldEqual "CS700100A"
+      parsedResponse.email.get shouldEqual "test@test.com"
     }
 
     "return 500 when request from session is malformed" in {
@@ -184,6 +185,77 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader)
       val response = await(request.get)
+      response.status shouldBe 521
+    }
+  }
+
+  "POST /set-email" should {
+    "return 200" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForSetEmail(response = Json.obj("email" -> "test@test.com").toString())
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 200
+    }
+
+    "return 401 when a 401 is returned from open-banking" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForSetEmail(401)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 401
+    }
+
+    "return 404 when a 404 is returned from open-banking" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForSetEmail(404)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 404
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 401
+    }
+
+    "return 500 when unknown error is returned from open-banking" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForSetEmail(500)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
       response.status shouldBe 521
     }
   }

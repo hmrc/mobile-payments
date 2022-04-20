@@ -127,7 +127,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockPaymentStatus(Future successful paymentStatusOpenBankingResponse)
 
       val result = Await.result(sut.getPaymentStatus(sessionDataId, journeyId), 0.5.seconds)
-      result.status shouldEqual "Authorised"
+      result.status shouldEqual "Verified"
     }
   }
 

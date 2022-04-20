@@ -18,12 +18,13 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
+import openbanking.cor.model.{OriginSpecificSessionData, SessionData, SessionDataId}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, OriginSpecificData, SelectBankRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, OriginSpecificData, SelectBankRequest, SetEmailRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
@@ -112,5 +113,36 @@ class OpenBankingConnector @Inject() (
   ): Future[Unit] =
     http.DELETE[Unit](
       s"$serviceUrl/open-banking/session/$sessionDataId/clear-payment?journeyId=${journeyId.value}"
+    )
+
+  def setEmail(
+    sessionDataId:          String,
+    email:                  String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[SetEmailRequest] =
+    http
+      .POST[SetEmailRequest, SetEmailRequest](
+        url = s"$serviceUrl/open-banking/session/$sessionDataId/set-email?journeyId=${journeyId.value}",
+        SetEmailRequest(email)
+      )
+
+  def sendEmail(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Unit] =
+    http.POST[InitiateEmailSendRequest, Unit](
+      s"$serviceUrl/open-banking/session/$sessionDataId/send-email?journeyId=${journeyId.value}",
+      InitiateEmailSendRequest("en", "Self Assessment")
+    )
+
+  def setEmailSentFlag(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Unit] =
+    http.POSTEmpty[Unit](
+      s"$serviceUrl/open-banking/session/$sessionDataId/set-email-sent-flag?journeyId=${journeyId.value}"
     )
 }

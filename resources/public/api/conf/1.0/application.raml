@@ -183,3 +183,32 @@ uses:
                 examples:
                   example-8:
                     value: !include examples/get-session-response-example.json
+    /{sessionDataId}/set-email:
+          uriParameters:
+            sessionDataId:
+              description: The ID associated with the payment session.
+              type: string
+              example: 51cc67d6-21da-11ec-9621-0242ac130002
+              required: true
+          post:
+            displayName: Set an email address for the user's session
+            is: [headers.acceptHeader]
+            (annotations.scope): "read:native-apps-api-orchestration"
+            securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+            body:
+              application/json:
+                examples:
+                  example-9:
+                    value: !include examples/post-set-email-request-example.json
+            queryParameters:
+              journeyId:
+                type: string
+                example: 27085215-69a4-4027-8f72-b04b10ec16b0
+                required: true
+            responses:
+              200:
+                body:
+                  application/json:
+                    examples:
+                      example-10:
+                        value: !include examples/post-set-email-response-example.json

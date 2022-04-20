@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.request.SetEmailRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
@@ -168,6 +169,7 @@ class LiveSessionControllerSpec
       response.bankId shouldEqual Some("some-bank-id")
       response.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
       response.saUtr.value shouldEqual "CS700100A"
+      response.email.get shouldEqual("test@test.com")
     }
   }
 
@@ -210,6 +212,85 @@ class LiveSessionControllerSpec
       status(result) shouldBe 500
     }
   }
+
+  "when set email invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSetEmail(Future successful SetEmailRequest(email = "test@test.com"))
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+    }
+  }
+
+  "when set email invoked and service returns NotFoundException then" should {
+    "return 404" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSetEmail(Future failed Upstream4xxResponse("Error", 404, 404))
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 404
+    }
+  }
+
+  "when set email invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSetEmail(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when set email invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when set email invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockSetEmail(Future failed Upstream5xxResponse("Error", 502, 502))
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("email" -> "test@test.com"))
+
+      val result = sut.setEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
+  private def mockSetEmail(f: Future[SetEmailRequest]) =
+    (mockOpenBankingService
+      .setEmail(_: String, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
+      .returning(f)
 
   private def mockCreateSession(future: Future[CreateSessionDataResponse]) =
     (mockOpenBankingService

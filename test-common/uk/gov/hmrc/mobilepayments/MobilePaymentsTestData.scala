@@ -80,6 +80,10 @@ trait MobilePaymentsTestData {
   lazy val paymentInitiatedUpdateResponseJson:      String = json("payment-initiated-update-response")
   lazy val paymentStatusResponseJson:               String = json("payment-status-ob-response")
 
+  lazy val sessionDataPaymentFinalisedEmailSentResponseJson: String = json(
+    "session-data-payment-finalised-email-sent-response"
+  )
+
   private def json(fileName: String): String = {
     val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")
     val raw    = source.getLines.mkString

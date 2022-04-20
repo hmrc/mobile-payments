@@ -9,6 +9,7 @@ mobile-payments
 - Fetch the payment URL consumed status for a given session ID.
 - Create a session.
 - Fetch a session for a given session ID.
+- Set the email for a session given a session ID.
 
 Requirements
 ------------
@@ -29,6 +30,7 @@ API
 | ```/payments/:sessionDataId/url-consumed``` | GET | Fetch the payment URL consumed status for a given session ID. [More...](app/docs/get-payment-url-consumed.md)|
 | ```/sessions``` | POST | Create a session. [More...](app/docs/post-session.md)|
 | ```/sessions/:sessionDataId``` | GET | Fetch a session for a given session ID. [More...](app/docs/get-session.md)|
+| ```/sessions/:sessionDataId/set-email``` | POST | Set the email for a session given a session ID. [More...](app/docs/set-email.md)|
 
 Shuttered
 ---------

@@ -108,7 +108,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   "when getPaymentStatus call is successful it" should {
     "return banks" in {
       performSuccessfulGET(Future successful paymentStatusOpenBankingResponse)(mockHttp)
-      await(sut.getPaymentStatus(sessionDataId, journeyId)).ecospendPaymentStatus shouldEqual "Authorised"
+      await(sut.getPaymentStatus(sessionDataId, journeyId)).ecospendPaymentStatus shouldEqual "Verified"
     }
   }
 

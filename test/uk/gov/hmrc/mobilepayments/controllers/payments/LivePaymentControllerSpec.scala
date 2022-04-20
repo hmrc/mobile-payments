@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.request.SetEmailRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
@@ -173,10 +174,27 @@ class LivePaymentControllerSpec
   }
 
   "when get payment status invoked and service returns success then" should {
-    "return 200" in {
+    "return 200 and trigger sending of email if status Verified or Complete" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetPaymentStatus(Future successful PaymentStatusResponse("Verified"))
+      mockGetSession(Future successful sessionDataResponse)
+      mockSendEmail()
+
+      val request = FakeRequest("GET", s"/payments/$sessionDataId")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[PaymentStatusResponse]
+      response.status shouldEqual "Verified"
+    }
+
+    "return 200 and do not trigger sending of email if status is not Verified or Complete" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
       mockGetPaymentStatus(Future successful PaymentStatusResponse("Authorised"))
+      mockGetSession(Future successful sessionDataResponse)
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader)
@@ -350,4 +368,10 @@ class LivePaymentControllerSpec
       .getSession(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returning(future)
+
+  private def mockSendEmail() =
+    (mockOpenBankingService
+      .sendEmail(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returning(Future successful Success)
 }
