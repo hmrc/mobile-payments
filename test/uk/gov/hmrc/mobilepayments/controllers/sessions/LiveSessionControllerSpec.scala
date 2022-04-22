@@ -214,17 +214,17 @@ class LiveSessionControllerSpec
   }
 
   "when set email invoked and service returns success then" should {
-    "return 200" in {
+    "return 201" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockSetEmail(Future successful SetEmailRequest(email = "test@test.com"))
+      mockSetEmail(Future successful Unit)
 
       val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
         .withHeaders(acceptJsonHeader, contentHeader)
         .withBody(Json.obj("email" -> "test@test.com"))
 
       val result = sut.setEmail(sessionDataId, journeyId)(request)
-      status(result) shouldBe 200
+      status(result) shouldBe 201
     }
   }
 
@@ -286,7 +286,7 @@ class LiveSessionControllerSpec
     }
   }
 
-  private def mockSetEmail(f: Future[SetEmailRequest]) =
+  private def mockSetEmail(f: Future[Unit]) =
     (mockOpenBankingService
       .setEmail(_: String, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)

@@ -120,9 +120,9 @@ class OpenBankingConnector @Inject() (
     email:                  String,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[SetEmailRequest] =
+  ): Future[Unit] =
     http
-      .POST[SetEmailRequest, SetEmailRequest](
+      .POST[SetEmailRequest, Unit](
         url = s"$serviceUrl/open-banking/session/$sessionDataId/set-email?journeyId=${journeyId.value}",
         SetEmailRequest(email)
       )

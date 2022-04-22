@@ -190,7 +190,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
   }
 
   "POST /set-email" should {
-    "return 200" in {
+    "return 201" in {
       grantAccess()
       stubForShutteringDisabled
       stubForSetEmail(response = Json.obj("email" -> "test@test.com").toString())
@@ -199,53 +199,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader)
       val response = await(request.post(Json.obj("email" -> "test@test.com")))
-      response.status shouldBe 200
-    }
-
-    "return 401 when a 401 is returned from open-banking" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForSetEmail(401)
-
-      val request: WSRequest = wsUrl(
-        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, contentHeader)
-      val response = await(request.post(Json.obj("email" -> "test@test.com")))
-      response.status shouldBe 401
-    }
-
-    "return 404 when a 404 is returned from open-banking" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForSetEmail(404)
-
-      val request: WSRequest = wsUrl(
-        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, contentHeader)
-      val response = await(request.post(Json.obj("email" -> "test@test.com")))
-      response.status shouldBe 404
-    }
-
-    "return 401 when auth fails" in {
-      authorisationRejected()
-
-      val request: WSRequest = wsUrl(
-        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, contentHeader)
-      val response = await(request.post(Json.obj("email" -> "test@test.com")))
-      response.status shouldBe 401
-    }
-
-    "return 500 when unknown error is returned from open-banking" in {
-      grantAccess()
-      stubForShutteringDisabled
-      stubForSetEmail(500)
-
-      val request: WSRequest = wsUrl(
-        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, contentHeader)
-      val response = await(request.post(Json.obj("email" -> "test@test.com")))
-      response.status shouldBe 500
+      response.status shouldBe 201
     }
 
     "return 521 when shuttered" in {
