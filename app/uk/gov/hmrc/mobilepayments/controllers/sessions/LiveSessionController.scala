@@ -106,7 +106,7 @@ class LiveSessionController @Inject() (
                   setEmailRequest.email,
                   journeyId
                 )
-                .map(response => Ok(Json.toJson(response)))
+                .map(_ => Ok)
             }
           }
         }

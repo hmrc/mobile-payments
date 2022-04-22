@@ -177,7 +177,7 @@ class OpenBankingService @Inject() (
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[SetEmailRequest] = connector.setEmail(sessionDataId, email, journeyId)
+  ): Future[Unit] = connector.setEmail(sessionDataId, email, journeyId)
 
   private def groupBanks(banks: List[Bank])(implicit hc: HeaderCarrier): Future[List[BankGroupData]] =
     Future successful banks

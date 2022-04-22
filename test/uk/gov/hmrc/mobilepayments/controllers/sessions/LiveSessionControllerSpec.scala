@@ -217,7 +217,7 @@ class LiveSessionControllerSpec
     "return 200" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
-      mockSetEmail(Future successful SetEmailRequest(email = "test@test.com"))
+      mockSetEmail(Future successful Unit)
 
       val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -286,7 +286,7 @@ class LiveSessionControllerSpec
     }
   }
 
-  private def mockSetEmail(f: Future[SetEmailRequest]) =
+  private def mockSetEmail(f: Future[Unit]) =
     (mockOpenBankingService
       .setEmail(_: String, _: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)
