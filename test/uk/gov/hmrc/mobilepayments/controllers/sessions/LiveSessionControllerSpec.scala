@@ -214,7 +214,7 @@ class LiveSessionControllerSpec
   }
 
   "when set email invoked and service returns success then" should {
-    "return 200" in {
+    "return 201" in {
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
       mockSetEmail(Future successful Unit)
@@ -224,7 +224,7 @@ class LiveSessionControllerSpec
         .withBody(Json.obj("email" -> "test@test.com"))
 
       val result = sut.setEmail(sessionDataId, journeyId)(request)
-      status(result) shouldBe 200
+      status(result) shouldBe 201
     }
   }
 

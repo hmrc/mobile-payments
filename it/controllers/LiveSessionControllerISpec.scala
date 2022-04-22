@@ -190,7 +190,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
   }
 
   "POST /set-email" should {
-    "return 200" in {
+    "return 201" in {
       grantAccess()
       stubForShutteringDisabled
       stubForSetEmail(response = Json.obj("email" -> "test@test.com").toString())
@@ -199,7 +199,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader)
       val response = await(request.post(Json.obj("email" -> "test@test.com")))
-      response.status shouldBe 200
+      response.status shouldBe 201
     }
 
     "return 521 when shuttered" in {
