@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class LiveSessionController @Inject() (
@@ -108,6 +108,28 @@ class LiveSessionController @Inject() (
                 )
                 .map(_ => Created)
             }
+          }
+        }
+      }
+    }
+
+  override def clearEmail(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            openBankingService
+              .clearEmail(
+                sessionDataId,
+                journeyId
+              )
+              .map { _ =>
+                NoContent
+              }
           }
         }
       }

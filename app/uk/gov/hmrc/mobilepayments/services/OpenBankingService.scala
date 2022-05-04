@@ -197,4 +197,11 @@ class OpenBankingService @Inject() (
       _ <- connector.sendEmail(sessionDataId, journeyId)
       _ <- connector.setEmailSentFlag(sessionDataId, journeyId)
     } yield ()
+
+  def clearEmail(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[Unit] = connector.clearEmail(sessionDataId, journeyId)
 }

@@ -202,6 +202,16 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 201
     }
 
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 401
+    }
+
     "return 521 when shuttered" in {
       grantAccess()
       stubForShutteringEnabled
@@ -210,6 +220,41 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/sessions/$sessionDataId/set-email?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader)
       val response = await(request.post(Json.obj("email" -> "test@test.com")))
+      response.status shouldBe 521
+    }
+  }
+
+  "DELETE /sessions/:sessionDataId/clear-email" should {
+    "return 204 when call is successful" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForClearEmail()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/clear-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.delete)
+      response.status shouldBe 204
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/clear-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.delete)
+      response.status shouldBe 401
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/clear-email?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.delete)
       response.status shouldBe 521
     }
   }

@@ -182,9 +182,26 @@ object OpenBankingStub {
       )
     )
 
+  def stubForClearEmail(
+    statusCode: Int    = 200,
+    response:   String = "{}"
+  ): StubMapping =
+    stubFor(
+      post(
+        urlEqualTo(
+          s"/open-banking/session/$sessionDataId/clear-email?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
+
   def verifyEmailSent(sessionDataId: String): Assertion = {
     import scala.collection.JavaConverters._
-    val emailUrlString = s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
+    val emailUrlString =
+      s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
     verify(postRequestedFor(urlEqualTo(emailUrlString)))
     findAll(postRequestedFor(urlEqualTo(emailUrlString))).asScala.toList.headOption match {
       case None => Assertions.fail("Expecting an email request")
@@ -195,7 +212,8 @@ object OpenBankingStub {
   }
 
   def verifyEmailNotSend(sessionDataId: String): Unit = {
-    val emailUrlString = s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
+    val emailUrlString =
+      s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
     verify(0, postRequestedFor(urlEqualTo(emailUrlString)))
   }
 }
