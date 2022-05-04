@@ -122,6 +122,28 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
     }
   }
 
+  "when clear email invoked then" should {
+    "return 204" in {
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
+        .withHeaders(acceptJsonHeader, sandboxHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 204
+    }
+  }
+
+  "when clear email invoked and auth fails then" should {
+    "return 406" in {
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
+        .withHeaders(sandboxHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 406
+    }
+  }
+
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =
     mockShutteringResponse(Shuttering(shuttered = false))
 }

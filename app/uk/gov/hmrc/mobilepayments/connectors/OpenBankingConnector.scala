@@ -145,4 +145,13 @@ class OpenBankingConnector @Inject() (
     http.POSTEmpty[Unit](
       s"$serviceUrl/open-banking/session/$sessionDataId/set-email-sent-flag?journeyId=${journeyId.value}"
     )
+
+  def clearEmail(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Unit] =
+    http.DELETE[Unit](
+      s"$serviceUrl/open-banking/session/$sessionDataId/clear-email?journeyId=${journeyId.value}"
+    )
 }

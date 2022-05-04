@@ -90,4 +90,19 @@ trait AccessControl extends HeaderValidator with Authorisation {
             )
           )
     }
+
+  def validateWithAuth(): ActionBuilder[Request, AnyContent] =
+    new ActionBuilder[Request, AnyContent] {
+
+      override def parser:                     BodyParser[AnyContent] = outer.parser
+      override protected def executionContext: ExecutionContext       = outer.executionContext
+
+      def invokeBlock[A](
+        request: Request[A],
+        block:   Request[A] => Future[Result]
+      ): Future[Result] =
+        if (requiresAuth) invokeAuthBlock(request, block)
+        else block(request)
+
+    }
 }

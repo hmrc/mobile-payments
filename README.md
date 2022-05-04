@@ -31,6 +31,7 @@ API
 | ```/sessions``` | POST | Create a session. [More...](app/docs/post-session.md)|
 | ```/sessions/:sessionDataId``` | GET | Fetch a session for a given session ID. [More...](app/docs/get-session.md)|
 | ```/sessions/:sessionDataId/set-email``` | POST | Set the email for a session given a session ID. [More...](app/docs/set-email.md)|
+| ```/sessions/:sessionDataId/clear-email``` | DELETE | Clear the email for a session given a session ID. [More...](app/docs/clear-email.md)|
 
 Shuttered
 ---------

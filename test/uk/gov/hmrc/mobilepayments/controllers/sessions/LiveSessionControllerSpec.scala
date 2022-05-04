@@ -169,7 +169,7 @@ class LiveSessionControllerSpec
       response.bankId shouldEqual Some("some-bank-id")
       response.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
       response.saUtr.value shouldEqual "CS700100A"
-      response.email.get shouldEqual("test@test.com")
+      response.email.get shouldEqual ("test@test.com")
     }
   }
 
@@ -285,6 +285,80 @@ class LiveSessionControllerSpec
       status(result) shouldBe 500
     }
   }
+
+  "when clear email invoked and service returns success then" should {
+    "return 204" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockClearEmail(Future successful Unit)
+
+      val request =
+        FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email").withHeaders(acceptJsonHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 204
+    }
+  }
+
+  "when clear email invoked and service returns NotFoundException then" should {
+    "return 404" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockClearEmail(Future failed Upstream4xxResponse("Error", 404, 404))
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 404
+    }
+  }
+
+  "when clear email invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockClearEmail(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when clear email invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when clear email invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockClearEmail(Future failed Upstream5xxResponse("Error", 502, 502))
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.clearEmail(sessionDataId, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
+  private def mockClearEmail(f: Future[Unit]) =
+    (mockOpenBankingService
+      .clearEmail(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returning(f)
 
   private def mockSetEmail(f: Future[Unit]) =
     (mockOpenBankingService

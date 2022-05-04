@@ -8,3 +8,5 @@ PUT         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayme
 
 POST        /sessions                                     uk.gov.hmrc.mobilepayments.controllers.sessions.SandboxSessionController.createSession(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 GET         /sessions/:sessionDataId                      uk.gov.hmrc.mobilepayments.controllers.sessions.SandboxSessionController.getSession(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+POST        /sessions/:sessionDataId/set-email            uk.gov.hmrc.mobilepayments.controllers.sessions.SandboxSessionController.setEmail(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+DELETE      /sessions/:sessionDataId/clear-email          uk.gov.hmrc.mobilepayments.controllers.sessions.SandboxSessionController.clearEmail(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)

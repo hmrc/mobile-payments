@@ -32,4 +32,9 @@ trait SessionController {
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[JsValue]
+
+  def clearEmail(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent]
 }

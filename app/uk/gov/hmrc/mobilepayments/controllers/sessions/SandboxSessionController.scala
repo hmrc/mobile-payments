@@ -97,4 +97,12 @@ class SandboxSessionController @Inject() (
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       Future successful Created
     }
+
+  override def clearEmail(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      Future successful NoContent
+    }
 }
