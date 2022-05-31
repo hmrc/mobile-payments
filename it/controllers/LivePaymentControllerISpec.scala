@@ -5,10 +5,13 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
+import stubs.PayApiStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
+
+import java.time.LocalDate
 
 class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
@@ -338,7 +341,6 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         verifyEmailNotSend(sessionDataId)
       }
 
-
       "return 500 when response from status json is malformed" in {
         grantAccess()
         stubForShutteringDisabled
@@ -407,6 +409,95 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         val response = await(request.get())
         response.status shouldBe 521
       }
+    }
+  }
+
+  "GET /payments/:utr/latest-payments" should {
+    "return 200 with the latest payments for the user" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetPayments(200, paymentsResponseString())
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[LatestPaymentsResponse]
+      parsedResponse.payments.size               shouldBe 1
+      parsedResponse.payments.head.date.toString shouldBe LocalDate.now().toString
+      parsedResponse.payments.head.amountInPence shouldBe 11100
+
+    }
+
+    "return 404 when no valid payments returned" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetPayments(200, paymentsResponseString(LocalDate.now().minusDays(15).toString))
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 404
+
+    }
+
+    "return 404 when a 404 is returned from get payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetPayments(404)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 404
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 401
+    }
+
+    "return 500 when a 401 is returned from get payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetPayments(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 500
+    }
+
+    "return 500 when unknown error 500 returned from get payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForGetPayments(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.get)
+      response.status shouldBe 521
     }
   }
 }

@@ -1,0 +1,35 @@
+{
+  "searchScope": "MA",
+  "searchTag": "101747641",
+  "payments": [
+    {
+      "id": "5bc75ae4190000b34a1b841d",
+      "reference": "1017476410407",
+      "transactionReference": "123456",
+      "amountInPence": 11100,
+      "commissionInPence": 220,
+      "status": "Successful",
+      "createdOn": "<DATE>T08:58:34.015",
+      "taxType": "selfAssessment"
+    },
+    {
+      "id": "5bc75ae4190000b34a1b841e",
+      "reference": "1017476410408",
+      "transactionReference": "123457",
+      "amountInPence": 20000,
+      "status": "Successful",
+      "createdOn": "2022-05-01T09:58:34.015",
+      "taxType": "selfAssessment"
+    },
+    {
+      "id": "5bc75ae4190000b34a1b841f",
+      "reference": "1017476410709",
+      "transactionReference": "123458",
+      "amountInPence": 1320000,
+      "status": "Cancelled",
+      "createdOn": "<DATE>T09:58:34.015",
+      "taxType": "selfAssessment"
+    }
+
+  ]
+}

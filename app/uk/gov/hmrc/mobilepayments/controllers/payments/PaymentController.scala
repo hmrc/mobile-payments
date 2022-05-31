@@ -40,4 +40,9 @@ trait PaymentController {
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent]
+
+  def latestPayments(
+    utr: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent]
 }

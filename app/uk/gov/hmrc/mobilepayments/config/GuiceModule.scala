@@ -60,6 +60,9 @@ class GuiceModule(
     bind(classOf[String])
       .annotatedWith(named("mobile-shuttering"))
       .toInstance(servicesConfig.baseUrl("mobile-shuttering"))
+    bind(classOf[String])
+      .annotatedWith(named("payments"))
+      .toInstance(servicesConfig.baseUrl("payments"))
   }
 
   private def bindConfigStringSeq(path: String): Unit = {

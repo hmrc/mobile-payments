@@ -20,8 +20,9 @@ import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymen
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
-import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Shuttering}
+import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Payment, PaymentRecordListFromApi, Shuttering}
 
+import java.time.LocalDate
 import scala.io.Source
 
 trait MobilePaymentsTestData {
@@ -68,6 +69,19 @@ trait MobilePaymentsTestData {
 
   lazy val sessionPaymentFinalisedDataResponse: SessionData[OriginSpecificSessionData] =
     Json.fromJson[SessionData[OriginSpecificSessionData]](js("session-data-payment-finalised-response")).get
+
+  lazy val latestPaymentsResponse: LatestPaymentsResponse =
+    Json.fromJson[LatestPaymentsResponse](js("latest-payments-response")).get
+
+  def paymentsResponseString(date: String = LocalDate.now().toString): String =
+    json(("payments-response")).replace("<DATE>", date)
+
+  def paymentsResponse(date: String = LocalDate.now().toString): PaymentRecordListFromApi =
+    Json
+      .fromJson[PaymentRecordListFromApi](
+        Json.parse(json("payments-response").replace("<DATE>", date))
+      )
+      .get
 
   lazy val rawMalformedJson:                        String = "{\"data\": [{,]}"
   lazy val banksResponseJson:                       String = json("banks-response")

@@ -1,0 +1,12 @@
+{
+  "payments": [
+    {
+      "amountInPence": 12000,
+      "date": "2022-06-01"
+    },
+    {
+      "amountInPence": 74000,
+      "date": "2022-06-07"
+    }
+  ]
+}

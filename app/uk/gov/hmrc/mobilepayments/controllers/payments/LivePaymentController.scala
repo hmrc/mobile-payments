@@ -26,7 +26,7 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
+import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 
@@ -40,7 +40,8 @@ class LivePaymentController @Inject() (
   cc:                                                           ControllerComponents,
   openBankingService:                                           OpenBankingService,
   shutteringService:                                            ShutteringService,
-  auditService:                                                 AuditService
+  auditService:                                                 AuditService,
+  paymentsService:                                              PaymentsService
 )(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
     with PaymentController
@@ -136,6 +137,25 @@ class LivePaymentController @Inject() (
                 openBankingService.sendEmail(sessionDataId, journeyId)
               }
               Ok(Json.toJson(response))
+            }
+          }
+        }
+      }
+    }
+
+  def latestPayments(
+    utr:       String,
+    journeyId: JourneyId
+  ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            paymentsService.getLatestPayments(utr, journeyId) map {
+              case Right(None)     => NotFound
+              case Right(payments) => Ok(Json.toJson(payments))
+              case Left(e)         => InternalServerError(e)
             }
           }
         }

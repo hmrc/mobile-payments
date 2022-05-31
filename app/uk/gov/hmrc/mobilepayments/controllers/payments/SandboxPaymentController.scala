@@ -24,11 +24,12 @@ import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.time.LocalDate
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -78,9 +79,19 @@ class SandboxPaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            Future successful Ok(samplePaymentStatusJson(resource = "sandbox-payment-status-response.json"))
+            Future successful Ok(samplePaymentStatusJson)
           }
         }
+      }
+    }
+
+  def latestPayments(
+    utr:       String,
+    journeyId: JourneyId
+  ): Action[AnyContent] =
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      withErrorWrapper {
+        Future successful Ok(sampleLatestPaymentsJson)
       }
     }
 
@@ -93,15 +104,28 @@ class SandboxPaymentController @Inject() (
       }
     }
 
-  private def samplePaymentStatusJson(resource: String): JsValue =
+  private def samplePaymentStatusJson: JsValue =
     toJson(
       Json
         .parse(
-          findResource(path = s"/resources/mobilepayments/$resource")
+          findResource(path = s"/resources/mobilepayments/sandbox-payment-status-response.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
         .as[PaymentStatusResponse]
     )
 
+  private def sampleLatestPaymentsJson: JsValue =
+    toJson(
+      Json
+        .parse(
+          findResource(path = s"/resources/mobilepayments/sandbox-latest-payments-response.json")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+            .replace("<DATE1>", LocalDate.now().minusDays(10).toString)
+            .replace("<DATE2>", LocalDate.now().minusDays(1).toString)
+        )
+        .as[LatestPaymentsResponse]
+    )
+
   override val app: String = "Sandbox Payment Controller"
+
 }
