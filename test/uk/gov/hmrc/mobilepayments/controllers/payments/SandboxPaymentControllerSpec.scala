@@ -17,6 +17,7 @@
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import openbanking.cor.model.response.InitiatePaymentResponse
+import org.joda.time.LocalDate
 import org.scalamock.handlers.CallHandler
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -24,7 +25,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
@@ -38,6 +39,7 @@ class SandboxPaymentControllerSpec
 
   private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
   private val sessionDataId:   String          = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val utr:             String          = "11223344"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
@@ -58,7 +60,8 @@ class SandboxPaymentControllerSpec
       val result = sut.createPayment(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[InitiatePaymentResponse]
-      response.paymentUrl.toString() shouldEqual "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
+      response.paymentUrl
+        .toString() shouldEqual "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking"
     }
   }
 
@@ -116,6 +119,31 @@ class SandboxPaymentControllerSpec
       val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed?journeyId=$journeyId")
 
       val result = sut.urlConsumed(sessionDataId, journeyId)(request)
+      status(result) shouldBe 406
+    }
+  }
+
+  "when get latest payments invoked and service returns success then" should {
+    "return 200 and payments" in {
+
+      val request = FakeRequest("GET", s"/payments/$utr/latest-payments?journeyId=$journeyId")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.latestPayments(utr, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[LatestPaymentsResponse]
+      response.payments.size               shouldBe 2
+      response.payments.head.amountInPence shouldBe 12000
+      response.payments.head.date.toString shouldBe LocalDate.now().minusDays(10).toString
+    }
+  }
+
+  "when get latest payments invoked and auth fails then" should {
+    "return 406" in {
+
+      val request = FakeRequest("GET", s"/payments/$utr/latest-payments?journeyId=$journeyId")
+
+      val result = sut.latestPayments(utr, journeyId)(request)
       status(result) shouldBe 406
     }
   }

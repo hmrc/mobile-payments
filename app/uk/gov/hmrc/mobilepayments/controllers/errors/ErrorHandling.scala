@@ -34,6 +34,8 @@ case object ErrorMalformedRequest extends ErrorResponse(400, "MALFORMED", "Malfo
 
 class GrantAccessException(message: String) extends HttpException(message, 401)
 
+class NotFoundException(message: String) extends HttpException(message, 404)
+
 class AccountWithLowCL extends GrantAccessException("Unauthorised! Account with low CL!")
 
 trait ErrorHandling {

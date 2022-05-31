@@ -47,6 +47,7 @@ abstract class BaseISpec
       "auditing.enabled"                             -> false,
       "microservice.services.auth.port"              -> wireMockPort,
       "microservice.services.open-banking.port"      -> wireMockPort,
+      "microservice.services.payments.port"          -> wireMockPort,
       "microservice.services.mobile-shuttering.port" -> wireMockPort
     )
 

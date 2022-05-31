@@ -5,12 +5,13 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
 
 class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
   private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val utr: String = "1122334455"
 
   "POST /payments" should {
     "return 200 when payload valid and sandbox header present it" in {
@@ -138,5 +139,29 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       val response = await(request.get())
       response.status shouldBe 521
     }
+  }
+
+  "GET /payments/:utr/latest-payments" should {
+    "return 200 and latest payment list when sandbox header present" in {
+      stubForShutteringDisabled
+
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader, acceptJsonHeader)
+      val response = await(request.get())
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[LatestPaymentsResponse]
+      parsedResponse.payments.size shouldBe 2
+    }
+
+    "return 406 when request authorisation fails it" in {
+      stubForShutteringDisabled
+      val request: WSRequest = wsUrl(
+        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader)
+      val response = await(request.get())
+      response.status shouldBe 406
+    }
+
   }
 }

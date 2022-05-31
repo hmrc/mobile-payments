@@ -22,15 +22,15 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.dto.request.SetEmailRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
-import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, ShutteringService}
+import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,10 +44,12 @@ class LivePaymentControllerSpec
   private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
   private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val utr:                    String             = "12212321"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
   implicit val mockAuditService:      AuditService      = mock[AuditService]
+  implicit val mockPaymentsService:   PaymentsService   = mock[PaymentsService]
 
   private val sut = new LivePaymentController(
     mockAuthConnector,
@@ -55,7 +57,8 @@ class LivePaymentControllerSpec
     Helpers.stubControllerComponents(),
     mockOpenBankingService,
     mockShutteringService,
-    mockAuditService
+    mockAuditService,
+    mockPaymentsService
   )
 
   "when create payment invoked and service returns success then" should {
@@ -330,6 +333,52 @@ class LivePaymentControllerSpec
     }
   }
 
+  "when get latest payments invoked and service returns success then" should {
+    "return 200 and latest payments" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetLatestPayments(Future successful Right(Some(latestPaymentsResponse)))
+
+      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.latestPayments(utr, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[LatestPaymentsResponse]
+      response.payments.size               shouldBe 2
+      response.payments.head.amountInPence shouldBe 11100
+      response.payments.head.date.toString shouldBe "2022-05-07"
+    }
+  }
+
+  "when get latest payments invoked and service returns None" should {
+    "return 404 Not Found" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetLatestPayments(Future successful Right(None))
+
+      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.latestPayments(utr, journeyId)(request)
+      status(result) shouldBe 404
+    }
+  }
+
+  "when get latest payments invoked and service returns Error String" should {
+    "return 500 Internal Server Error" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockGetLatestPayments(Future successful Left("Unknown response"))
+
+      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.latestPayments(utr, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
   private def mockInitiatePayment(future: Future[InitiatePaymentResponse]) =
     (mockOpenBankingService
       .initiatePayment(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
@@ -374,4 +423,10 @@ class LivePaymentControllerSpec
       .sendEmail(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returning(Future successful Success)
+
+  private def mockGetLatestPayments(future: Future[Either[String, Option[LatestPaymentsResponse]]]) =
+    (mockPaymentsService
+      .getLatestPayments(_: String, _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
+      .expects(*, *, *, *)
+      .returning(future)
 }
