@@ -19,7 +19,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[BanksResponse]
@@ -33,7 +33,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get())
       response.status shouldBe 500
     }
@@ -57,7 +57,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get())
       response.status shouldBe 404
     }
@@ -79,7 +79,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get())
       response.status shouldBe 500
     }
@@ -90,7 +90,7 @@ class LiveBankControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/banks?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader)
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get())
       response.status shouldBe 521
     }
