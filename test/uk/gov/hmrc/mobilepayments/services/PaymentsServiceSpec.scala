@@ -31,12 +31,7 @@ import scala.concurrent.{Await, Future}
 class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val mockConnector: PaymentsConnector = mock[PaymentsConnector]
-  private val amount:        BigDecimal        = 102.85
-  private val amountInPence: AmountInPence     = AmountInPence(amount)
   private val saUtr:         SaUtr             = SaUtr("CS700100A")
-  private val bankId:        String            = "asd-123"
-  private val sessionDataId: String            = "51cc67d6-21da-11ec-9621-0242ac130002"
-  private val returnUrl:     String            = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
 
   private val sut = new PaymentsService(mockConnector)
 
