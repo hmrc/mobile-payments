@@ -73,6 +73,12 @@ trait MobilePaymentsTestData {
   lazy val latestPaymentsResponse: LatestPaymentsResponse =
     Json.fromJson[LatestPaymentsResponse](js("latest-payments-response")).get
 
+  lazy val payApiPayByCardResponse: PayApiPayByCardResponse =
+    Json.fromJson[PayApiPayByCardResponse](js("pay-api-pay-by-card-response")).get
+
+  lazy val payByCardResponse: PayByCardResponse =
+    Json.fromJson[PayByCardResponse](js("pay-by-card-response")).get
+
   def paymentsResponseString(date: String = LocalDate.now().toString): String =
     json(("payments-response")).replace("<DATE>", date)
 

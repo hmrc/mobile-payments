@@ -18,8 +18,11 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import play.api.Logger
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
+import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{PayApiPayByCardResponse, PayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import javax.inject.{Inject, Named}
@@ -58,5 +61,17 @@ class PaymentsConnector @Inject() (
         Left("exception thrown from payment api")
       }
     }
+
+  def getPayByCardUrl(
+    amount:                 Long,
+    saUtr:                  SaUtr,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[PayApiPayByCardResponse] =
+    http.POST[PayByCardRequest, PayApiPayByCardResponse](
+      url = s"$serviceUrl/[TODO]/$saUtr",
+      PayByCardRequest(amount),
+      Seq(("X-Session-ID", journeyId.value))
+    )
 
 }
