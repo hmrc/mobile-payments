@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.mobilepayments.domain.dto.request
 
+import payapi.corcommon.model.{SearchOptions, TaxType}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.domain.dto.request.OriginSpecificData.originSa
 
 final case class CreateSessionDataRequest(
   amount:             AmountInPence,
+  taxType:            TaxType,
+  searchOptions:      SearchOptions,
   originSpecificData: OriginSpecificData)
 
 object CreateSessionDataRequest {

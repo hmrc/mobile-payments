@@ -21,6 +21,7 @@ import com.google.inject.name.Named
 import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData, SessionDataId}
+import payapi.corcommon.model.{SearchOptions, SearchScope, SearchTag, TaxType, TaxTypes}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
@@ -51,7 +52,10 @@ class OpenBankingConnector @Inject() (
   ): Future[CreateSessionDataResponse] =
     http.POST[CreateSessionDataRequest, CreateSessionDataResponse](
       url = s"$serviceUrl/open-banking/session?journeyId=${journeyId.value}",
-      CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
+      CreateSessionDataRequest(amount,
+                               TaxTypes.selfAssessment,
+                               SearchOptions(Some(SearchScope("PTA")), Some(SearchTag(saUtr.utr))),
+                               OriginSpecificData(saUtr.utr)),
       Seq(("X-Session-ID", journeyId.value))
     )
 
