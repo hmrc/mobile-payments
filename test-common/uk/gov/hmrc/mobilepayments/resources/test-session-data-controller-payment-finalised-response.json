@@ -1,6 +1,12 @@
 {
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
   "amount": 125.64,
+  "taxType": "selfAssessment",
+  "searchOptions": {
+    "searchScope": "PTA",
+    "searchTag": "CS700100A"
+
+  },
   "bankId": "some-bank-id",
   "email": "test@test.com",
   "state": "PaymentFinalised",
