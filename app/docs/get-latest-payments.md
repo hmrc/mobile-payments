@@ -5,7 +5,7 @@ Get Latest Payments
 
 * **URL**
 
-  `/payments/:utr/latest-payments`
+  `/payments/latest-payments/:utr`
 
 * **Method:**
 

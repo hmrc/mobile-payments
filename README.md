@@ -28,7 +28,7 @@ API
 | ```/payments/:sessionDataId``` | POST | Create a payment URL for a given session ID. [More...](app/docs/post-payment.md)|
 | ```/payments/:sessionDataId``` | PUT | Update a payment URL for a given session ID. [More...](app/docs/put-payment.md)|
 | ```/payments/:sessionDataId/url-consumed``` | GET | Fetch the payment URL consumed status for a given session ID. [More...](app/docs/get-payment-url-consumed.md)|
-| ```/payments/:utr/latest-payments``` | GET | Fetch self assessment payments made within the last 14 days for the given UTR. [More...](app/docs/get-latest-payments.md)|
+| ```/payments/latest-payments/:utr``` | GET | Fetch self assessment payments made within the last 14 days for the given UTR. [More...](app/docs/get-latest-payments.md)|
 | ```/sessions``` | POST | Create a session. [More...](app/docs/post-session.md)|
 | ```/sessions/:sessionDataId``` | GET | Fetch a session for a given session ID. [More...](app/docs/get-session.md)|
 | ```/sessions/:sessionDataId/set-email``` | POST | Set the email for a session given a session ID. [More...](app/docs/set-email.md)|

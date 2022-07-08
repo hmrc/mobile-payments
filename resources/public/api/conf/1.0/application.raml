@@ -136,7 +136,7 @@ uses:
                   examples:
                     example-5:
                       value: !include examples/get-payment-url-consumed-response-example.json
-    /{utr}/latest-payments:
+    /latest-payments/{utr}:
       uriParameters:
         utr:
           description: The UTR associated with the user.
