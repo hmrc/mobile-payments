@@ -23,8 +23,6 @@ import uk.gov.hmrc.mobilepayments.domain.dto.request.OriginSpecificData.originSa
 
 final case class CreateSessionDataRequest(
   amount:             AmountInPence,
-  taxType:            TaxType,
-  searchOptions:      SearchOptions,
   originSpecificData: OriginSpecificData)
 
 object CreateSessionDataRequest {
