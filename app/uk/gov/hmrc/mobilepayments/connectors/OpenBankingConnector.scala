@@ -52,10 +52,7 @@ class OpenBankingConnector @Inject() (
   ): Future[CreateSessionDataResponse] =
     http.POST[CreateSessionDataRequest, CreateSessionDataResponse](
       url = s"$serviceUrl/open-banking/session?journeyId=${journeyId.value}",
-      CreateSessionDataRequest(amount,
-                               TaxTypes.selfAssessment,
-                               SearchOptions(Some(SearchScope("PTA")), Some(SearchTag(saUtr.utr))),
-                               OriginSpecificData(saUtr.utr)),
+      CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
       Seq(("X-Session-ID", journeyId.value))
     )
 
