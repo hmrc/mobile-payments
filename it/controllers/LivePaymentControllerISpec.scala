@@ -419,7 +419,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForGetPayments(200, paymentsResponseString())
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
       response.status shouldBe 200
@@ -436,7 +436,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForGetPayments(200, paymentsResponseString(LocalDate.now().minusDays(15).toString))
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
       response.status shouldBe 404
@@ -449,7 +449,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForGetPayments(404)
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
       response.status shouldBe 404
@@ -459,7 +459,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       authorisationRejected()
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader)
       val response = await(request.get)
       response.status shouldBe 401
@@ -471,7 +471,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForGetPayments(401)
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
       response.status shouldBe 500
@@ -483,7 +483,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForGetPayments(500)
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
       response.status shouldBe 500
@@ -494,7 +494,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       stubForShutteringEnabled
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
       response.status shouldBe 521

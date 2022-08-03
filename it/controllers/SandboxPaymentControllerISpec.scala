@@ -146,7 +146,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       stubForShutteringDisabled
 
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(sandboxHeader, acceptJsonHeader)
       val response = await(request.get())
       response.status shouldBe 200
@@ -157,7 +157,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
     "return 406 when request authorisation fails it" in {
       stubForShutteringDisabled
       val request: WSRequest = wsUrl(
-        s"/payments/$utr/latest-payments?journeyId=$journeyId"
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(sandboxHeader)
       val response = await(request.get())
       response.status shouldBe 406

@@ -5,7 +5,7 @@ GET         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayme
 GET         /payments/:sessionDataId/url-consumed        uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.urlConsumed(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 POST        /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.createPayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 PUT         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.updatePayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
-GET         /payments/:utr/latest-payments               uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.latestPayments(utr: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /payments/latest-payments/:utr               uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.latestPayments(utr: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 POST        /payments/:utr/pay-by-card                   uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.latestPayments(utr: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 
 POST        /sessions                                    uk.gov.hmrc.mobilepayments.controllers.sessions.LiveSessionController.createSession(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
