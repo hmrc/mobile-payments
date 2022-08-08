@@ -19,7 +19,8 @@ package uk.gov.hmrc.mobilepayments.controllers.errors
 import play.api.mvc.Result
 import play.api.{Logger, mvc}
 import uk.gov.hmrc.api.controllers._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.auth.core.MissingBearerToken
+import uk.gov.hmrc.http.{NotFoundException, _}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendBaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,8 +35,6 @@ case object ErrorMalformedRequest extends ErrorResponse(400, "MALFORMED", "Malfo
 
 class GrantAccessException(message: String) extends HttpException(message, 401)
 
-class NotFoundException(message: String) extends HttpException(message, 404)
-
 class AccountWithLowCL extends GrantAccessException("Unauthorised! Account with low CL!")
 
 trait ErrorHandling {
@@ -45,11 +44,19 @@ trait ErrorHandling {
 
   def withErrorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
     func.recover {
-      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 =>
+      case ex: UpstreamErrorResponse if ex.statusCode == 401 =>
         logger.warn("Upstream service returned 401")
         Status(ErrorUnauthorizedUpstream.httpStatusCode)
 
-      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 404 =>
+      case ex: UpstreamErrorResponse if ex.statusCode == 404 =>
+        logger.warn("Resource not found!")
+        Status(ErrorNotFound.httpStatusCode)
+
+      case ex: MissingBearerToken =>
+        logger.warn("Upstream service returned 401")
+        Status(ErrorUnauthorizedUpstream.httpStatusCode)
+
+      case ex: NotFoundException =>
         logger.warn("Resource not found!")
         Status(ErrorNotFound.httpStatusCode)
 

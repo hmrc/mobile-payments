@@ -541,7 +541,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 401
     }
 
-    "return 500 when a 401 is returned from payments" in {
+    "return 401 when a 401 is returned from payments" in {
       grantAccess()
       stubForShutteringDisabled
       stubForPayByCard(401)
@@ -550,7 +550,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/payments/pay-by-card/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.post(Json.obj("amountInPence" -> 100000)))
-      response.status shouldBe 500
+      response.status shouldBe 401
     }
 
     "return 500 when unknown error 500 returned from payments" in {

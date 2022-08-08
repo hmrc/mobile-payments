@@ -99,7 +99,7 @@ class SandboxPaymentController @Inject() (
   override def getPayByCardURL(utr: String, journeyId: JourneyId): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       withErrorWrapper {
-        Future successful Ok(Json.toJson(PayByCardResponse("TODO")))
+        Future successful Ok(Json.toJson(PayByCardResponse("/")))
       }
     }
 
