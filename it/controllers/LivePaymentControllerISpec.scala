@@ -412,7 +412,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     }
   }
 
-  "GET /payments/:utr/latest-payments" should {
+  "GET /payments/latest-payments/:utr" should {
     "return 200 with the latest payments for the user" in {
       grantAccess()
       stubForShutteringDisabled

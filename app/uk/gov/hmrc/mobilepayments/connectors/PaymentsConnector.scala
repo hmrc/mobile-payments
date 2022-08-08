@@ -39,7 +39,7 @@ class PaymentsConnector @Inject() (
   )(implicit headerCarrier: HeaderCarrier
   ): Future[Either[String, Option[PaymentRecordListFromApi]]] =
     http.GET[HttpResponse](
-      url = s"$serviceUrl/pay-api/payment/search/$utr?taxType=selfAssessment&journeyId=${journeyId.value}"
+      url = s"$serviceUrl/pay-api/v2/payment/search/$utr?taxType=selfAssessment&journeyId=${journeyId.value}"
     ) map { response =>
       response.status match {
         case OK =>
