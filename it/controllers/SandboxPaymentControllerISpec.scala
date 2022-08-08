@@ -141,7 +141,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
     }
   }
 
-  "GET /payments/:utr/latest-payments" should {
+  "GET /payments/latest-payments/:utr" should {
     "return 200 and latest payment list when sandbox header present" in {
       stubForShutteringDisabled
 

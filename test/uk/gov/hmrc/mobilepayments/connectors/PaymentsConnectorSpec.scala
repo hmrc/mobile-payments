@@ -34,7 +34,7 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   val mockHttp:                   HttpClient    = mock[HttpClient]
   implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  val sut = new PaymentsConnector(mockHttp, "baseUrl")
+  val sut = new PaymentsConnector(mockHttp, "baseUrl", "returnUrl", "backUrl")
   val utr = "12344566"
 
   "getSelfAssessmentPayments" should {

@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, Upstream4xxResp
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.request.SetEmailRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequest, SetEmailRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayApiPayByCardResponse, PayByCardResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
@@ -340,7 +340,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(Some(latestPaymentsResponse)))
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
@@ -358,7 +358,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(None))
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
@@ -372,7 +372,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Left("Unknown response"))
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
@@ -386,7 +386,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockPayByCardUrl(Future successful payByCardResponse)
 
-      val request = FakeRequest("POST", s"/payments/$utr/pay-by-card")
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("amountInPence" -> 1234))
 
@@ -402,7 +402,7 @@ class LivePaymentControllerSpec
       stubAuthorisationGrantAccess(confidenceLevel)
       shutteringDisabled()
 
-      val request = FakeRequest("POST", s"/payments/$utr/pay-by-card")
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("bad-key" -> 1234))
 
@@ -417,7 +417,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockPayByCardUrl(Future failed Upstream4xxResponse("Error", 401, 401))
 
-      val request = FakeRequest("POST", s"/payments/$utr/pay-by-card")
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("amountInPence" -> 1234))
 
@@ -430,7 +430,7 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
-      val request = FakeRequest("POST", s"/payments/$utr/pay-by-card")
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("amountInPence" -> 1234))
 
@@ -445,7 +445,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockPayByCardUrl(Future failed Upstream5xxResponse("Error", 502, 502))
 
-      val request = FakeRequest("POST", s"/payments/$utr/pay-by-card")
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("amountInPence" -> 1234))
 

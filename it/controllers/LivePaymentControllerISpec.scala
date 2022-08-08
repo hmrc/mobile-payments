@@ -1,6 +1,7 @@
 package controllers
 
 import openbanking.cor.model.response.InitiatePaymentResponse
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
@@ -8,7 +9,7 @@ import stubs.OpenBankingStub._
 import stubs.PayApiStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayApiPayByCardResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
 
 import java.time.LocalDate
@@ -412,7 +413,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     }
   }
 
-  "GET /payments/:utr/latest-payments" should {
+  "GET /payments/latest-payments/:utr" should {
     "return 200 with the latest payments for the user" in {
       grantAccess()
       stubForShutteringDisabled
@@ -497,6 +498,81 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.get)
+      response.status shouldBe 521
+    }
+  }
+
+  "GET /payments/pay-by-card/:utr" should {
+    "return 200 with the pay by card url" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(200, payApiPayByCardResponseJson)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 200
+      println("BODY = " + response.body)
+      val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
+      parsedResponse.payByCardUrl shouldBe "http://localhost:9056/pay/choose-a-way-to-pay?traceId=12345678"
+
+    }
+
+    "return 404 when a 404 is returned from payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(404)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 404
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 401
+    }
+
+    "return 500 when a 401 is returned from payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 500
+    }
+
+    "return 500 when unknown error 500 returned from payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
       response.status shouldBe 521
     }
   }
