@@ -16,7 +16,7 @@ object PayApiStub {
     stubFor(
       get(
         urlEqualTo(
-          s"/pay-api/payment/search/$utr?taxType=selfAssessment&journeyId=$journeyId"
+          s"/pay-api/v2/payment/search/$utr?taxType=selfAssessment&journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()
