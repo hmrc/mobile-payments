@@ -126,7 +126,7 @@ class SandboxPaymentControllerSpec
   "when get latest payments invoked and service returns success then" should {
     "return 200 and payments" in {
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments?journeyId=$journeyId")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr?journeyId=$journeyId")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
@@ -141,7 +141,7 @@ class SandboxPaymentControllerSpec
   "when get latest payments invoked and auth fails then" should {
     "return 406" in {
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments?journeyId=$journeyId")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr?journeyId=$journeyId")
 
       val result = sut.latestPayments(utr, journeyId)(request)
       status(result) shouldBe 406

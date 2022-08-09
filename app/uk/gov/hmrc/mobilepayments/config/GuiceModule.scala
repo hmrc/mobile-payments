@@ -43,6 +43,8 @@ class GuiceModule(
     bindConfigInt("controllers.confidenceLevel")
     bindConfigString("openBankingPaymentReturnUrl", "openBankingPaymentReturnUrl")
     bindConfigString("sandboxOpenBankingPaymentUrl", "sandboxOpenBankingPaymentUrl")
+    bindConfigString("payByCardReturnUrl", "payByCardReturnUrl")
+    bindConfigString("payByCardBackUrl", "payByCardBackUrl")
     bind(classOf[ApiAccess]).toInstance(
       ApiAccess(
         "PRIVATE",

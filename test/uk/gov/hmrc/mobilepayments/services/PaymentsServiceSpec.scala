@@ -18,11 +18,11 @@ package uk.gov.hmrc.mobilepayments.services
 
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.response.LatestPaymentsResponse
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayApiPayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, PaymentRecordListFromApi}
 
@@ -40,7 +40,7 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockLatestPayments(Future successful Right(Some(paymentsResponse())))
 
       val result = Await.result(sut.getLatestPayments(saUtr.value, journeyId), 0.5.seconds)
-      result.right.get.get.payments.size shouldBe 1
+      result.right.get.get.payments.size               shouldBe 1
       result.right.get.get.payments.head.amountInPence shouldBe 11100
     }
 
@@ -66,10 +66,34 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
+  "when getPayByCardUrl invoked and connector returns success with URL then" should {
+    "return pay by card URL" in {
+      mockPayByCardUrl(Future successful PayApiPayByCardResponse("/payByCard"))
+
+      val result = Await.result(sut.getPayByCardUrl(saUtr.value, 2000, journeyId), 0.5.seconds)
+      result.payByCardUrl shouldBe "/payByCard"
+    }
+
+    "return an error when connector fails" in {
+      mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        Await.result(sut.getPayByCardUrl(saUtr.value, 2000, journeyId), 0.5.seconds)
+      }
+    }
+
+  }
+
   private def mockLatestPayments(future: Future[Either[String, Option[PaymentRecordListFromApi]]]): Unit =
     (mockConnector
       .getSelfAssessmentPayments(_: String, _: JourneyId)(_: HeaderCarrier))
       .expects(*, journeyId, hc)
+      .returning(future)
+
+  private def mockPayByCardUrl(future: Future[PayApiPayByCardResponse]): Unit =
+    (mockConnector
+      .getPayByCardUrl(_: Long, _: SaUtr, _: JourneyId)(_: HeaderCarrier))
+      .expects(*, *, journeyId, hc)
       .returning(future)
 
 }

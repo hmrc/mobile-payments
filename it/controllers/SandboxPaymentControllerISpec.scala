@@ -5,7 +5,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
 
 class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
@@ -141,7 +141,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
     }
   }
 
-  "GET /payments/:utr/latest-payments" should {
+  "GET /payments/latest-payments/:utr" should {
     "return 200 and latest payment list when sandbox header present" in {
       stubForShutteringDisabled
 
@@ -160,6 +160,30 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
         s"/payments/latest-payments/$utr?journeyId=$journeyId"
       ).addHttpHeaders(sandboxHeader)
       val response = await(request.get())
+      response.status shouldBe 406
+    }
+
+  }
+
+  "GET /payments/pay-by-card/:utr" should {
+    "return 200 and the payByCardUrl when sandbox header present" in {
+      stubForShutteringDisabled
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader, acceptJsonHeader)
+      val response = await(request.post(Json.obj()))
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
+      parsedResponse.payByCardUrl shouldBe "/"
+    }
+
+    "return 406 when request authorisation fails it" in {
+      stubForShutteringDisabled
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(sandboxHeader)
+      val response = await(request.post(Json.obj()))
       response.status shouldBe 406
     }
 

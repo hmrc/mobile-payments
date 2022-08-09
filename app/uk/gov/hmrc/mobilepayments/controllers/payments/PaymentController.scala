@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
+import play.api.libs.json.JsValue
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -42,7 +43,12 @@ trait PaymentController {
   ): Action[AnyContent]
 
   def latestPayments(
-    utr: String,
-    journeyId:     JourneyId
+    utr:       String,
+    journeyId: JourneyId
   ): Action[AnyContent]
+
+  def getPayByCardURL(
+    utr:       String,
+    journeyId: JourneyId
+  ): Action[JsValue]
 }

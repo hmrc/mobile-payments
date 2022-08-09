@@ -18,6 +18,7 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
@@ -26,8 +27,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, Upstream4xxResp
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.request.SetEmailRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequest, SetEmailRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayApiPayByCardResponse, PayByCardResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
@@ -339,7 +340,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(Some(latestPaymentsResponse)))
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
@@ -357,7 +358,7 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(None))
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
@@ -371,10 +372,84 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Left("Unknown response"))
 
-      val request = FakeRequest("GET", s"/payments/$utr/latest-payments")
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
       val result = sut.latestPayments(utr, journeyId)(request)
+      status(result) shouldBe 500
+    }
+  }
+
+  "when get pay by card url invoked and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockPayByCardUrl(Future successful payByCardResponse)
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234))
+
+      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[PayByCardResponse]
+      response.payByCardUrl shouldBe "/pay/choose-a-way-to-pay?traceId=12345678"
+    }
+  }
+
+  "when get pay by card url invoked with malformed json then" should {
+    "return 400" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("bad-key" -> 1234))
+
+      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      status(result) shouldBe 400
+    }
+  }
+
+  "when get pay by card url invoked and service returns 401 then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockPayByCardUrl(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234))
+
+      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get pay by card url invoked and auth fails then" should {
+    "return 401" in {
+      stubAuthorisationWithAuthorisationException()
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234))
+
+      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get pay by card url invoked and service returns 5XX then" should {
+    "return 500" in {
+      stubAuthorisationGrantAccess(confidenceLevel)
+      shutteringDisabled()
+      mockPayByCardUrl(Future failed Upstream5xxResponse("Error", 502, 502))
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234))
+
+      val result = sut.getPayByCardURL(utr, journeyId)(request)
       status(result) shouldBe 500
     }
   }
@@ -428,5 +503,11 @@ class LivePaymentControllerSpec
     (mockPaymentsService
       .getLatestPayments(_: String, _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
       .expects(*, *, *, *)
+      .returning(future)
+
+  private def mockPayByCardUrl(future: Future[PayByCardResponse]): Unit =
+    (mockPaymentsService
+      .getPayByCardUrl(_: String, _: Long, _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
+      .expects(*, *, journeyId, *, *)
       .returning(future)
 }

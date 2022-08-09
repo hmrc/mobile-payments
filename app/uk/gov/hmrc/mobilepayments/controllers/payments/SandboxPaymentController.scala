@@ -24,7 +24,8 @@ import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -95,6 +96,13 @@ class SandboxPaymentController @Inject() (
       }
     }
 
+  override def getPayByCardURL(utr: String, journeyId: JourneyId): Action[JsValue] =
+    validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      withErrorWrapper {
+        Future successful Ok(Json.toJson(PayByCardResponse("/")))
+      }
+    }
+
   private def paymentUrl(journeyId: JourneyId) =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -127,5 +135,6 @@ class SandboxPaymentController @Inject() (
     )
 
   override val app: String = "Sandbox Payment Controller"
+
 
 }

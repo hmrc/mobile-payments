@@ -34,7 +34,7 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   val mockHttp:                   HttpClient    = mock[HttpClient]
   implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  val sut = new PaymentsConnector(mockHttp, "baseUrl")
+  val sut = new PaymentsConnector(mockHttp, "baseUrl", "returnUrl", "backUrl")
   val utr = "12344566"
 
   "getSelfAssessmentPayments" should {
@@ -68,5 +68,19 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
       await(sut.getSelfAssessmentPayments(utr, journeyId)).left.get shouldBe "exception thrown from payment api"
     }
 
+  }
+
+  "getPayCardUrl" should {
+    "return URL following successful response" in {
+      performSuccessfulPOST(Future successful payApiPayByCardResponse)(mockHttp)
+      val result = await(sut.getPayByCardUrl(2000, SaUtr("CS700100A"), journeyId))
+      result.nextUrl shouldBe "http://localhost:9056/pay/choose-a-way-to-pay?traceId=12345678"
+    }
+    "return an error following error response" in {
+      performUnsuccessfulPOST(new BadRequestException("Bad Request"))(mockHttp)
+      intercept[BadRequestException] {
+        await(sut.getPayByCardUrl(2000, SaUtr("CS700100A"), journeyId))
+      }
+    }
   }
 }

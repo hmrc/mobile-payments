@@ -18,10 +18,11 @@ package uk.gov.hmrc.mobilepayments.services
 
 import akka.stream.TLSClientAuth
 import payapi.corcommon.model.PaymentStatuses.Successful
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
-import uk.gov.hmrc.mobilepayments.domain.{Payment, PaymentRecordListFromApi}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPayment, LatestPaymentsResponse}
+import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Payment, PaymentRecordListFromApi}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPayment, LatestPaymentsResponse, PayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import java.time.LocalDate
@@ -50,6 +51,15 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
       case Left(e)     => Left(e)
       case _           => Left("Error calling pay-api")
     }
+
+  def getPayByCardUrl(
+    utr:                       String,
+    amountInPence:             Long,
+    journeyId:                 JourneyId
+  )(implicit executionContext: ExecutionContext,
+    headerCarrier:             HeaderCarrier
+  ): Future[PayByCardResponse] =
+    connector.getPayByCardUrl(amountInPence, SaUtr(utr), journeyId).map(response => PayByCardResponse(response.nextUrl))
 
   private def filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsFromApi: PaymentRecordListFromApi) =
     paymentsFromApi.payments.filter(payment =>

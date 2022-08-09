@@ -7,9 +7,12 @@ mobile-payments
 - Create a payment URL for a given session ID.
 - Update a payment URL for a given session ID.
 - Fetch the payment URL consumed status for a given session ID.
+- Fetch self assessment payments made within the last 14 days for the given UTR.
+- Get a Web URL to complete the payment journey online with a pre-populated amount
 - Create a session.
 - Fetch a session for a given session ID.
 - Set the email for a session given a session ID.
+- Clear the email for a session given a session ID.
 
 Requirements
 ------------
@@ -29,6 +32,7 @@ API
 | ```/payments/:sessionDataId``` | PUT | Update a payment URL for a given session ID. [More...](app/docs/put-payment.md)|
 | ```/payments/:sessionDataId/url-consumed``` | GET | Fetch the payment URL consumed status for a given session ID. [More...](app/docs/get-payment-url-consumed.md)|
 | ```/payments/latest-payments/:utr``` | GET | Fetch self assessment payments made within the last 14 days for the given UTR. [More...](app/docs/get-latest-payments.md)|
+| ```/payments/pay-by-card/:utr``` | POST | Get a Web URL to complete the payment journey online with a pre-populated amount [More...](app/docs/post-pay-by-card.md)|
 | ```/sessions``` | POST | Create a session. [More...](app/docs/post-session.md)|
 | ```/sessions/:sessionDataId``` | GET | Fetch a session for a given session ID. [More...](app/docs/get-session.md)|
 | ```/sessions/:sessionDataId/set-email``` | POST | Set the email for a session given a session ID. [More...](app/docs/set-email.md)|

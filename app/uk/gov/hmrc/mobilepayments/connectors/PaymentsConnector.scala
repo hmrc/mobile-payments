@@ -18,8 +18,11 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import play.api.Logger
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayApiPayByCardRequest, PayByCardRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import javax.inject.{Inject, Named}
@@ -27,9 +30,11 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class PaymentsConnector @Inject() (
-  http:                          HttpClient,
-  @Named("payments") serviceUrl: String
-)(implicit ex:                   ExecutionContext) {
+  http:                                   HttpClient,
+  @Named("payments") serviceUrl:          String,
+  @Named("payByCardReturnUrl") returnUrl: String,
+  @Named("payByCardBackUrl") backUrl:     String
+)(implicit ex:                            ExecutionContext) {
 
   val logger = Logger(this.getClass)
 
@@ -58,5 +63,17 @@ class PaymentsConnector @Inject() (
         Left("exception thrown from payment api")
       }
     }
+
+  def getPayByCardUrl(
+    amount:                 Long,
+    saUtr:                  SaUtr,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[PayApiPayByCardResponse] =
+    http.POST[PayApiPayByCardRequest, PayApiPayByCardResponse](
+      url = s"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}",
+      PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl),
+      Seq(("X-Session-ID", journeyId.value))
+    )
 
 }

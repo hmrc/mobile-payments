@@ -18,13 +18,14 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import openbanking.cor.model.ecospend.EcospendFinalStatuses.Completed
 import openbanking.cor.model.ecospend.EcospendFinishedStatuses.Verified
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequest
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -156,6 +157,29 @@ class LivePaymentController @Inject() (
               case Right(None)     => NotFound
               case Right(payments) => Ok(Json.toJson(payments))
               case Left(e)         => InternalServerError(e)
+            }
+          }
+        }
+      }
+    }
+
+  def getPayByCardURL(
+    utr:       String,
+    journeyId: JourneyId
+  ): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            withValidJson[PayByCardRequest] { payByCardRequest =>
+              paymentsService
+                .getPayByCardUrl(
+                  utr,
+                  payByCardRequest.amountInPence,
+                  journeyId
+                )
+                .map(response => Ok(Json.toJson(response)))
             }
           }
         }
