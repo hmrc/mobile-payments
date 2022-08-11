@@ -162,37 +162,37 @@ uses:
                     value: !include examples/get-latest-payments-response-example.json
           404:
             description: No recent payments were found
-      /pay-by-card/{utr}:
-        uriParameters:
-          utr:
-            description: The UTR associated with the user.
+    /pay-by-card/{utr}:
+      uriParameters:
+        utr:
+          description: The UTR associated with the user.
+          type: string
+          example: UTR12345678
+          required: true
+      get:
+        displayName: Get a URL to complete payment journey through the web with pre-populated amount
+        is: [ headers.acceptHeader ]
+        (annotations.scope): "read:native-apps-api-orchestration"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
+        body:
+          application/json:
+            examples:
+              example-11:
+                value: !include examples/post-pay-by-card-request-example.json
+        queryParameters:
+          journeyId:
             type: string
-            example: UTR12345678
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
             required: true
-        get:
-          displayName: Get a URL to complete payment journey through the web with pre-populated amount
-          is: [ headers.acceptHeader ]
-          (annotations.scope): "read:native-apps-api-orchestration"
-          securedBy: [ sec.oauth_2_0: { scopes: [ "read:native-apps-api-orchestration" ] } ]
-          body:
-            application/json:
-              examples:
-                example-11:
-                  value: !include examples/post-pay-by-card-request-example.json
-          queryParameters:
-            journeyId:
-              type: string
-              example: 27085215-69a4-4027-8f72-b04b10ec16b0
-              required: true
-          responses:
-            200:
-              body:
-                application/json:
-                  examples:
-                    example-12:
-                      value: !include examples/post-pay-by-card-response-example.json
-            404:
-              description: No recent payments were found
+        responses:
+          200:
+            body:
+              application/json:
+                examples:
+                  example-12:
+                    value: !include examples/post-pay-by-card-response-example.json
+          404:
+            description: No recent payments were found
   /sessions:
     post:
       displayName: Create a payment for a given session ID.
