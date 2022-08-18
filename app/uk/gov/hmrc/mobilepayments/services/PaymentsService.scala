@@ -59,7 +59,9 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
   ): Future[PayByCardResponse] =
-    connector.getPayByCardUrl(amountInPence, SaUtr(utr), journeyId).map(response => PayByCardResponse(response.nextUrl))
+    connector
+      .getPayByCardUrl(amountInPence, SaUtr(utr), journeyId)
+      .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
 
   private def filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsFromApi: PaymentRecordListFromApi) =
     paymentsFromApi.payments.filter(payment =>

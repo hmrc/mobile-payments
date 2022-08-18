@@ -503,7 +503,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
   }
 
   "GET /payments/pay-by-card/:utr" should {
-    "return 200 with the pay by card url" in {
+    "return 200 with the pay by card url without the domain prefix" in {
       grantAccess()
       stubForShutteringDisabled
       stubForPayByCard(200, payApiPayByCardResponseJson)
@@ -515,7 +515,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 200
       println("BODY = " + response.body)
       val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
-      parsedResponse.payByCardUrl shouldBe "http://localhost:9056/pay/choose-a-way-to-pay?traceId=12345678"
+      parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=83303543"
 
     }
 
