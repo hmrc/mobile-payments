@@ -74,7 +74,7 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
     "return URL following successful response" in {
       performSuccessfulPOST(Future successful payApiPayByCardResponse)(mockHttp)
       val result = await(sut.getPayByCardUrl(2000, SaUtr("CS700100A"), journeyId))
-      result.nextUrl shouldBe "http://localhost:9056/pay/choose-a-way-to-pay?traceId=12345678"
+      result.nextUrl shouldBe "https://www.staging.tax.service.gov.uk/pay/initiate-journey?traceId=83303543"
     }
     "return an error following error response" in {
       performUnsuccessfulPOST(new BadRequestException("Bad Request"))(mockHttp)

@@ -24,8 +24,11 @@ object PayByCardResponse {
   implicit val format: Format[PayByCardResponse] = Json.format[PayByCardResponse]
 }
 
-case class PayApiPayByCardResponse(nextUrl: String)
+case class PayApiPayByCardResponse(nextUrl: String) {
+  val urlWithoutDomainPrefix: String = nextUrl.split("gov.uk").last
+}
 
 object PayApiPayByCardResponse {
+
   implicit val format: Format[PayApiPayByCardResponse] = Json.format[PayApiPayByCardResponse]
 }

@@ -1,4 +1,4 @@
 {
   "journeyId": "592d4a09cdc8e04b00021459",
-  "nextUrl" : "http://localhost:9056/pay/choose-a-way-to-pay?traceId=12345678"
+  "nextUrl" : "https://www.staging.tax.service.gov.uk/pay/initiate-journey?traceId=83303543"
 }
