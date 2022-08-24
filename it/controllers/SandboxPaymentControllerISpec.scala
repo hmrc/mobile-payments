@@ -87,7 +87,7 @@ class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestDat
       val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[PaymentStatusResponse]
-      parsedResponse.status shouldBe "Authorised"
+      parsedResponse.status shouldBe "Completed"
     }
 
     "return 406 when request authorisation fails it" in {
