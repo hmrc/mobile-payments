@@ -65,7 +65,10 @@ class SandboxSessionController @Inject() (
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future successful Ok(sampleSessionJson)
+          Future.successful(request.headers.get("SANDBOX-CONTROL") match {
+            case Some("SUCCESS-PAYMENT") => Ok(sampleSessionJson("sandbox-session-completed-response"))
+            case _                       => Ok(sampleSessionJson("sandbox-session-response"))
+          })
         }
       }
     }
@@ -80,11 +83,11 @@ class SandboxSessionController @Inject() (
         .as[CreateSessionDataResponse]
     )
 
-  private def sampleSessionJson: JsValue =
+  private def sampleSessionJson(filename: String): JsValue =
     toJson(
       Json
         .parse(
-          findResource(path = s"/resources/mobilepayments/sandbox-session-response.json")
+          findResource(path = s"/resources/mobilepayments/$filename.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
         )
         .as[SessionDataResponse]

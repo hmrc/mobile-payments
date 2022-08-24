@@ -1,0 +1,10 @@
+{
+  "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
+  "amount": 125.64,
+  "state": "PaymentFinished",
+  "bankId": "obie-barclays-personal",
+  "paymentDate": "2021-12-01",
+  "createdOn": "2021-11-03T10:15:30",
+  "email": "test@test.com",
+  "saUtr": "1555369056"
+}

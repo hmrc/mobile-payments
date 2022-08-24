@@ -51,6 +51,7 @@ To test different scenarios, add a header "SANDBOX-CONTROL" with one of the foll
 
 | *Value* | *Description* |
 |--------|----|
+|SUCCESS-PAYMENT|Responds with a session in the "PaymentFinished" state when calling GET /payments/:sessionDataId|
 
 # Definition
 

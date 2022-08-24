@@ -85,7 +85,7 @@ class SandboxPaymentControllerSpec
       val result = sut.getPaymentStatus(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[PaymentStatusResponse]
-      response.status shouldEqual "Authorised"
+      response.status shouldEqual "Completed"
     }
   }
 
