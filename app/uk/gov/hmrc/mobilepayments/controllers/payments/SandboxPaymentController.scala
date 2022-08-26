@@ -96,10 +96,13 @@ class SandboxPaymentController @Inject() (
       }
     }
 
-  override def getPayByCardURL(utr: String, journeyId: JourneyId): Action[JsValue] =
+  override def getPayByCardURL(
+    utr:       String,
+    journeyId: JourneyId
+  ): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       withErrorWrapper {
-        Future successful Ok(Json.toJson(PayByCardResponse("/")))
+        Future successful Ok(Json.toJson(PayByCardResponse("/", "1111-233-414-121-12")))
       }
     }
 
@@ -135,6 +138,5 @@ class SandboxPaymentController @Inject() (
     )
 
   override val app: String = "Sandbox Payment Controller"
-
 
 }
