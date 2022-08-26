@@ -72,6 +72,7 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getPayByCardUrl(saUtr.value, 2000, journeyId), 0.5.seconds)
       result.payByCardUrl shouldBe "/payByCard"
+      result.sessionId    shouldBe "1111-2222-3333-4444"
     }
 
     "return an error when connector fails" in {

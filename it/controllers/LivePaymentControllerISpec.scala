@@ -510,12 +510,13 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(
         s"/payments/pay-by-card/$utr?journeyId=$journeyId"
-      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader, sessionIdHeader)
       val response = await(request.post(Json.obj("amountInPence" -> 100000)))
       response.status shouldBe 200
       println("BODY = " + response.body)
       val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
       parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=83303543"
+      parsedResponse.sessionId    shouldBe "1111-2222-3333-4444"
 
     }
 
