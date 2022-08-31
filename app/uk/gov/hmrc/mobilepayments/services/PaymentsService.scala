@@ -64,7 +64,7 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
       .map(response =>
         PayByCardResponse(
           response.urlWithoutDomainPrefix,
-          headerCarrier.sessionId.map(_.value).getOrElse(throw new NotFoundException("Session ID not found"))
+          journeyId.value
         )
       )
 
