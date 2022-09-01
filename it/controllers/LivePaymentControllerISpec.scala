@@ -516,7 +516,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       println("BODY = " + response.body)
       val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
       parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=83303543"
-      parsedResponse.sessionId    shouldBe journeyId.value
+      parsedResponse.sessionId    shouldBe "13345a9d-0958-4931-ae83-5a36e4ccd979"
 
     }
 

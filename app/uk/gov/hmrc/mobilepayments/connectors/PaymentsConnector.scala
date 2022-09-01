@@ -72,8 +72,7 @@ class PaymentsConnector @Inject() (
   ): Future[PayApiPayByCardResponse] =
     http.POST[PayApiPayByCardRequest, PayApiPayByCardResponse](
       url = s"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}",
-      PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl),
-      Seq(("X-Session-ID", journeyId.value))
+      PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl)
     )
 
 }
