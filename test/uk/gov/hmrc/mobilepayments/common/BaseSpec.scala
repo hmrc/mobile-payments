@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 
 trait BaseSpec extends AnyWordSpec with MockFactory with Matchers with DefaultAwaitTimeout {
   implicit lazy val ec:     ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  implicit lazy val hc:     HeaderCarrier    = HeaderCarrier(sessionId = Some(SessionId("1111-2222-3333-4444")))
+  implicit lazy val hc:     HeaderCarrier    = HeaderCarrier(sessionId = Some(SessionId("13345a9d-0958-4931-ae83-5a36e4ccd979")))
   implicit lazy val system: ActorSystem      = ActorSystem()
 
   val journeyId: JourneyId = "13345a9d-0958-4931-ae83-5a36e4ccd979"

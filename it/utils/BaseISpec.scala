@@ -41,7 +41,7 @@ abstract class BaseISpec
   protected val contentHeader:           (String, String) = "Content-Type" -> "application/json"
   protected val acceptJsonHeader:        (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
   protected val authorisationJsonHeader: (String, String) = "AUTHORIZATION" -> "Bearer 123"
-  protected val sessionIdHeader:         (String, String) = "X-Session-ID" -> "1111-2222-3333-4444"
+  protected val sessionIdHeader:         (String, String) = "X-Session-ID" -> "13345a9d-0958-4931-ae83-5a36e4ccd979"
   val journeyId:                         JourneyId        = "27085215-69a4-4027-8f72-b04b10ec16b0"
 
   def config: Map[String, Any] =
