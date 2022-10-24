@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
-import akka.stream.TLSClientAuth
 import payapi.corcommon.model.PaymentStatuses.Successful
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
-import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Payment, PaymentRecordListFromApi}
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPayment, LatestPaymentsResponse, PayByCardResponse}
+import uk.gov.hmrc.mobilepayments.domain.{Payment, PaymentRecordListFromApi}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 import java.time.LocalDate
@@ -61,12 +60,7 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
   ): Future[PayByCardResponse] =
     connector
       .getPayByCardUrl(amountInPence, SaUtr(utr), journeyId)
-      .map(response =>
-        PayByCardResponse(
-          response.urlWithoutDomainPrefix,
-          headerCarrier.sessionId.map(_.value).getOrElse(throw new NotFoundException("Session ID not found"))
-        )
-      )
+      .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
 
   private def filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsFromApi: PaymentRecordListFromApi) =
     paymentsFromApi.payments.filter(payment =>

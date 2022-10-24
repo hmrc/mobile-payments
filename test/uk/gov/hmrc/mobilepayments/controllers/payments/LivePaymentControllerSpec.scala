@@ -36,7 +36,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LivePaymentControllerSpec
+class  LivePaymentControllerSpec
     extends BaseSpec
     with AuthorisationStub
     with MobilePaymentsTestData

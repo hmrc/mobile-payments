@@ -47,8 +47,7 @@ Post Pay By Card
 
 ```json
 {
-  "payByCardUrl" : "/pay/choose-a-way-to-pay?traceId=12345678",
-  "sessionId": "11111-4564-fhgyj-gyj45gy-454gyj"
+  "payByCardUrl" : "/pay/choose-a-way-to-pay?traceId=12345678"
 }
 ```
 
