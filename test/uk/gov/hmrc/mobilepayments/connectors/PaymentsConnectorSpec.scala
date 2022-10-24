@@ -16,18 +16,15 @@
 
 package uk.gov.hmrc.mobilepayments.connectors
 
-import openbanking.cor.model.SessionInitiated
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{NotFoundException, _}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
-import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
-import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData with ScalaFutures {

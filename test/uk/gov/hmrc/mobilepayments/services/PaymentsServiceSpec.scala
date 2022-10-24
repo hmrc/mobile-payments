@@ -22,9 +22,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayApiPayByCardResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, PaymentRecordListFromApi}
+import uk.gov.hmrc.mobilepayments.domain. PaymentRecordListFromApi
 
 import scala.concurrent.{Await, Future}
 
@@ -72,7 +72,6 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getPayByCardUrl(saUtr.value, 2000, journeyId), 0.5.seconds)
       result.payByCardUrl shouldBe "/payByCard"
-      result.sessionId    shouldBe journeyId.value
     }
 
     "return an error when connector fails" in {

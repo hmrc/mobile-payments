@@ -20,8 +20,7 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData, SessionDataId}
-import payapi.corcommon.model.{SearchOptions, SearchScope, SearchTag, TaxType, TaxTypes}
+import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._

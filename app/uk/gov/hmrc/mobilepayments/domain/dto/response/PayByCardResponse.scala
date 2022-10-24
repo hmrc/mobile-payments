@@ -18,9 +18,7 @@ package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
 
-case class PayByCardResponse(
-  payByCardUrl: String,
-  sessionId:    String)
+case class PayByCardResponse(payByCardUrl: String)
 
 object PayByCardResponse {
   implicit val format: Format[PayByCardResponse] = Json.format[PayByCardResponse]

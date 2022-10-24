@@ -1,7 +1,6 @@
 package controllers
 
 import openbanking.cor.model.response.InitiatePaymentResponse
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
@@ -9,7 +8,7 @@ import stubs.OpenBankingStub._
 import stubs.PayApiStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayApiPayByCardResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
 
 import java.time.LocalDate
@@ -513,10 +512,8 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader, sessionIdHeader)
       val response = await(request.post(Json.obj("amountInPence" -> 100000)))
       response.status shouldBe 200
-      println("BODY = " + response.body)
       val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
       parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=83303543"
-      parsedResponse.sessionId    shouldBe journeyId.value
 
     }
 

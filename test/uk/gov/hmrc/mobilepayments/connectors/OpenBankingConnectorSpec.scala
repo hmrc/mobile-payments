@@ -20,7 +20,7 @@ import openbanking.cor.model.SessionInitiated
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{NotFoundException, _}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
