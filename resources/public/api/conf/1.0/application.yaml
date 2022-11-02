@@ -1,0 +1,1188 @@
+openapi: 3.0.0
+info:
+  title: Mobile Payments
+  description: >-
+    # Mobile Payments
+
+    ### What is this API for?
+
+    Allow HMRC Mobile App developers to access the functionality provided by the `open-banking` service so payments can be made to HMRC via the app.
+  contact: {}
+  version: '1.0'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk/mobile-payments
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk/mobile-payments
+    description: Production
+    variables: {}
+paths:
+  /mobile/payments/banks:
+    get:
+      tags:
+        - mobile
+      summary: Fetch the list of supported banks.
+      operationId: Fetchthelistofsupportedbanks.
+      parameters:
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsBanksresponse'
+                  - example:
+                      data:
+                        - bankGroupName: Barclays
+                          bankGroupNameFormatted: Barclays
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-barclays-business
+                              name: Barclays Personal
+                              friendlyName: Barclays Personal
+                              iconUrl: https://logo.com
+                              group: Barclays
+                            - bankId: obie-barclays-business
+                              name: Barclays Business
+                              friendlyName: Barclays Business
+                              iconUrl: https://logo.com
+                              group: Barclays
+                        - bankGroupName: Lloyds
+                          bankGroupNameFormatted: Lloyds
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-lloyds-personal
+                              name: Lloyds Personal
+                              friendlyName: Lloyds Personal
+                              iconUrl: https://logo.com
+                              group: Lloyds
+                            - bankId: obie-lloyds-business
+                              name: Lloyds Business
+                              friendlyName: Lloyds Business
+                              iconUrl: https://logo.com
+                              group: Lloyds
+                        - bankGroupName: Monzo
+                          bankGroupNameFormatted: Monzo
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-monzo-personal
+                              name: Monzo Personal
+                              friendlyName: Monzo Persnal
+                              iconUrl: https://logo.com
+                              group: Monzo
+                            - bankId: obie-monzo-business
+                              name: Monzo Business
+                              friendlyName: Monzo Business
+                              iconUrl: https://logo.com
+                              group: Monzo
+                            - bankId: obie-monzo-special
+                              name: Monzo Special
+                              friendlyName: Monzo Special
+                              iconUrl: https://logo.com
+                              group: Monzo
+                        - bankGroupName: Natwest
+                          bankGroupNameFormatted: Natwest
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-natwest-personal
+                              name: Natwest Personal
+                              friendlyName: Natwest Personal
+                              iconUrl: https://logo.com
+                              group: Natwest
+                            - bankId: obie-natwest-business
+                              name: Natwest Business
+                              friendlyName: Natwest Business
+                              iconUrl: https://logo.com
+                              group: Natwest
+                        - bankGroupName: HSBC
+                          bankGroupNameFormatted: HSBC
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-hsbc-personal
+                              name: HSBC Personal
+                              friendlyName: HSBC Personal
+                              iconUrl: https://logo.com
+                              group: HSBC
+                            - bankId: obie-hsbc-business
+                              name: HSBC Business
+                              friendlyName: HSBC Business
+                              iconUrl: https://logo.com
+                              group: HSBC
+                        - bankGroupName: Santander
+                          bankGroupNameFormatted: Santander
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-santander-personal
+                              name: Santander Personal
+                              friendlyName: Santander Personal
+                              iconUrl: https://logo.com
+                              group: Santander
+                            - bankId: obie-santander-business
+                              name: Santander Business
+                              friendlyName: Santander Business
+                              iconUrl: https://logo.com
+                              group: Santander
+                        - bankGroupName: Chase Bank
+                          bankGroupNameFormatted: Chase Bank
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-chase
+                              name: Chase
+                              friendlyName: Chase
+                              iconUrl: https://logo.com
+                              group: Chase Bank
+                        - bankGroupName: RBS
+                          bankGroupNameFormatted: RBS
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-rbs-personal
+                              name: RBS Personal
+                              friendlyName: RBS Personal
+                              iconUrl: https://logo.com
+                              group: RBS
+                            - bankId: obie-rbs-business
+                              name: RBS Business
+                              friendlyName: RBS Business
+                              iconUrl: https://logo.com
+                              group: RBS
+                            - bankId: obie-rbs-bankline
+                              name: RBS Bankline
+                              friendlyName: RBS Bankline
+                              iconUrl: https://logo.com
+                              group: RBS
+                        - bankGroupName: M&S Bank
+                          bankGroupNameFormatted: M&S Bank
+                          iconUrl: https://logo.com
+                          banksInGroup:
+                            - bankId: obie-m&s
+                              name: M&S Bank
+                              friendlyName: M&S Bank
+                              iconUrl: https://logo.com
+                              group: M&S Bank
+              examples:
+                example-1:
+                  value:
+                    data:
+                      - bankGroupName: Barclays
+                        bankGroupNameFormatted: Barclays
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-barclays-business
+                            name: Barclays Personal
+                            friendlyName: Barclays Personal
+                            iconUrl: https://logo.com
+                            group: Barclays
+                          - bankId: obie-barclays-business
+                            name: Barclays Business
+                            friendlyName: Barclays Business
+                            iconUrl: https://logo.com
+                            group: Barclays
+                      - bankGroupName: Lloyds
+                        bankGroupNameFormatted: Lloyds
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-lloyds-personal
+                            name: Lloyds Personal
+                            friendlyName: Lloyds Personal
+                            iconUrl: https://logo.com
+                            group: Lloyds
+                          - bankId: obie-lloyds-business
+                            name: Lloyds Business
+                            friendlyName: Lloyds Business
+                            iconUrl: https://logo.com
+                            group: Lloyds
+                      - bankGroupName: Monzo
+                        bankGroupNameFormatted: Monzo
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-monzo-personal
+                            name: Monzo Personal
+                            friendlyName: Monzo Persnal
+                            iconUrl: https://logo.com
+                            group: Monzo
+                          - bankId: obie-monzo-business
+                            name: Monzo Business
+                            friendlyName: Monzo Business
+                            iconUrl: https://logo.com
+                            group: Monzo
+                          - bankId: obie-monzo-special
+                            name: Monzo Special
+                            friendlyName: Monzo Special
+                            iconUrl: https://logo.com
+                            group: Monzo
+                      - bankGroupName: Natwest
+                        bankGroupNameFormatted: Natwest
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-natwest-personal
+                            name: Natwest Personal
+                            friendlyName: Natwest Personal
+                            iconUrl: https://logo.com
+                            group: Natwest
+                          - bankId: obie-natwest-business
+                            name: Natwest Business
+                            friendlyName: Natwest Business
+                            iconUrl: https://logo.com
+                            group: Natwest
+                      - bankGroupName: HSBC
+                        bankGroupNameFormatted: HSBC
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-hsbc-personal
+                            name: HSBC Personal
+                            friendlyName: HSBC Personal
+                            iconUrl: https://logo.com
+                            group: HSBC
+                          - bankId: obie-hsbc-business
+                            name: HSBC Business
+                            friendlyName: HSBC Business
+                            iconUrl: https://logo.com
+                            group: HSBC
+                      - bankGroupName: Santander
+                        bankGroupNameFormatted: Santander
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-santander-personal
+                            name: Santander Personal
+                            friendlyName: Santander Personal
+                            iconUrl: https://logo.com
+                            group: Santander
+                          - bankId: obie-santander-business
+                            name: Santander Business
+                            friendlyName: Santander Business
+                            iconUrl: https://logo.com
+                            group: Santander
+                      - bankGroupName: Chase Bank
+                        bankGroupNameFormatted: Chase Bank
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-chase
+                            name: Chase
+                            friendlyName: Chase
+                            iconUrl: https://logo.com
+                            group: Chase Bank
+                      - bankGroupName: RBS
+                        bankGroupNameFormatted: RBS
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-rbs-personal
+                            name: RBS Personal
+                            friendlyName: RBS Personal
+                            iconUrl: https://logo.com
+                            group: RBS
+                          - bankId: obie-rbs-business
+                            name: RBS Business
+                            friendlyName: RBS Business
+                            iconUrl: https://logo.com
+                            group: RBS
+                          - bankId: obie-rbs-bankline
+                            name: RBS Bankline
+                            friendlyName: RBS Bankline
+                            iconUrl: https://logo.com
+                            group: RBS
+                      - bankGroupName: M&S Bank
+                        bankGroupNameFormatted: M&S Bank
+                        iconUrl: https://logo.com
+                        banksInGroup:
+                          - bankId: obie-m&s
+                            name: M&S Bank
+                            friendlyName: M&S Bank
+                            iconUrl: https://logo.com
+                            group: M&S Bank
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/banks/{sessionDataId}:
+    post:
+      tags:
+        - mobile
+      summary: Select a bank for a given session ID
+      operationId: SelectabankforagivensessionID
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '201':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/payments/{sessionDataId}:
+    get:
+      tags:
+        - mobile
+      summary: Fetch the payment status for a given session ID.
+      operationId: FetchthepaymentstatusforagivensessionID.
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsresponse'
+                  - example:
+                      status: Authorised
+              examples:
+                example-2:
+                  value:
+                    status: Authorised
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+    post:
+      tags:
+        - mobile
+      summary: Create a payment for a given session ID.
+      operationId: CreateapaymentforagivensessionID.
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsresponse1'
+                  - example:
+                      paymentUrl: https://some-bank.com?param=dosomething
+              examples:
+                example-3:
+                  value:
+                    paymentUrl: https://some-bank.com?param=dosomething
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+    put:
+      tags:
+        - mobile
+      summary: Update a payment for a given session ID.
+      operationId: UpdateapaymentforagivensessionID.
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsresponse1'
+                  - example:
+                      paymentUrl: https://some-bank.com?param=dosomething
+              examples:
+                example-4:
+                  value:
+                    paymentUrl: https://some-bank.com?param=dosomething
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/payments/{sessionDataId}/url-consumed:
+    get:
+      tags:
+        - mobile
+      summary: Fetch the payment URL consumed status for a given session ID.
+      operationId: FetchthepaymentURLconsumedstatusforagivensessionID.
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsUrlConsumedresponse'
+                  - example:
+                      consumed: true
+              examples:
+                example-5:
+                  value:
+                    consumed: true
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/payments/latest-payments/{utr}:
+    get:
+      tags:
+        - mobile
+      summary: Fetch the latest self assessment payments for a given UTR.
+      operationId: FetchthelatestselfassessmentpaymentsforagivenUTR.
+      parameters:
+        - name: utr
+          in: path
+          description: The UTR associated with the user.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: UTR12345678
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsLatestPaymentsresponse'
+                  - example:
+                      payments:
+                        - amountInPence: 12000
+                          date: 2022-06-01
+                        - amountInPence: 74000
+                          date: 2022-06-07
+              examples:
+                example-10:
+                  value:
+                    payments:
+                      - amountInPence: 12000
+                        date: 2022-06-01
+                      - amountInPence: 74000
+                        date: 2022-06-07
+        '404':
+          description: No recent payments were found
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/payments/pay-by-card/{utr}:
+    post:
+      tags:
+        - mobile
+      summary: Get a URL to complete payment journey through the web with pre-populated amount
+      operationId: GetaURLtocompletepaymentjourneythroughthewebwithpre-populatedamount
+      parameters:
+        - name: utr
+          in: path
+          description: The UTR associated with the user.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: UTR12345678
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobilePaymentsPaymentsPayByCardrequest'
+                - example:
+                    amountInPence: 120000
+            examples:
+              example-11:
+                value:
+                  amountInPence: 120000
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsPayByCardresponse'
+                  - example:
+                      payByCardUrl: /pay/choose-a-way-to-pay?traceId=12345678
+              examples:
+                example-12:
+                  value:
+                    payByCardUrl: /pay/choose-a-way-to-pay?traceId=12345678
+        '404':
+          description: No recent payments were found
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/sessions:
+    post:
+      tags:
+        - mobile
+      summary: Create a payment for a given session ID.
+      operationId: PostCreateapaymentforagivensessionID.
+      parameters:
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobilePaymentsSessionsrequest'
+                - example:
+                    amount: 322.75
+                    saUtr: CS700100A
+            examples:
+              example-6:
+                value:
+                  amount: 322.75
+                  saUtr: CS700100A
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsSessionsresponse'
+                  - example:
+                      sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
+              examples:
+                example-7:
+                  value:
+                    sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/sessions/{sessionDataId}:
+    get:
+      tags:
+        - mobile
+      summary: Fetch a session for a given session ID.
+      operationId: FetchasessionforagivensessionID.
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsSessionsresponse1'
+                  - example:
+                      sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
+                      amount: 125.64
+                      bankId: some-bank-id
+                      state: PaymentFinalised
+                      paymentDate: 2021-12-01
+                      createdOn: 2021-11-03T10:15:30
+                      saUtr: CS700100A
+              examples:
+                example-8:
+                  value:
+                    sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
+                    amount: 125.64
+                    bankId: some-bank-id
+                    state: PaymentFinalised
+                    paymentDate: 2021-12-01
+                    createdOn: 2021-11-03T10:15:30
+                    saUtr: CS700100A
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/sessions/{sessionDataId}/set-email:
+    post:
+      tags:
+        - mobile
+      summary: Set an email address for the user's session
+      operationId: Setanemailaddressfortheuser'ssession
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobilePaymentsSessionsSetEmailrequest'
+                - example:
+                    email: test@test.com
+            examples:
+              example-9:
+                value:
+                  email: test@test.com
+        required: true
+      responses:
+        '201':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+  /mobile/payments/sessions/{sessionDataId}/clear-email:
+    delete:
+      tags:
+        - mobile
+      summary: Clear an email address for the user's session
+      operationId: Clearanemailaddressfortheuser'ssession
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '204':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+components:
+  securitySchemes:
+    userRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating user-restricted API requests using an OAuth 2.0 Bearer Token in the
+        AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints for details.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes:
+            read:native-apps-api-orchestration: Expose APIs to allow app users to make payments to HMRC.
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+    BanksInGroup:
+      title: BanksInGroup
+      required:
+        - bankId
+        - name
+        - friendlyName
+        - iconUrl
+        - group
+      type: object
+      properties:
+        bankId:
+          type: string
+        name:
+          type: string
+        friendlyName:
+          type: string
+        iconUrl:
+          type: string
+        group:
+          type: string
+      example:
+        bankId: obie-barclays-business
+        name: Barclays Personal
+        friendlyName: Barclays Personal
+        iconUrl: https://logo.com
+        group: Barclays
+    Datum:
+      title: Datum
+      required:
+        - bankGroupName
+        - bankGroupNameFormatted
+        - iconUrl
+        - banksInGroup
+      type: object
+      properties:
+        bankGroupName:
+          type: string
+        bankGroupNameFormatted:
+          type: string
+        iconUrl:
+          type: string
+        banksInGroup:
+          type: array
+          items:
+            $ref: '#/components/schemas/BanksInGroup'
+          description: ''
+      example:
+        bankGroupName: Barclays
+        bankGroupNameFormatted: Barclays
+        iconUrl: https://logo.com
+        banksInGroup:
+          - bankId: obie-barclays-business
+            name: Barclays Personal
+            friendlyName: Barclays Personal
+            iconUrl: https://logo.com
+            group: Barclays
+          - bankId: obie-barclays-business
+            name: Barclays Business
+            friendlyName: Barclays Business
+            iconUrl: https://logo.com
+            group: Barclays
+    MobilePaymentsBanksresponse:
+      title: MobilePaymentsBanksresponse
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Datum'
+          description: ''
+      example:
+        data:
+          - bankGroupName: Barclays
+            bankGroupNameFormatted: Barclays
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-barclays-business
+                name: Barclays Personal
+                friendlyName: Barclays Personal
+                iconUrl: https://logo.com
+                group: Barclays
+              - bankId: obie-barclays-business
+                name: Barclays Business
+                friendlyName: Barclays Business
+                iconUrl: https://logo.com
+                group: Barclays
+          - bankGroupName: Lloyds
+            bankGroupNameFormatted: Lloyds
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-lloyds-personal
+                name: Lloyds Personal
+                friendlyName: Lloyds Personal
+                iconUrl: https://logo.com
+                group: Lloyds
+              - bankId: obie-lloyds-business
+                name: Lloyds Business
+                friendlyName: Lloyds Business
+                iconUrl: https://logo.com
+                group: Lloyds
+          - bankGroupName: Monzo
+            bankGroupNameFormatted: Monzo
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-monzo-personal
+                name: Monzo Personal
+                friendlyName: Monzo Persnal
+                iconUrl: https://logo.com
+                group: Monzo
+              - bankId: obie-monzo-business
+                name: Monzo Business
+                friendlyName: Monzo Business
+                iconUrl: https://logo.com
+                group: Monzo
+              - bankId: obie-monzo-special
+                name: Monzo Special
+                friendlyName: Monzo Special
+                iconUrl: https://logo.com
+                group: Monzo
+          - bankGroupName: Natwest
+            bankGroupNameFormatted: Natwest
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-natwest-personal
+                name: Natwest Personal
+                friendlyName: Natwest Personal
+                iconUrl: https://logo.com
+                group: Natwest
+              - bankId: obie-natwest-business
+                name: Natwest Business
+                friendlyName: Natwest Business
+                iconUrl: https://logo.com
+                group: Natwest
+          - bankGroupName: HSBC
+            bankGroupNameFormatted: HSBC
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-hsbc-personal
+                name: HSBC Personal
+                friendlyName: HSBC Personal
+                iconUrl: https://logo.com
+                group: HSBC
+              - bankId: obie-hsbc-business
+                name: HSBC Business
+                friendlyName: HSBC Business
+                iconUrl: https://logo.com
+                group: HSBC
+          - bankGroupName: Santander
+            bankGroupNameFormatted: Santander
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-santander-personal
+                name: Santander Personal
+                friendlyName: Santander Personal
+                iconUrl: https://logo.com
+                group: Santander
+              - bankId: obie-santander-business
+                name: Santander Business
+                friendlyName: Santander Business
+                iconUrl: https://logo.com
+                group: Santander
+          - bankGroupName: Chase Bank
+            bankGroupNameFormatted: Chase Bank
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-chase
+                name: Chase
+                friendlyName: Chase
+                iconUrl: https://logo.com
+                group: Chase Bank
+          - bankGroupName: RBS
+            bankGroupNameFormatted: RBS
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-rbs-personal
+                name: RBS Personal
+                friendlyName: RBS Personal
+                iconUrl: https://logo.com
+                group: RBS
+              - bankId: obie-rbs-business
+                name: RBS Business
+                friendlyName: RBS Business
+                iconUrl: https://logo.com
+                group: RBS
+              - bankId: obie-rbs-bankline
+                name: RBS Bankline
+                friendlyName: RBS Bankline
+                iconUrl: https://logo.com
+                group: RBS
+          - bankGroupName: M&S Bank
+            bankGroupNameFormatted: M&S Bank
+            iconUrl: https://logo.com
+            banksInGroup:
+              - bankId: obie-m&s
+                name: M&S Bank
+                friendlyName: M&S Bank
+                iconUrl: https://logo.com
+                group: M&S Bank
+    MobilePaymentsPaymentsLatestPaymentsresponse:
+      title: MobilePaymentsPaymentsLatestPaymentsresponse
+      required:
+        - payments
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+          description: ''
+      example:
+        payments:
+          - amountInPence: 12000
+            date: 2022-06-01
+          - amountInPence: 74000
+            date: 2022-06-07
+    MobilePaymentsPaymentsPayByCardrequest:
+      title: MobilePaymentsPaymentsPayByCardrequest
+      required:
+        - amountInPence
+      type: object
+      properties:
+        amountInPence:
+          type: integer
+          format: int32
+      example:
+        amountInPence: 120000
+    MobilePaymentsPaymentsPayByCardresponse:
+      title: MobilePaymentsPaymentsPayByCardresponse
+      required:
+        - payByCardUrl
+      type: object
+      properties:
+        payByCardUrl:
+          type: string
+      example:
+        payByCardUrl: /pay/choose-a-way-to-pay?traceId=12345678
+    MobilePaymentsPaymentsresponse:
+      title: MobilePaymentsPaymentsresponse
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+      example:
+        status: Authorised
+    MobilePaymentsPaymentsresponse1:
+      title: MobilePaymentsPaymentsresponse1
+      required:
+        - paymentUrl
+      type: object
+      properties:
+        paymentUrl:
+          type: string
+      example:
+        paymentUrl: https://some-bank.com?param=dosomething
+    MobilePaymentsPaymentsUrlConsumedresponse:
+      title: MobilePaymentsPaymentsUrlConsumedresponse
+      required:
+        - consumed
+      type: object
+      properties:
+        consumed:
+          type: boolean
+      example:
+        consumed: true
+    MobilePaymentsSessionsrequest:
+      title: MobilePaymentsSessionsrequest
+      required:
+        - amount
+        - saUtr
+      type: object
+      properties:
+        amount:
+          type: number
+        saUtr:
+          type: string
+      example:
+        amount: 322.75
+        saUtr: CS700100A
+    MobilePaymentsSessionsresponse:
+      title: MobilePaymentsSessionsresponse
+      required:
+        - sessionDataId
+      type: object
+      properties:
+        sessionDataId:
+          type: string
+      example:
+        sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
+    MobilePaymentsSessionsresponse1:
+      title: MobilePaymentsSessionsresponse1
+      required:
+        - sessionDataId
+        - amount
+        - bankId
+        - state
+        - paymentDate
+        - createdOn
+        - saUtr
+      type: object
+      properties:
+        sessionDataId:
+          type: string
+        amount:
+          type: number
+        bankId:
+          type: string
+        state:
+          type: string
+        paymentDate:
+          type: string
+        createdOn:
+          type: string
+        saUtr:
+          type: string
+      example:
+        sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
+        amount: 125.64
+        bankId: some-bank-id
+        state: PaymentFinalised
+        paymentDate: 2021-12-01
+        createdOn: 2021-11-03T10:15:30
+        saUtr: CS700100A
+    MobilePaymentsSessionsSetEmailrequest:
+      title: MobilePaymentsSessionsSetEmailrequest
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          type: string
+      example:
+        email: test@test.com
+    Payment:
+      title: Payment
+      required:
+        - amountInPence
+        - date
+      type: object
+      properties:
+        amountInPence:
+          type: integer
+          format: int32
+        date:
+          type: string
+      example:
+        amountInPence: 12000
+        date: 2022-06-01
+tags:
+  - name: mobile
+    description: ''
