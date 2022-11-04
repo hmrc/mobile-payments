@@ -168,7 +168,8 @@ class LivePaymentController @Inject() (
     journeyId: JourneyId
   ): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
-      implicit val hc: HeaderCarrier = fromRequest(request)
+      implicit val hc: HeaderCarrier =
+        fromRequest(request).copy(sessionId = Some(SessionId(journeyId.value)))
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
