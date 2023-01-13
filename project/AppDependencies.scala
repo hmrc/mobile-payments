@@ -8,7 +8,7 @@ object AppDependencies {
   private val flexmarkAllVersion     = "0.36.8"
   private val refinedVersion         = "0.9.26"
   private val domainVersion          = "8.1.0-play-28"
-  private val openBankingVersion     = "0.184.0"
+  private val openBankingVersion     = "0.186.0"
 
   private val pegdownVersion       = "1.6.0"
   private val wireMockVersion      = "2.20.0"
