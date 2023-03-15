@@ -465,6 +465,28 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 401
     }
 
+    "return 403 for valid utr for authorised user but for a different utr" in {
+      grantAccess(saUtr = "differentUtr")
+
+      val request: WSRequest = wsUrl(
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+
+      val response = await(request.get())
+      response.status shouldBe 403
+    }
+
+    "return 401 when no active UTR is found on account" in {
+      grantAccess(activeUtr = false)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/latest-payments/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+
+      val response = await(request.get())
+      response.status shouldBe 401
+    }
+
     "return 500 when a 401 is returned from get payments" in {
       grantAccess()
       stubForShutteringDisabled
@@ -548,6 +570,28 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/payments/pay-by-card/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 401
+    }
+
+    "return 403 for valid utr for authorised user but for a different utr" in {
+      grantAccess(saUtr = "differentUtr")
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+
+      response.status shouldBe 403
+    }
+
+    "return 401 when no active UTR is found on account" in {
+      grantAccess(activeUtr = false)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/$utr?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+
       response.status shouldBe 401
     }
 

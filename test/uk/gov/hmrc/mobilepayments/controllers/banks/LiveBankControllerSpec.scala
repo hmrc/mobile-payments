@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData with ShutteringMock {
 
-  private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
   private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
 
@@ -53,7 +52,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when get banks invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetBanks(Future successful BanksResponse(banksResponseGrouped))
 
@@ -69,7 +68,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when get banks invoked and service returns NotFoundException then" should {
     "return 404" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetBanks(Future failed Upstream4xxResponse("Error", 404, 404))
 
@@ -83,7 +82,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when get banks invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetBanks(Future failed new Upstream4xxResponse("Error", 401, 401))
 
@@ -109,7 +108,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when get banks invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetBanks(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -123,7 +122,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when select banks invoked and service returns success then" should {
     "return 201" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSelectBank(Future successful Unit)
 
@@ -138,7 +137,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when select banks invoked and service returns NotFoundException then" should {
     "return 404" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSelectBank(Future failed Upstream4xxResponse("Error", 404, 404))
 
@@ -153,7 +152,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when select banks invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSelectBank(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -181,7 +180,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
 
   "when select banks invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSelectBank(Future failed Upstream5xxResponse("Error", 502, 502))
 

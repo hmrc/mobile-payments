@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ class LivePaymentController @Inject() (
     utr:       String,
     journeyId: JourneyId
   ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+    validateAcceptWithAuth(acceptHeaderValidationRules, Some(utr)).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
@@ -167,7 +167,7 @@ class LivePaymentController @Inject() (
     utr:       String,
     journeyId: JourneyId
   ): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+    validateAcceptWithAuth(acceptHeaderValidationRules, Some(utr)).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier =
         fromRequest(request).copy(sessionId = Some(SessionId(journeyId.value)))
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>

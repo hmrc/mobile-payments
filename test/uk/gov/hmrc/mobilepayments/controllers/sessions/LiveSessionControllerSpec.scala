@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ class LiveSessionControllerSpec
     with MobilePaymentsTestData
     with ShutteringMock {
 
-  private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
   private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
 
@@ -59,7 +58,7 @@ class LiveSessionControllerSpec
 
   "when create session invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockCreateSession(Future successful createSessionDataResponse)
 
@@ -76,7 +75,7 @@ class LiveSessionControllerSpec
 
   "when create session invoked with malformed json then" should {
     "return 400" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
 
       val request = FakeRequest("POST", "/sessions")
@@ -90,7 +89,7 @@ class LiveSessionControllerSpec
 
   "when create session invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockCreateSession(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -118,7 +117,7 @@ class LiveSessionControllerSpec
 
   "when create session invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockCreateSession(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -133,7 +132,7 @@ class LiveSessionControllerSpec
 
   "when get session invoked for bank selected state and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetSession(Future successful sessionDataResponse)
 
@@ -153,7 +152,7 @@ class LiveSessionControllerSpec
 
   "when get session invoked for payment finalised state and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetSession(Future successful sessionDataPaymentFinalisedResponse)
 
@@ -174,7 +173,7 @@ class LiveSessionControllerSpec
 
   "when get session invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetSession(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -200,7 +199,7 @@ class LiveSessionControllerSpec
 
   "when get session invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetSession(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -214,7 +213,7 @@ class LiveSessionControllerSpec
 
   "when set email invoked and service returns success then" should {
     "return 201" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSetEmail(Future successful Unit)
 
@@ -229,7 +228,7 @@ class LiveSessionControllerSpec
 
   "when set email invoked and service returns NotFoundException then" should {
     "return 404" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSetEmail(Future failed Upstream4xxResponse("Error", 404, 404))
 
@@ -244,7 +243,7 @@ class LiveSessionControllerSpec
 
   "when set email invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSetEmail(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -272,7 +271,7 @@ class LiveSessionControllerSpec
 
   "when set email invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockSetEmail(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -287,7 +286,7 @@ class LiveSessionControllerSpec
 
   "when clear email invoked and service returns success then" should {
     "return 204" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockClearEmail(Future successful Unit)
 
@@ -301,7 +300,7 @@ class LiveSessionControllerSpec
 
   "when clear email invoked and service returns NotFoundException then" should {
     "return 404" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockClearEmail(Future failed Upstream4xxResponse("Error", 404, 404))
 
@@ -315,7 +314,7 @@ class LiveSessionControllerSpec
 
   "when clear email invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockClearEmail(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -341,7 +340,7 @@ class LiveSessionControllerSpec
 
   "when clear email invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockClearEmail(Future failed Upstream5xxResponse("Error", 502, 502))
 

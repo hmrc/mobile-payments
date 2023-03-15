@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,12 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class  LivePaymentControllerSpec
+class LivePaymentControllerSpec
     extends BaseSpec
     with AuthorisationStub
     with MobilePaymentsTestData
     with ShutteringMock {
 
-  private val confidenceLevel:        ConfidenceLevel    = ConfidenceLevel.L200
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
   private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
   private val utr:                    String             = "12212321"
@@ -64,7 +63,7 @@ class  LivePaymentControllerSpec
 
   "when create payment invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockInitiatePayment(Future successful paymentSessionResponse)
       mockGetSession(Future successful sessionDataResponse)
@@ -82,7 +81,7 @@ class  LivePaymentControllerSpec
 
   "when create payment invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockInitiatePayment(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -108,7 +107,7 @@ class  LivePaymentControllerSpec
 
   "when create payment invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockInitiatePayment(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -122,7 +121,7 @@ class  LivePaymentControllerSpec
 
   "when update payment invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockUpdatePayment(Future successful paymentSessionResponse)
       //      stubPaymentEvent()
@@ -139,7 +138,7 @@ class  LivePaymentControllerSpec
 
   "when update payment invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockUpdatePayment(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -165,7 +164,7 @@ class  LivePaymentControllerSpec
 
   "when update payment invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockUpdatePayment(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -179,7 +178,7 @@ class  LivePaymentControllerSpec
 
   "when get payment status invoked and service returns success then" should {
     "return 200 and trigger sending of email if status Verified or Complete" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetPaymentStatus(Future successful PaymentStatusResponse("Verified"))
       mockGetSession(Future successful sessionDataResponse)
@@ -195,7 +194,7 @@ class  LivePaymentControllerSpec
     }
 
     "return 200 and do not trigger sending of email if status is not Verified or Complete" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetPaymentStatus(Future successful PaymentStatusResponse("Authorised"))
       mockGetSession(Future successful sessionDataResponse)
@@ -212,7 +211,7 @@ class  LivePaymentControllerSpec
 
   "when get payment status invoked and service returns NotFoundException then" should {
     "return 404" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetPaymentStatus(Future.failed(Upstream4xxResponse("Error", 404, 404)))
 
@@ -226,7 +225,7 @@ class  LivePaymentControllerSpec
 
   "when get payment status and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetPaymentStatus(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
 
@@ -252,7 +251,7 @@ class  LivePaymentControllerSpec
 
   "when get payment status invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetPaymentStatus(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
 
@@ -266,7 +265,7 @@ class  LivePaymentControllerSpec
 
   "when get url consumed invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetUrlConsumed(Future successful UrlConsumedResponse(true))
 
@@ -282,7 +281,7 @@ class  LivePaymentControllerSpec
 
   "when get url consumed invoked and service returns NotFoundException then" should {
     "return 404" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetUrlConsumed(Future.failed(Upstream4xxResponse("Error", 404, 404)))
 
@@ -296,7 +295,7 @@ class  LivePaymentControllerSpec
 
   "when get url consumed and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetUrlConsumed(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
 
@@ -322,7 +321,7 @@ class  LivePaymentControllerSpec
 
   "when get url consumed invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetUrlConsumed(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -336,7 +335,7 @@ class  LivePaymentControllerSpec
 
   "when get latest payments invoked and service returns success then" should {
     "return 200 and latest payments" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(Some(latestPaymentsResponse)))
 
@@ -354,7 +353,7 @@ class  LivePaymentControllerSpec
 
   "when get latest payments invoked and service returns None" should {
     "return 404 Not Found" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(None))
 
@@ -368,7 +367,7 @@ class  LivePaymentControllerSpec
 
   "when get latest payments invoked and service returns Error String" should {
     "return 500 Internal Server Error" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockGetLatestPayments(Future successful Left("Unknown response"))
 
@@ -380,9 +379,34 @@ class  LivePaymentControllerSpec
     }
   }
 
+  "when get latest payments invoked and valid utr for authorised user found but for a different utr" should {
+    "return 403" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+
+      val request = FakeRequest("GET", "/payments/latest-payments/123123123")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.latestPayments("123123123", journeyId)(request)
+      status(result) shouldBe 403
+
+    }
+  }
+
+  "when get latest payments invoked and no UTR is found on account" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(authorisedNoEnrolmentsResponse)
+
+      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
+        .withHeaders(acceptJsonHeader)
+
+      val result = sut.latestPayments(utr, journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
   "when get pay by card url invoked and service returns success then" should {
     "return 200" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockPayByCardUrl(Future successful payByCardResponse)
 
@@ -399,7 +423,7 @@ class  LivePaymentControllerSpec
 
   "when get pay by card url invoked with malformed json then" should {
     "return 400" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
 
       val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
@@ -413,7 +437,7 @@ class  LivePaymentControllerSpec
 
   "when get pay by card url invoked and service returns 401 then" should {
     "return 401" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockPayByCardUrl(Future failed Upstream4xxResponse("Error", 401, 401))
 
@@ -441,7 +465,7 @@ class  LivePaymentControllerSpec
 
   "when get pay by card url invoked and service returns 5XX then" should {
     "return 500" in {
-      stubAuthorisationGrantAccess(confidenceLevel)
+      stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
       mockPayByCardUrl(Future failed Upstream5xxResponse("Error", 502, 502))
 
@@ -451,6 +475,33 @@ class  LivePaymentControllerSpec
 
       val result = sut.getPayByCardURL(utr, journeyId)(request)
       status(result) shouldBe 500
+    }
+  }
+
+  "when get pay by card url invoked and valid utr for authorised user found but for a different utr" should {
+    "return 403" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+
+      val request = FakeRequest("POST", "/payments/pay-by-card/123123123")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234))
+
+      val result = sut.getPayByCardURL("123123123", journeyId)(request)
+      status(result) shouldBe 403
+
+    }
+  }
+
+  "when get pay by card url invoked and no UTR is found on account" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(authorisedNoEnrolmentsResponse)
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234))
+
+      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      status(result) shouldBe 401
     }
   }
 

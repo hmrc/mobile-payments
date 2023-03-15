@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,14 @@ case object ErrorMalformedRequest extends ErrorResponse(400, "MALFORMED", "Malfo
 class GrantAccessException(message: String) extends HttpException(message, 401)
 
 class AccountWithLowCL extends GrantAccessException("Unauthorised! Account with low CL!")
+
+class FailToMatchTaxIdOnAuth extends GrantAccessException("Unauthorised! Failure to match URL UTR against Auth UTR")
+
+class UtrNotFoundOnAccount extends GrantAccessException("Unauthorised! UTR not found on account!")
+
+case object ForbiddenAccess extends ErrorResponse(403, "UNAUTHORIZED", "Access denied!")
+
+case object ErrorUnauthorizedNoUtr extends ErrorResponse(401, "UNAUTHORIZED", "UTR does not exist on account")
 
 trait ErrorHandling {
   self: BackendBaseController =>
