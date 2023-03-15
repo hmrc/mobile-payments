@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength}
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength, Enrolments}
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mobilepayments.controllers.errors.AccountWithLowCL
+import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,23 +36,32 @@ trait Authorisation extends Results with AuthorisedFunctions {
   val confLevel: Int
   private val logger: Logger = Logger(this.getClass)
 
-  lazy val requiresAuth       = true
-  lazy val lowConfidenceLevel = new AccountWithLowCL
+  lazy val requiresAuth         = true
+  lazy val lowConfidenceLevel   = new AccountWithLowCL
+  lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
+  lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
 
-  def grantAccess()(implicit hc: HeaderCarrier): Future[Boolean] =
+  def grantAccess(requestedUtr: Option[String])(implicit hc: HeaderCarrier): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
-      .retrieve(confidenceLevel) { foundConfidenceLevel =>
-        if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
-        else Future successful true
+      .retrieve(confidenceLevel and allEnrolments) {
+        case foundConfidenceLevel ~ enrolments =>
+          if (requestedUtr.isDefined) {
+            val activatedUtr = getActivatedSaUtr(enrolments)
+            if (activatedUtr.isEmpty) throw utrNotFoundOnAccount
+            if (!activatedUtr.getOrElse(SaUtr("")).utr.equals(requestedUtr.getOrElse(""))) throw failedToMatchUtr
+          }
+          if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
+          else Future successful true
       }
 
   def invokeAuthBlock[A](
     request: Request[A],
-    block:   Request[A] => Future[Result]
+    block:   Request[A] => Future[Result],
+    saUtr:   Option[String]
   ): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
-    grantAccess
+    grantAccess(saUtr)
       .flatMap { _ =>
         block(request)
       }
@@ -59,18 +70,38 @@ trait Authorisation extends Results with AuthorisedFunctions {
           logger.info("Unauthorized! Failed to grant access since 4xx response!")
           Unauthorized(Json.toJson(ErrorUnauthorized.asInstanceOf[ErrorResponse]))
 
+        case _: UtrNotFoundOnAccount =>
+          logger.info("Unauthorized! UTR not found on account!")
+          Unauthorized(Json.toJson[ErrorResponse](ErrorUnauthorizedNoUtr))
+
+        case _: FailToMatchTaxIdOnAuth =>
+          logger.info("Forbidden! Failure to match URL UTR against Auth UTR")
+          Forbidden(Json.toJson[ErrorResponse](ForbiddenAccess))
+
         case _: AccountWithLowCL =>
           logger.info("Unauthorized! Account with low CL!")
           Unauthorized(Json.toJson(ErrorUnauthorizedLowCL.asInstanceOf[ErrorResponse]))
       }
   }
+
+  private def getActivatedSaUtr(enrolments: Enrolments): Option[SaUtr] =
+    enrolments.enrolments
+      .find(_.key == "IR-SA")
+      .flatMap { enrolment =>
+        enrolment.identifiers
+          .find(id => id.key == "UTR" && enrolment.state == "Activated")
+          .map(key => SaUtr(key.value))
+      }
 }
 
 trait AccessControl extends HeaderValidator with Authorisation {
   outer =>
   def parser: BodyParser[AnyContent]
 
-  def validateAcceptWithAuth(rules: Option[String] => Boolean): ActionBuilder[Request, AnyContent] =
+  def validateAcceptWithAuth(
+    rules: Option[String] => Boolean,
+    saUtr: Option[String] = None
+  ): ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
 
       override def parser:                     BodyParser[AnyContent] = outer.parser
@@ -81,7 +112,7 @@ trait AccessControl extends HeaderValidator with Authorisation {
         block:   Request[A] => Future[Result]
       ): Future[Result] =
         if (rules(request.headers.get("Accept"))) {
-          if (requiresAuth) invokeAuthBlock(request, block)
+          if (requiresAuth) invokeAuthBlock(request, block, saUtr)
           else block(request)
         } else
           Future.successful(
@@ -91,18 +122,4 @@ trait AccessControl extends HeaderValidator with Authorisation {
           )
     }
 
-  def validateWithAuth(): ActionBuilder[Request, AnyContent] =
-    new ActionBuilder[Request, AnyContent] {
-
-      override def parser:                     BodyParser[AnyContent] = outer.parser
-      override protected def executionContext: ExecutionContext       = outer.executionContext
-
-      def invokeBlock[A](
-        request: Request[A],
-        block:   Request[A] => Future[Result]
-      ): Future[Result] =
-        if (requiresAuth) invokeAuthBlock(request, block)
-        else block(request)
-
-    }
 }

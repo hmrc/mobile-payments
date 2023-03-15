@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import scala.concurrent.Future
 
 class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData with ShutteringMock {
 
-  private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
   private val sessionDataId:   String          = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
