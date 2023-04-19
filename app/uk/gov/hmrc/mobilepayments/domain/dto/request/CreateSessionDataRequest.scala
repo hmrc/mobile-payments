@@ -35,5 +35,5 @@ final case class OriginSpecificData(
 
 object OriginSpecificData {
   implicit val format: Format[OriginSpecificData] = Json.format[OriginSpecificData]
-  private val originSa = "PtaSa"
+  private val originSa = "AppSa"
 }
