@@ -68,7 +68,7 @@ class OpenBankingService @Inject() (
     connector
       .getSession(sessionDataId, journeyId)
       .map { data: SessionData[OriginSpecificSessionData] =>
-        val ptaSa = data.originSpecificData.asInstanceOf[PtaSaSessionData]
+        val ptaSa = data.originSpecificData.asInstanceOf[AppSaSessionData]
 
         val bankId: Option[String] = data.sessionState match {
           case SessionInitiated => None
