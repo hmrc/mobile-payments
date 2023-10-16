@@ -16,13 +16,18 @@
 
 package uk.gov.hmrc.mobilepayments.domain.dto.request
 
+import payapi.corcommon.model.TaxType
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.domain.SaUtr
+import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 
 final case class CreateSessionRequest(
-  amount: BigDecimal,
-  saUtr:  SaUtr)
-
+  amount: Option[BigDecimal],
+  saUtr:  Option[SaUtr],
+  amountInPence: Option[BigDecimal],
+  reference: Option[String],
+  taxType: Option[TaxType]
+  )
 object CreateSessionRequest {
   implicit val format: Format[CreateSessionRequest] = Json.format[CreateSessionRequest]
 }
