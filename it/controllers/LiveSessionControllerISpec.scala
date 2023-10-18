@@ -6,6 +6,7 @@ import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
+import uk.gov.hmrc.http.BadRequestException
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import utils.BaseISpec
@@ -24,6 +25,34 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/sessions?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
       val response = await(request.post(Json.obj("amount" -> 1200, "saUtr" -> "CS700100A")))
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[CreateSessionDataResponse]
+      parsedResponse.sessionDataId.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
+    }
+
+    "return 200 when payload is valid and the taxType is set to appSelfAssessment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(response = createSessionDataResponseJson)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 1200, "reference" -> "CS700100A","taxType" -> "appSelfAssessment")))
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[CreateSessionDataResponse]
+      parsedResponse.sessionDataId.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
+    }
+
+    "return 200 when payload is valid and the taxType is set to appSimpleAssessment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForCreateSession(response = createSessionDataResponseJson)
+
+      val request: WSRequest = wsUrl(
+        s"/sessions?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 1200, "reference" -> "CS700100A", "taxType" -> "appSimpleAssessment")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[CreateSessionDataResponse]
       parsedResponse.sessionDataId.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"

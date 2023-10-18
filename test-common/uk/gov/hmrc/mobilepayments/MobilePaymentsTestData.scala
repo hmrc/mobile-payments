@@ -19,6 +19,7 @@ package uk.gov.hmrc.mobilepayments
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, CreateSessionRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Payment, PaymentRecordListFromApi, Shuttering}
 
@@ -34,6 +35,24 @@ trait MobilePaymentsTestData {
 
   lazy val paymentStatusOpenBankingResponse: OpenBankingPaymentStatusResponse =
     Json.fromJson[OpenBankingPaymentStatusResponse](js("payment-status-ob-response")).get
+
+  lazy val createSessionRequest: CreateSessionRequest =
+    Json.fromJson[CreateSessionRequest](js("create-session-request")).get
+
+  lazy val createSessionNewSARequest: CreateSessionRequest =
+    Json.fromJson[CreateSessionRequest](js("create-new-session-sa-request")).get
+
+  lazy val createSessionNewSIRequest: CreateSessionRequest =
+    Json.fromJson[CreateSessionRequest](js("create-new-session-si-request")).get
+
+  lazy val createSessionIncorrectFieldsSA: CreateSessionRequest =
+    Json.fromJson[CreateSessionRequest](js("create-session-incorrect-fields-sa-request")).get
+
+  lazy val createSessionIncorrectFieldsSI: CreateSessionRequest =
+    Json.fromJson[CreateSessionRequest](js("create-session-incorrect-fields-si-request")).get
+
+  lazy val createSessionIncorrectFieldsOld: CreateSessionRequest =
+    Json.fromJson[CreateSessionRequest](js("create-session-incorrect-fields-old-request")).get
 
   lazy val paymentStatusResponse: PaymentStatusResponse =
     Json.fromJson[PaymentStatusResponse](js("payment-status-response")).get

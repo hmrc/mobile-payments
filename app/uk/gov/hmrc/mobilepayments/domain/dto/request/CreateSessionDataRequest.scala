@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package uk.gov.hmrc.mobilepayments.domain.dto.request
 import payapi.corcommon.model.{SearchOptions, TaxType}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
-
 import play.api.libs.json._
+import uk.gov.hmrc.domain.SaUtr
 
 sealed abstract class OriginSpecificData(val origin: String)
 
 final case class CreateSessionDataRequest(
-                                           amount: AmountInPence,
+                                           amount: BigDecimal,
                                            originSpecificData: OriginSpecificData
                                          )
 
@@ -34,12 +34,12 @@ object CreateSessionDataRequest {
 }
 
 final case class SimpleAssessmentOriginSpecificData(
-                                                     pa302ref: String,
+                                                     p302ref: String,
                                                    ) extends OriginSpecificData("appSi")
 
 final case class SelfAssessmentOriginSpecificData(
-                                                   saUtr: String,
-                                                 ) extends OriginSpecificData("appSa")
+                                                   saUtr: SaUtr,
+                                                 ) extends OriginSpecificData("AppSa")
 
 object OriginSpecificData {
   implicit val writes: Writes[OriginSpecificData] = (o: OriginSpecificData) =>
@@ -47,4 +47,12 @@ object OriginSpecificData {
       case s: SimpleAssessmentOriginSpecificData => Json.format[SimpleAssessmentOriginSpecificData].writes(s)
       case s: SelfAssessmentOriginSpecificData => Json.format[SelfAssessmentOriginSpecificData].writes(s)
     }) + ("origin" -> Json.toJson(o.origin))
+
+  implicit val reads: Reads[OriginSpecificData] = (json: JsValue) =>
+    (__ \ "origin").read[String].reads(json).flatMap {
+      case "appSi" => Json.format[SimpleAssessmentOriginSpecificData].reads(json)
+      case "AppSa" => Json.format[SelfAssessmentOriginSpecificData].reads(json)
+    }
+
+  implicit val format: Format[OriginSpecificData] = Format(reads, writes)
 }
