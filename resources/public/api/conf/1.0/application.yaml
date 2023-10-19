@@ -646,7 +646,7 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/MobilePaymentsSessionsrequest'
                 - example:
-                    amountInPence: 322.75
+                    amountInPence: 32275
                     reference: CS700100A
                     taxType: appSimpleAssessment
             examples:
@@ -656,12 +656,12 @@ paths:
                   saUtr: CS700100A
               simpleAssessmentPayment:
                 value:
-                  amountInPence: 322.75
+                  amountInPence: 32275
                   reference: CS700100A
                   taxType: appSimpleAssessment
               selfAssessmentPayment:
                 value:
-                  amountInPence: 322.75
+                  amountInPence: 32275
                   reference: CS700100A
                   taxType: appSelfAssessment
         required: false
@@ -1122,7 +1122,7 @@ components:
         taxType:
           type: string
       example:
-        amountInPence: 322.75
+        amountInPence: 32275
         reference: CS700100A
         taxType: appSimpleAssessment
     MobilePaymentsSessionsresponse:

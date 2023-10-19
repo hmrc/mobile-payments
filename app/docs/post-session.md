@@ -24,7 +24,7 @@ Post Session
 Self Assessment valid payload
 ```json
 {
-  "amountInPence": 322.75,
+  "amountInPence": 32275,
   "reference": "CS700100A",
   "taxType": "appSelfAssessment"
 }
@@ -32,7 +32,7 @@ Self Assessment valid payload
 Simple Assessment valid payload
 ```json
 {
-  "amountInPence": 322.75,
+  "amountInPence": 32275,
   "reference": "CS700100A",
   "taxType": "appSimpleAssessment"
 }
