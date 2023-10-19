@@ -40,9 +40,6 @@ class OpenBankingService @Inject() (
   connector:                                                         OpenBankingConnector,
   @Named("openBankingPaymentReturnUrl") openBankingPaymentReturnUrl: String) {
 
-  val appSimpleAssessment: String = "appSimpleAssessment"
-  val appSelfAssessment: String = "appSelfAssessment"
-
   def getBanks(
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
