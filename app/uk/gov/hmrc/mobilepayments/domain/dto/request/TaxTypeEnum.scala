@@ -34,9 +34,5 @@ object TaxTypeEnum extends Enumeration {
         case "appSelfAssessment" => JsSuccess(appSelfAssessment)
         case e => JsError(s"$e not recognised")
       }
-
   }
-
-
-
 }

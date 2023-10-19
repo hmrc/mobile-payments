@@ -33,13 +33,9 @@ object CreateSessionDataRequest {
   implicit val format: Format[CreateSessionDataRequest] = Json.format[CreateSessionDataRequest]
 }
 
-final case class SimpleAssessmentOriginSpecificData(
-                                                     p302ref: String,
-                                                   ) extends OriginSpecificData("appSi")
+final case class SimpleAssessmentOriginSpecificData(p302ref: String) extends OriginSpecificData("appSi")
 
-final case class SelfAssessmentOriginSpecificData(
-                                                   saUtr: SaUtr,
-                                                 ) extends OriginSpecificData("AppSa")
+final case class SelfAssessmentOriginSpecificData(saUtr: SaUtr) extends OriginSpecificData("AppSa")
 
 object OriginSpecificData {
   implicit val writes: Writes[OriginSpecificData] = (o: OriginSpecificData) =>

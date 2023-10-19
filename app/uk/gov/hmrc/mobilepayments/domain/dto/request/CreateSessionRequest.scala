@@ -26,6 +26,7 @@ final case class CreateSessionRequest(
   reference: Option[String] = None,
   taxType: Option[TaxTypeEnum.Value] = None
   )
+
 object CreateSessionRequest {
   implicit val format: Format[CreateSessionRequest] = Json.format[CreateSessionRequest]
 }

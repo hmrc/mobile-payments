@@ -20,9 +20,8 @@ import akka.http.scaladsl.model.Uri
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.test.Helpers.await
-import uk.gov.hmrc.api.controllers.ErrorGenericBadRequest
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
