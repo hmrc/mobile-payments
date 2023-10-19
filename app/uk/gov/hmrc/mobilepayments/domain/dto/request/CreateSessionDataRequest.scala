@@ -33,7 +33,7 @@ object CreateSessionDataRequest {
   implicit val format: Format[CreateSessionDataRequest] = Json.format[CreateSessionDataRequest]
 }
 
-final case class SimpleAssessmentOriginSpecificData(p302ref: String) extends OriginSpecificData("appSi")
+final case class SimpleAssessmentOriginSpecificData(p302ref: String) extends OriginSpecificData("AppSimpleAssessment")
 
 final case class SelfAssessmentOriginSpecificData(saUtr: SaUtr) extends OriginSpecificData("AppSa")
 
@@ -46,7 +46,7 @@ object OriginSpecificData {
 
   implicit val reads: Reads[OriginSpecificData] = (json: JsValue) =>
     (__ \ "origin").read[String].reads(json).flatMap {
-      case "appSi" => Json.format[SimpleAssessmentOriginSpecificData].reads(json)
+      case "AppSimpleAssessment" => Json.format[SimpleAssessmentOriginSpecificData].reads(json)
       case "AppSa" => Json.format[SelfAssessmentOriginSpecificData].reads(json)
     }
 
