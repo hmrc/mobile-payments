@@ -20,8 +20,12 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.domain.SaUtr
 
 final case class CreateSessionRequest(
-  amount: BigDecimal,
-  saUtr:  SaUtr)
+  amount: Option[BigDecimal] = None,
+  saUtr:  Option[SaUtr] = None,
+  amountInPence: Option[BigDecimal] = None,
+  reference: Option[String] = None,
+  taxType: Option[TaxTypeEnum.Value] = None
+  )
 
 object CreateSessionRequest {
   implicit val format: Format[CreateSessionRequest] = Json.format[CreateSessionRequest]

@@ -1,7 +1,5 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
-
 val appName = "mobile-payments"
 
 lazy val microservice = Project(appName, file("."))
@@ -16,7 +14,6 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(publishingSettings: _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     routesImport ++= Seq(

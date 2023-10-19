@@ -21,18 +21,22 @@ Post Session
 
 * **Body**
 
-  **Required:**
-
-  `bankId`
-  the identifier of the chosen bank.
-
+Self Assessment valid payload
 ```json
 {
-  "amount": 322.75,
-  "saUtr": "CS700100A"
+  "amountInPence": 32275,
+  "reference": "CS700100A",
+  "taxType": "appSelfAssessment"
 }
 ```
-
+Simple Assessment valid payload
+```json
+{
+  "amountInPence": 32275,
+  "reference": "CS700100A",
+  "taxType": "appSimpleAssessment"
+}
+```
 * **Success Responses:**
 
     * **Code:** 200

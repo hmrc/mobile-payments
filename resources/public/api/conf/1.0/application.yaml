@@ -646,14 +646,25 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/MobilePaymentsSessionsrequest'
                 - example:
-                    amount: 322.75
-                    saUtr: CS700100A
+                    amountInPence: 32275
+                    reference: CS700100A
+                    taxType: appSimpleAssessment
             examples:
               example-6:
                 value:
                   amount: 322.75
                   saUtr: CS700100A
-        required: true
+              simpleAssessmentPayment:
+                value:
+                  amountInPence: 32275
+                  reference: CS700100A
+                  taxType: appSimpleAssessment
+              selfAssessmentPayment:
+                value:
+                  amountInPence: 32275
+                  reference: CS700100A
+                  taxType: appSelfAssessment
+        required: false
       responses:
         '200':
           description: ''
@@ -1102,18 +1113,18 @@ components:
         consumed: true
     MobilePaymentsSessionsrequest:
       title: MobilePaymentsSessionsrequest
-      required:
-        - amount
-        - saUtr
       type: object
       properties:
-        amount:
+        amountInPence:
           type: number
-        saUtr:
+        reference:
+          type: string
+        taxType:
           type: string
       example:
-        amount: 322.75
-        saUtr: CS700100A
+        amountInPence: 32275
+        reference: CS700100A
+        taxType: appSimpleAssessment
     MobilePaymentsSessionsresponse:
       title: MobilePaymentsSessionsresponse
       required:

@@ -19,21 +19,36 @@ package uk.gov.hmrc.mobilepayments.domain.dto.request
 import payapi.corcommon.model.{SearchOptions, TaxType}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
-import uk.gov.hmrc.mobilepayments.domain.dto.request.OriginSpecificData.originSa
+import play.api.libs.json._
+import uk.gov.hmrc.domain.SaUtr
+
+sealed abstract class OriginSpecificData(val origin: String)
 
 final case class CreateSessionDataRequest(
-  amount:             AmountInPence,
-  originSpecificData: OriginSpecificData)
+                                           amount: BigDecimal,
+                                           originSpecificData: OriginSpecificData
+                                         )
 
 object CreateSessionDataRequest {
   implicit val format: Format[CreateSessionDataRequest] = Json.format[CreateSessionDataRequest]
 }
 
-final case class OriginSpecificData(
-  saUtr:  String,
-  origin: String = originSa)
+final case class SimpleAssessmentOriginSpecificData(p302ref: String) extends OriginSpecificData("AppSimpleAssessment")
+
+final case class SelfAssessmentOriginSpecificData(saUtr: SaUtr) extends OriginSpecificData("AppSa")
 
 object OriginSpecificData {
-  implicit val format: Format[OriginSpecificData] = Json.format[OriginSpecificData]
-  private val originSa = "AppSa"
+  implicit val writes: Writes[OriginSpecificData] = (o: OriginSpecificData) =>
+    (o match {
+      case s: SimpleAssessmentOriginSpecificData => Json.format[SimpleAssessmentOriginSpecificData].writes(s)
+      case s: SelfAssessmentOriginSpecificData => Json.format[SelfAssessmentOriginSpecificData].writes(s)
+    }) + ("origin" -> Json.toJson(o.origin))
+
+  implicit val reads: Reads[OriginSpecificData] = (json: JsValue) =>
+    (__ \ "origin").read[String].reads(json).flatMap {
+      case "AppSimpleAssessment" => Json.format[SimpleAssessmentOriginSpecificData].reads(json)
+      case "AppSa" => Json.format[SelfAssessmentOriginSpecificData].reads(json)
+    }
+
+  implicit val format: Format[OriginSpecificData] = Format(reads, writes)
 }

@@ -23,8 +23,7 @@ import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.http.{NotFoundException, _}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendBaseController
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class MalformedRequestException(message: String = "") extends HttpException(message, 400)
 
@@ -50,7 +49,7 @@ trait ErrorHandling {
   val app: String
   private val logger: Logger = Logger(this.getClass)
 
-  def withErrorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
+  def withErrorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Result] =
     func.recover {
       case ex: UpstreamErrorResponse if ex.statusCode == 401 =>
         logger.warn("Upstream service returned 401")

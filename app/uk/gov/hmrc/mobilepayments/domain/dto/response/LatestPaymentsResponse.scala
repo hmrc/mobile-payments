@@ -17,7 +17,7 @@
 package uk.gov.hmrc.mobilepayments.domain.dto.response
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Payment}
+import uk.gov.hmrc.mobilepayments.domain.Payment
 
 import java.time.LocalDate
 

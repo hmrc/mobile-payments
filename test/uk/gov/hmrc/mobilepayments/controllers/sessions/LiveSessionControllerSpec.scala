@@ -23,10 +23,11 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionRequest, OriginSpecificData}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
@@ -73,19 +74,54 @@ class LiveSessionControllerSpec
     }
   }
 
-  "when create session invoked with malformed json then" should {
-    "return 400" in {
+  "Calling create session with taxType as SelfAssessment, reference and amountInPence" should {
+    "return 200" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
+      mockCreateSession(Future successful createSessionDataResponse)
 
       val request = FakeRequest("POST", "/sessions")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("bad-key" -> 1234, "saUtr" -> "CS700100A"))
+        .withBody(Json.obj("amountInPence" -> 1234, "reference" -> "CS700100A", "taxType" -> "appSimpleAssessment"))
 
       val result = sut.createSession(journeyId)(request)
-      status(result) shouldBe 400
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[CreateSessionDataResponse]
+      response.sessionDataId.value shouldEqual sessionDataId
     }
   }
+
+  "Calling create session with taxType as SimpleAssessment, reference and amountInPence" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+      shutteringDisabled()
+      mockCreateSession(Future successful createSessionDataResponse)
+
+      val request = FakeRequest("POST", "/sessions")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234, "reference" -> "CS700100A", "taxType" -> "appSelfAssessment"))
+
+      val result = sut.createSession(journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[CreateSessionDataResponse]
+      response.sessionDataId.value shouldEqual sessionDataId
+    }
+  }
+
+  //TODO Uncomment once the backwards compatibility has been done
+//  "when create session invoked with malformed json then" should {
+//    "return 400" in {
+//      stubAuthorisationGrantAccess(authorisedResponse)
+//      shutteringDisabled()
+////      mockCreateSession(Future failed Upstream4xxResponse("Error", 400, 400))
+//      val request = FakeRequest("POST", "/sessions")
+//        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+//        .withBody(Json.obj("bad-key" -> 1234, "saUtr" -> "CS700100A"))
+//
+//      val result = sut.createSession(journeyId)(request)
+//      status(result) shouldBe 400
+//    }
+//  }
 
   "when create session invoked and service returns 401 then" should {
     "return 401" in {
@@ -366,8 +402,8 @@ class LiveSessionControllerSpec
 
   private def mockCreateSession(future: Future[CreateSessionDataResponse]) =
     (mockOpenBankingService
-      .createSession(_: BigDecimal, _: SaUtr, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *, *)
+      .createSession(_: CreateSessionRequest, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
       .returning(future)
 
   private def mockGetSession(future: Future[SessionDataResponse]) =

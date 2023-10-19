@@ -25,6 +25,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
+import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{OriginSpecificData, SelfAssessmentOriginSpecificData, SimpleAssessmentOriginSpecificData}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.OpenBankingPaymentStatusResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
@@ -37,12 +39,14 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
   private val amount:        BigDecimal           = 102.85
-  private val amountInPence: AmountInPence        = AmountInPence(amount)
+  private val amountInPence: BigDecimal           = (amount * 100).longValue()
   private val saUtr:         SaUtr                = SaUtr("CS700100A")
   private val bankId:        String               = "asd-123"
   private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
   private val returnUrl:     String               = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
   private val paymentUrl:    Uri                  = "https://some-bank.com?param=dosomething"
+  private val selfAssessmentSpecificData: SelfAssessmentOriginSpecificData = SelfAssessmentOriginSpecificData(saUtr)
+  private val simpleAssessmentSpecificData: SimpleAssessmentOriginSpecificData = SimpleAssessmentOriginSpecificData(saUtr.value)
 
   private val sut = new OpenBankingService(mockConnector, returnUrl)
 
@@ -65,12 +69,54 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
-  "when createSession invoked and connector succeeds then" should {
+  "when createSession invoked  with saUtr and amount and connector succeeds then" should {
     "return session data response" in {
       mockCreateSession(Future successful createSessionDataResponse)
 
-      val result = Await.result(sut.createSession(amount, saUtr, journeyId), 0.5.seconds)
+      val result = Await.result(sut.createSession(createSessionRequest, journeyId), 0.5.seconds)
       result.sessionDataId.value shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+    }
+  }
+
+  "when createSession invoked with reference, amountInPence and taxType is set to simpleAssessment and connector succeeds then" should {
+    "return session data response" in {
+      mockCreateSessionSimpleAssessment(Future successful createSessionDataResponse)
+
+      val result = Await.result(sut.createSession(createSessionNewSIRequest, journeyId), 0.5.seconds)
+      result.sessionDataId.value shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+    }
+  }
+
+  "when createSession invoked with reference, amountInPence and taxType is set to selfAssessment and connector succeeds then" should {
+    "return session data response" in {
+      mockCreateSessionSelfAssessment(Future successful createSessionDataResponse)
+
+      val result = Await.result(sut.createSession(createSessionNewSARequest, journeyId), 0.5.seconds)
+      result.sessionDataId.value shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
+    }
+  }
+
+  "Calling createSession with amount, saUtr and taxType set to appSelfAssessment" should {
+    "return MalformedRequestException" in {
+      intercept[MalformedRequestException]{
+        Await.result(sut.createSession(createSessionIncorrectFieldsSA, journeyId), 0.5.seconds)
+      }
+    }
+  }
+
+  "Calling createSession with amount, saUtr and taxType set to appSimpleAssessment" should {
+    "return MalformedRequestException" in {
+      intercept[MalformedRequestException] {
+        Await.result(sut.createSession(createSessionIncorrectFieldsSI, journeyId), 0.5.seconds)
+      }
+    }
+  }
+
+  "Calling createSession with amountInPence, reference but no taxType" should {
+    "return MalformedRequestException" in {
+      intercept[MalformedRequestException] {
+        Await.result(sut.createSession(createSessionIncorrectFieldsOld, journeyId), 0.5.seconds)
+      }
     }
   }
 
@@ -79,7 +125,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockCreateSession(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        Await.result(sut.createSession(amount, saUtr, journeyId), 0.5.seconds)
+        Await.result(sut.createSession(createSessionRequest, journeyId), 0.5.seconds)
       }
     }
   }
@@ -255,9 +301,22 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private def mockCreateSession(future: Future[CreateSessionDataResponse]): Unit =
     (mockConnector
-      .createSession(_: AmountInPence, _: SaUtr, _: JourneyId)(_: HeaderCarrier))
-      .expects(amountInPence, saUtr, journeyId, hc)
+      .createSession(_: BigDecimal, _: OriginSpecificData, _: JourneyId)(_: HeaderCarrier))
+      .expects(amountInPence, selfAssessmentSpecificData, journeyId, hc)
       .returning(future)
+
+  private def mockCreateSessionSimpleAssessment(future: Future[CreateSessionDataResponse]): Unit =
+  (mockConnector
+    .createSession(_: BigDecimal, _: OriginSpecificData, _: JourneyId)(_: HeaderCarrier))
+    .expects(amountInPence, simpleAssessmentSpecificData, journeyId, hc)
+    .returning(future)
+
+  private def mockCreateSessionSelfAssessment(future: Future[CreateSessionDataResponse]): Unit =
+    (mockConnector
+      .createSession(_: BigDecimal, _: OriginSpecificData, _: JourneyId)(_: HeaderCarrier))
+      .expects(amountInPence, selfAssessmentSpecificData, journeyId, hc)
+      .returning(future)
+
 
   private def mockSelectBank(future: Future[HttpResponse]): Unit =
     (mockConnector

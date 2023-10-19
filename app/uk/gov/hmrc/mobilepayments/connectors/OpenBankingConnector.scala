@@ -21,7 +21,7 @@ import com.google.inject.name.Named
 import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
-import uk.gov.hmrc.domain.SaUtr
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, OriginSpecificData, SelectBankRequest, SetEmailRequest}
@@ -44,16 +44,17 @@ class OpenBankingConnector @Inject() (
     )
 
   def createSession(
-    amount:                 AmountInPence,
-    saUtr:                  SaUtr,
+    amount:                 BigDecimal,
+    originSpecificData: OriginSpecificData,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[CreateSessionDataResponse] =
+  ): Future[CreateSessionDataResponse] = {
     http.POST[CreateSessionDataRequest, CreateSessionDataResponse](
       url = s"$serviceUrl/open-banking/session?journeyId=${journeyId.value}",
-      CreateSessionDataRequest(amount, OriginSpecificData(saUtr.utr)),
+      CreateSessionDataRequest(amount, originSpecificData),
       Seq(("X-Session-ID", journeyId.value))
     )
+  }
 
   def getSession(
     sessionDataId:          String,

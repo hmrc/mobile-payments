@@ -24,6 +24,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
+import uk.gov.hmrc.mobilepayments.domain.dto.request.SelfAssessmentOriginSpecificData
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
 import java.time.LocalDateTime
@@ -36,7 +37,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   val sut           = new OpenBankingConnector(mockHttp, "baseUrl")
   val sessionDataId = "51cc67d6-21da-11ec-9621-0242ac130002"
   val returnUrl     = "https://tax.hmrc.gov.uk/payment-result"
-  val amount        = AmountInPence(12500)
+  val amount        = BigDecimal((12500 * 100).longValue())
 
   "when getBanks call is successful it" should {
     "return banks" in {
@@ -57,7 +58,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   "when createSession call is successful it" should {
     "return session data" in {
       performSuccessfulPOST(Future successful createSessionDataResponse)(mockHttp)
-      val result = await(sut.createSession(amount, SaUtr("CS700100A"), journeyId))
+      val result = await(sut.createSession(amount, SelfAssessmentOriginSpecificData(SaUtr("CS700100A")), journeyId))
       result.sessionDataId.value shouldEqual sessionDataId
     }
   }
@@ -66,7 +67,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
     "return an error" in {
       performUnsuccessfulPOST(new NotFoundException("not found"))(mockHttp)
       intercept[NotFoundException] {
-        await(sut.createSession(amount, SaUtr("CS700100A"), journeyId))
+        await(sut.createSession(amount, SelfAssessmentOriginSpecificData(SaUtr("CS700100A")), journeyId))
       }
     }
   }

@@ -59,8 +59,7 @@ class LiveSessionController @Inject() (
             withValidJson[CreateSessionRequest] { createPaymentRequest =>
               openBankingService
                 .createSession(
-                  createPaymentRequest.amount,
-                  createPaymentRequest.saUtr,
+                  createPaymentRequest,
                   journeyId
                 )
                 .map(response => Ok(Json.toJson(response)))
