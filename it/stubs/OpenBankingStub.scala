@@ -3,7 +3,6 @@ package stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import eu.timepit.refined.auto._
-import openbanking.cor.model.SessionDataId
 import openbanking.cor.model.request.InitiateEmailSendRequest
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.{Assertion, Assertions}
@@ -199,7 +198,7 @@ object OpenBankingStub {
     )
 
   def verifyEmailSent(sessionDataId: String): Assertion = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val emailUrlString =
       s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
     verify(postRequestedFor(urlEqualTo(emailUrlString)))

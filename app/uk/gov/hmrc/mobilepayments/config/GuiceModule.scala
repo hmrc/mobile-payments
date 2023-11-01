@@ -17,15 +17,14 @@
 package uk.gov.hmrc.mobilepayments.config
 
 import com.google.inject.name.Names.named
-import com.google.inject.{AbstractModule, TypeLiteral}
+import com.google.inject.AbstractModule
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.CorePost
 import uk.gov.hmrc.mobilepayments.controllers.api.ApiAccess
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class GuiceModule(
   environment:   Environment,
@@ -65,17 +64,6 @@ class GuiceModule(
     bind(classOf[String])
       .annotatedWith(named("payments"))
       .toInstance(servicesConfig.baseUrl("payments"))
-  }
-
-  private def bindConfigStringSeq(path: String): Unit = {
-    val configValue: Seq[String] = configuration
-      .getOptional[Seq[String]](path)
-      .getOrElse(
-        throw new RuntimeException(s"""Config property "$path" missing""")
-      )
-    bind(new TypeLiteral[Seq[String]] {})
-      .annotatedWith(named(path))
-      .toInstance(configValue)
   }
 
   private def bindConfigInt(path: String): Unit =

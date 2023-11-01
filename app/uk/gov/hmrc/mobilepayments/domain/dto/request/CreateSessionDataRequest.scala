@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.domain.dto.request
 
-import payapi.corcommon.model.{SearchOptions, TaxType}
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import play.api.libs.json._
 import uk.gov.hmrc.domain.SaUtr
 

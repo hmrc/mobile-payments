@@ -6,14 +6,15 @@
   "searchOptions": {
     "searchScope": "PTA",
     "searchTag": "CS700100A"
-
   },
   "sessionState": {
     "bankId": "a-bank-id",
     "paymentId": "89731289321893218923",
-    "paymentUrl": "https://url.com"
+    "paymentUrl": "https://url.com",
+    "dateFinalised": "2023-10-03",
+    "timeFinalised": "10:20:30"
   },
-  "createdOn": "2021-11-03T10:15:30",
+  "createdOn": "2023-10-03T10:15:30",
   "originSpecificData": {
     "saUtr": "CS700100A",
     "origin": "AppSa"
