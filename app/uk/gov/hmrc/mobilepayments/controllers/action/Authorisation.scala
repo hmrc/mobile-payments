@@ -28,7 +28,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Authorisation extends Results with AuthorisedFunctions {
@@ -41,7 +40,11 @@ trait Authorisation extends Results with AuthorisedFunctions {
   lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
   lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
 
-  def grantAccess(requestedUtr: Option[String])(implicit hc: HeaderCarrier): Future[Boolean] =
+  def grantAccess(
+    requestedUtr: Option[String]
+  )(implicit hc:  HeaderCarrier,
+    ec:           ExecutionContext
+  ): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
       .retrieve(confidenceLevel and allEnrolments) {
         case foundConfidenceLevel ~ enrolments =>
@@ -55,9 +58,10 @@ trait Authorisation extends Results with AuthorisedFunctions {
       }
 
   def invokeAuthBlock[A](
-    request: Request[A],
-    block:   Request[A] => Future[Result],
-    saUtr:   Option[String]
+    request:     Request[A],
+    block:       Request[A] => Future[Result],
+    saUtr:       Option[String]
+  )(implicit ec: ExecutionContext
   ): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
@@ -99,8 +103,9 @@ trait AccessControl extends HeaderValidator with Authorisation {
   def parser: BodyParser[AnyContent]
 
   def validateAcceptWithAuth(
-    rules: Option[String] => Boolean,
-    saUtr: Option[String] = None
+    rules:       Option[String] => Boolean,
+    saUtr:       Option[String] = None
+  )(implicit ec: ExecutionContext
   ): ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
 

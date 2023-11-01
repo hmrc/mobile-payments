@@ -6,7 +6,6 @@ import play.api.libs.ws.WSRequest
 import stubs.AuthStub._
 import stubs.OpenBankingStub._
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
-import uk.gov.hmrc.http.BadRequestException
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import utils.BaseISpec
@@ -137,7 +136,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[SessionDataResponse]
       parsedResponse.sessionDataId shouldEqual sessionDataId
@@ -156,7 +155,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 500
     }
 
@@ -168,7 +167,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 401
     }
 
@@ -180,7 +179,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 404
     }
 
@@ -190,7 +189,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 401
     }
 
@@ -202,7 +201,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 500
     }
 
@@ -213,7 +212,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.get)
+      val response = await(request.get())
       response.status shouldBe 521
     }
   }
@@ -262,7 +261,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId/clear-email?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.delete)
+      val response = await(request.delete())
       response.status shouldBe 204
     }
 
@@ -272,7 +271,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId/clear-email?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader)
-      val response = await(request.delete)
+      val response = await(request.delete())
       response.status shouldBe 401
     }
 
@@ -283,7 +282,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions/$sessionDataId/clear-email?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      val response = await(request.delete)
+      val response = await(request.delete())
       response.status shouldBe 521
     }
   }

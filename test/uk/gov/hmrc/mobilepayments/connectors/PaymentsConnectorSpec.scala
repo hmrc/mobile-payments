@@ -37,32 +37,32 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   "getSelfAssessmentPayments" should {
     "return payments if successful" in {
       performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).right.get.get.payments.size shouldBe 3
+      await(sut.getSelfAssessmentPayments(utr, journeyId)).toOption.get.get.payments.size shouldBe 3
     }
 
     "return None on NotFoundException" in {
       performUnsuccessfulGET(new NotFoundException("not found"))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).right.get shouldBe None
+      await(sut.getSelfAssessmentPayments(utr, journeyId)).toOption.get shouldBe None
     }
 
     "return None on NOT_FOUND response" in {
       performSuccessfulGET(Future successful HttpResponse(NOT_FOUND, ""))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).right.get shouldBe None
+      await(sut.getSelfAssessmentPayments(utr, journeyId)).toOption.get shouldBe None
     }
 
     "return Error on BAD_REQUEST Response" in {
       performSuccessfulGET(Future successful HttpResponse(BAD_REQUEST, ""))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).left.get shouldBe "invalid request sent"
+      await(sut.getSelfAssessmentPayments(utr, journeyId)).swap.getOrElse("") shouldBe "invalid request sent"
     }
 
     "return Error on Unknown response" in {
       performSuccessfulGET(Future successful HttpResponse(OK, "{unknownValue: \"\"}"))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).left.get shouldBe "unable to parse data from payment api"
+      await(sut.getSelfAssessmentPayments(utr, journeyId)).swap.getOrElse("") shouldBe "unable to parse data from payment api"
     }
 
     "return Error on Exception" in {
       performUnsuccessfulGET(new InternalServerException("Internal Error"))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).left.get shouldBe "exception thrown from payment api"
+      await(sut.getSelfAssessmentPayments(utr, journeyId)).swap.getOrElse("") shouldBe "exception thrown from payment api"
     }
 
   }

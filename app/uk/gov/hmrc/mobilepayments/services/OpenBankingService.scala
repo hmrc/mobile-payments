@@ -18,18 +18,15 @@ package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
 import openbanking.cor.model._
-import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import play.api.libs.json.JsValue
-import play.api.mvc.Result
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, NotFoundException, UnauthorizedException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
 import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionRequest, SelfAssessmentOriginSpecificData, SetEmailRequest, SimpleAssessmentOriginSpecificData, TaxTypeEnum}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionRequest, SelfAssessmentOriginSpecificData, SimpleAssessmentOriginSpecificData, TaxTypeEnum}
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank, BankGroupData}
+import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData}
 
 import java.time.LocalDate
 import javax.inject.Named
@@ -53,36 +50,39 @@ class OpenBankingService @Inject() (
     }
 
   def createSession(
-                     request: CreateSessionRequest,
-                     journeyId: JourneyId
-                   )(implicit headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[CreateSessionDataResponse] = {
-     if (request.taxType.isDefined) {
-       request.taxType match {
-         case Some(TaxTypeEnum.appSelfAssessment) =>
-           (request.amountInPence, request.reference) match {
-             case (Some(amountInPence), Some(reference)) =>
-               connector.createSession(amountInPence, SelfAssessmentOriginSpecificData(SaUtr(reference)), journeyId)
-             case _ =>
-               throw new MalformedRequestException("Malformed Json")
-           }
-         case Some(TaxTypeEnum.appSimpleAssessment) =>
-           (request.amountInPence, request.reference) match {
-             case (Some(amountInPence), Some(reference)) =>
-               connector.createSession(amountInPence, SimpleAssessmentOriginSpecificData(reference), journeyId)
-             case _ =>
-               throw new MalformedRequestException("Malformed Json")
-           }
-         case _ =>
-           throw new BadRequestException("Incorrect Tax Type returned")
+    request:                CreateSessionRequest,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[CreateSessionDataResponse] =
+    if (request.taxType.isDefined) {
+      request.taxType match {
+        case Some(TaxTypeEnum.appSelfAssessment) =>
+          (request.amountInPence, request.reference) match {
+            case (Some(amountInPence), Some(reference)) =>
+              connector.createSession(amountInPence, SelfAssessmentOriginSpecificData(SaUtr(reference)), journeyId)
+            case _ =>
+              throw new MalformedRequestException("Malformed Json")
+          }
+        case Some(TaxTypeEnum.appSimpleAssessment) =>
+          (request.amountInPence, request.reference) match {
+            case (Some(amountInPence), Some(reference)) =>
+              connector.createSession(amountInPence, SimpleAssessmentOriginSpecificData(reference), journeyId)
+            case _ =>
+              throw new MalformedRequestException("Malformed Json")
+          }
+        case _ =>
+          throw new BadRequestException("Incorrect Tax Type returned")
 
-       }
-     } else {
-       (request.amount, request.saUtr) match {
-         case (Some(amount), Some(saUtr)) => connector.createSession(BigDecimal((amount * 100).longValue()), SelfAssessmentOriginSpecificData(saUtr), journeyId)
-         case _ => throw new MalformedRequestException("Malformed Json")
-       }
-     }
-  }
+      }
+    } else {
+      (request.amount, request.saUtr) match {
+        case (Some(amount), Some(saUtr)) =>
+          connector
+            .createSession(BigDecimal((amount * 100).longValue), SelfAssessmentOriginSpecificData(saUtr), journeyId)
+        case _ => throw new MalformedRequestException("Malformed Json")
+      }
+    }
 
   def getSession(
     sessionDataId:          String,

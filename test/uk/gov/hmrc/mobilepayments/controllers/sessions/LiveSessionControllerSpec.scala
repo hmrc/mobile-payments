@@ -22,12 +22,11 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
-import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionRequest, OriginSpecificData}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.CreateSessionRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
@@ -251,7 +250,7 @@ class LiveSessionControllerSpec
     "return 201" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSetEmail(Future successful Unit)
+      mockSetEmail(Future successful ())
 
       val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -324,7 +323,7 @@ class LiveSessionControllerSpec
     "return 204" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockClearEmail(Future successful Unit)
+      mockClearEmail(Future successful ())
 
       val request =
         FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email").withHeaders(acceptJsonHeader)

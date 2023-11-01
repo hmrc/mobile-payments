@@ -124,7 +124,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 201" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSelectBank(Future successful Unit)
+      mockSelectBank(Future successful ())
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
         .withHeaders(acceptJsonHeader, contentHeader)

@@ -19,7 +19,7 @@ package uk.gov.hmrc.mobilepayments.domain
 import play.api.libs.json.{JsNumber, Json, Reads, Writes}
 
 final case class AmountInPence(amountInPounds: BigDecimal) {
-  def value: Long = (amountInPounds * 100).longValue()
+  def value: Long = (amountInPounds * 100).longValue
 }
 
 object AmountInPence {

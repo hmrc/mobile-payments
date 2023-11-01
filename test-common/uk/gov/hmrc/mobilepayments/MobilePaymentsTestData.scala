@@ -19,9 +19,9 @@ package uk.gov.hmrc.mobilepayments
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, CreateSessionRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.CreateSessionRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
-import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, Payment, PaymentRecordListFromApi, Shuttering}
+import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, PaymentRecordListFromApi, Shuttering}
 
 import java.time.LocalDate
 import scala.io.Source
@@ -126,7 +126,7 @@ trait MobilePaymentsTestData {
 
   private def json(fileName: String): String = {
     val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")
-    val raw    = source.getLines.mkString
+    val raw    = source.getLines().mkString
     source.close()
     raw
   }

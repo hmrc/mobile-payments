@@ -29,7 +29,7 @@ import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{OriginSpecificData, SelfAssessmentOriginSpecificData, SimpleAssessmentOriginSpecificData}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.OpenBankingPaymentStatusResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
-import uk.gov.hmrc.mobilepayments.domain.{AmountInPence, Bank}
+import uk.gov.hmrc.mobilepayments.domain.Bank
 
 import java.time.LocalDate
 import scala.concurrent.duration._
@@ -39,7 +39,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
   private val amount:        BigDecimal           = 102.85
-  private val amountInPence: BigDecimal           = (amount * 100).longValue()
+  private val amountInPence: BigDecimal           = (amount * 100).longValue
   private val saUtr:         SaUtr                = SaUtr("CS700100A")
   private val bankId:        String               = "asd-123"
   private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
@@ -259,6 +259,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return session" in {
       mockSession(Future successful sessionPaymentFinishedDataResponse)
 
+      println("DATA = " + sessionPaymentFinishedDataResponse)
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amount shouldEqual BigDecimal.valueOf(125.64)
