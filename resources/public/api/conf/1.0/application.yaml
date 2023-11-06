@@ -720,21 +720,25 @@ paths:
                   - example:
                       sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
                       amount: 125.64
+                      amountInPence: 12564
                       bankId: some-bank-id
                       state: PaymentFinalised
                       paymentDate: 2021-12-01
                       createdOn: 2021-11-03T10:15:30
                       saUtr: CS700100A
+                      reference: CS700100AK
               examples:
                 example-8:
                   value:
                     sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
                     amount: 125.64
+                    amountInPence: 12564
                     bankId: some-bank-id
                     state: PaymentFinalised
                     paymentDate: 2021-12-01
                     createdOn: 2021-11-03T10:15:30
                     saUtr: CS700100A
+                    reference: CS700100AK
       deprecated: false
       security:
         - userRestricted:
@@ -1139,17 +1143,17 @@ components:
       title: MobilePaymentsSessionsresponse1
       required:
         - sessionDataId
-        - amount
         - bankId
         - state
         - paymentDate
         - createdOn
-        - saUtr
       type: object
       properties:
         sessionDataId:
           type: string
         amount:
+          type: number
+        amountInPence:
           type: number
         bankId:
           type: string
@@ -1161,14 +1165,18 @@ components:
           type: string
         saUtr:
           type: string
+        reference:
+          type: string
       example:
         sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
         amount: 125.64
+        amountInPence: 12564
         bankId: some-bank-id
         state: PaymentFinalised
         paymentDate: 2021-12-01
         createdOn: 2021-11-03T10:15:30
         saUtr: CS700100A
+        reference: CS700100AK
     MobilePaymentsSessionsSetEmailrequest:
       title: MobilePaymentsSessionsSetEmailrequest
       required:

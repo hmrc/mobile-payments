@@ -178,10 +178,12 @@ class LiveSessionControllerSpec
       status(result) shouldBe 200
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
-      response.amount shouldEqual 125.64
+      response.amount.get shouldEqual 125.64
+      response.amountInPence.get shouldEqual 12564
       response.bankId shouldEqual Some("some-bank-id")
       response.paymentDate shouldEqual None
-      response.saUtr.value shouldEqual "CS700100A"
+      response.saUtr.get.value shouldEqual "CS700100A"
+      response.reference.get shouldEqual "CS700100AK"
     }
   }
 
@@ -198,10 +200,12 @@ class LiveSessionControllerSpec
       status(result) shouldBe 200
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
-      response.amount shouldEqual 125.64
+      response.amount.get shouldEqual 125.64
+      response.amountInPence.get shouldEqual 12564
       response.bankId shouldEqual Some("some-bank-id")
       response.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
-      response.saUtr.value shouldEqual "CS700100A"
+      response.saUtr.get.value shouldEqual "CS700100A"
+      response.reference.get shouldEqual "CS700100AK"
       response.email.get shouldEqual ("test@test.com")
     }
   }

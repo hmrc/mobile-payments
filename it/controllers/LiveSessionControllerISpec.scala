@@ -37,7 +37,9 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
-      val response = await(request.post(Json.obj("amountInPence" -> 1200, "reference" -> "CS700100A","taxType" -> "appSelfAssessment")))
+      val response = await(
+        request.post(Json.obj("amountInPence" -> 1200, "reference" -> "CS700100A", "taxType" -> "appSelfAssessment"))
+      )
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[CreateSessionDataResponse]
       parsedResponse.sessionDataId.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
@@ -51,7 +53,9 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val request: WSRequest = wsUrl(
         s"/sessions?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
-      val response = await(request.post(Json.obj("amountInPence" -> 1200, "reference" -> "CS700100A", "taxType" -> "appSimpleAssessment")))
+      val response = await(
+        request.post(Json.obj("amountInPence" -> 1200, "reference" -> "CS700100A", "taxType" -> "appSimpleAssessment"))
+      )
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[CreateSessionDataResponse]
       parsedResponse.sessionDataId.value shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
@@ -140,10 +144,12 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[SessionDataResponse]
       parsedResponse.sessionDataId shouldEqual sessionDataId
-      parsedResponse.amount shouldEqual 125.64
+      parsedResponse.amount.get shouldEqual 125.64
+      parsedResponse.amountInPence.get shouldEqual 12564
       parsedResponse.bankId shouldEqual Some("a-bank-id")
       parsedResponse.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
-      parsedResponse.saUtr.value shouldEqual "CS700100A"
+      parsedResponse.saUtr.get.value shouldEqual "CS700100A"
+      parsedResponse.reference.get shouldEqual "CS700100AK"
       parsedResponse.email.get shouldEqual "test@test.com"
     }
 
