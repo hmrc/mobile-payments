@@ -95,8 +95,14 @@ trait MobilePaymentsTestData {
   lazy val payApiPayByCardResponse: PayApiPayByCardResponse =
     Json.fromJson[PayApiPayByCardResponse](js("pay-api-pay-by-card-response")).get
 
+  lazy val payApiPayByCardSimpleAssessmentResponse: PayApiPayByCardResponse =
+    Json.fromJson[PayApiPayByCardResponse](js("pay-api-by-card-simple-assessment-response")).get
+
   lazy val payByCardResponse: PayByCardResponse =
     Json.fromJson[PayByCardResponse](js("pay-by-card-response")).get
+
+  lazy val payByCardSimpleAssessmentResponse: PayByCardResponse =
+    Json.fromJson[PayByCardResponse](js("pay-by-card-simple-assessment-response")).get
 
   def paymentsResponseString(date: String = LocalDate.now().toString): String =
     json(("payments-response")).replace("<DATE>", date)
@@ -108,17 +114,18 @@ trait MobilePaymentsTestData {
       )
       .get
 
-  lazy val rawMalformedJson:                        String = "{\"data\": [{,]}"
-  lazy val banksResponseJson:                       String = json("banks-response")
-  lazy val sessionDataResponseJson:                 String = json("session-data-initiated-response")
-  lazy val createSessionDataResponseJson:           String = json("create-session-data-response")
-  lazy val sessionDataBankSelectedResponseJson:     String = json("session-data-bank-selected-response")
-  lazy val sessionDataPaymentFinalisedResponseJson: String = json("session-data-payment-finalised-response")
-  lazy val createPaymentRequestJson:                String = json("create-payment-request")
-  lazy val paymentInitiatedResponseJson:            String = json("payment-initiated-response")
-  lazy val paymentInitiatedUpdateResponseJson:      String = json("payment-initiated-update-response")
-  lazy val paymentStatusResponseJson:               String = json("payment-status-ob-response")
-  lazy val payApiPayByCardResponseJson:             String = json("pay-api-pay-by-card-response")
+  lazy val rawMalformedJson:                            String = "{\"data\": [{,]}"
+  lazy val banksResponseJson:                           String = json("banks-response")
+  lazy val sessionDataResponseJson:                     String = json("session-data-initiated-response")
+  lazy val createSessionDataResponseJson:               String = json("create-session-data-response")
+  lazy val sessionDataBankSelectedResponseJson:         String = json("session-data-bank-selected-response")
+  lazy val sessionDataPaymentFinalisedResponseJson:     String = json("session-data-payment-finalised-response")
+  lazy val createPaymentRequestJson:                    String = json("create-payment-request")
+  lazy val paymentInitiatedResponseJson:                String = json("payment-initiated-response")
+  lazy val paymentInitiatedUpdateResponseJson:          String = json("payment-initiated-update-response")
+  lazy val paymentStatusResponseJson:                   String = json("payment-status-ob-response")
+  lazy val payApiPayByCardResponseJson:                 String = json("pay-api-pay-by-card-response")
+  lazy val payApiPayByCardSimpleAssessmentResponseJson: String = json("pay-api-by-card-simple-assessment-response")
 
   lazy val sessionDataPaymentFinalisedEmailSentResponseJson: String = json(
     "session-data-payment-finalised-email-sent-response"

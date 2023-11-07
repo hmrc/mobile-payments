@@ -22,7 +22,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       grantAccess()
       stubForShutteringDisabled
       stubForInitiatePayment(response = paymentInitiatedResponseJson)
-      stubForGetSession(response      = sessionDataBankSelectedResponseJson)
+      stubForGetSession(response = sessionDataBankSelectedResponseJson)
 
       val request: WSRequest = wsUrl(
         s"/payments/$sessionDataId?journeyId=$journeyId"
@@ -309,7 +309,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         grantAccess()
         stubForShutteringDisabled
         stubForGetPaymentStatus(response = paymentStatusResponseJson)
-        stubForGetSession(response       = sessionDataPaymentFinalisedResponseJson)
+        stubForGetSession(response = sessionDataPaymentFinalisedResponseJson)
         stubForSendEmail()
         stubForSetEmailSentFlag()
 
@@ -327,7 +327,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         grantAccess()
         stubForShutteringDisabled
         stubForGetPaymentStatus(response = paymentStatusResponseJson)
-        stubForGetSession(response       = sessionDataPaymentFinalisedEmailSentResponseJson)
+        stubForGetSession(response = sessionDataPaymentFinalisedEmailSentResponseJson)
         stubForSendEmail()
         stubForSetEmailSentFlag()
 
@@ -424,7 +424,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.get())
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[LatestPaymentsResponse]
-      parsedResponse.payments.size               shouldBe 1
+      parsedResponse.payments.size shouldBe 1
       parsedResponse.payments.head.date.toString shouldBe LocalDate.now().toString
       parsedResponse.payments.head.amountInPence shouldBe 11100
 
@@ -615,6 +615,94 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         s"/payments/pay-by-card/$utr?journeyId=$journeyId"
       ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
       val response = await(request.post(Json.obj("amountInPence" -> 100000)))
+      response.status shouldBe 521
+    }
+  }
+
+  "GET /payments/pay-by-card" should {
+    "return 200 with the pay by card url without the domain prefix when the taxType is set to appSelfAssessment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(200, payApiPayByCardResponseJson)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader, sessionIdHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSelfAssessment", "reference" -> utr)))
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
+      parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=83303543"
+
+    }
+
+    "return 200 with the pay by card url without the domain prefix when the taxType is set to appSimpleAssessment" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCardSimpleAssessment(200, payApiPayByCardSimpleAssessmentResponseJson)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader, sessionIdHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> "12345678")))
+      response.status shouldBe 200
+      val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
+      parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=12345678"
+    }
+
+    "return 404 when a 404 is returned from payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCardSimpleAssessment(404)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> utr)))
+      response.status shouldBe 404
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> utr)))
+      response.status shouldBe 401
+    }
+
+    "return 401 when a 401 is returned from payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(401)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSelfAssessment", "reference" -> utr)))
+      response.status shouldBe 401
+    }
+
+    "return 500 when unknown error 500 returned from payments" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForPayByCard(500)
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSelfAssessment", "reference" -> utr)))
+      response.status shouldBe 500
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/payments/pay-by-card/?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSelfAssessment", "reference" -> utr)))
       response.status shouldBe 521
     }
   }

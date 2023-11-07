@@ -22,9 +22,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
+import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequest, TaxTypeEnum}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardRequestGeneric
 
 import scala.concurrent.{Await, Future}
 
@@ -84,6 +87,57 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   }
 
+  "when getPayByCardUrlGeneric invoked with self assessment and connector returns success with URL then" should {
+    "return pay by card URL" in {
+      mockPayByCardUrl(Future successful PayApiPayByCardResponse("/payByCard"))
+
+      val result = Await.result(sut.getPayByCardUrlGeneric(
+        PayByCardRequestGeneric(2000,Some(TaxTypeEnum.appSelfAssessment),reference = Some(saUtr.value)), journeyId), 0.5.seconds)
+      result.payByCardUrl shouldBe "/payByCard"
+    }
+
+    "return an error when connector fails" in {
+      mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        Await.result(sut.getPayByCardUrlGeneric(
+          PayByCardRequestGeneric(2000,Some(TaxTypeEnum.appSelfAssessment),reference = Some(saUtr.value)), journeyId), 0.5.seconds)
+      }
+    }
+
+    "return a Malformed Request Exception when the reference isn't sent with the request" in {
+      intercept[MalformedRequestException]{
+        Await.result(sut.getPayByCardUrlGeneric(
+          PayByCardRequestGeneric(2000, Some(TaxTypeEnum.appSelfAssessment)), journeyId), 0.5.seconds)
+      }
+
+    }
+
+  }
+
+  "when getPayByCardUrlGeneric invoked with simple assessment and connector returns success with URL then" should {
+    "return pay by card URL" in {
+      mockPayCardUrlSimpleAssessment(Future successful PayApiPayByCardResponse("/payByCard"))
+
+      val result = Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000, Some(TaxTypeEnum.appSimpleAssessment), taxYear = Some(2023), reference = Some("CS700100A")), journeyId), 0.5.seconds)
+      result.payByCardUrl shouldBe "/payByCard"
+    }
+
+    "return an error when connector fails" in {
+      mockPayCardUrlSimpleAssessment(Future failed UpstreamErrorResponse("Error", 400, 400))
+
+      intercept[UpstreamErrorResponse] {
+        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000, Some(TaxTypeEnum.appSimpleAssessment), taxYear = Some(2023), reference = Some("CS700100A")), journeyId), 0.5.seconds)
+      }
+    }
+
+    "return a Malformed Request Exception when the TaxYear isn't sent with the request" in {
+      intercept[MalformedRequestException] {
+        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000, Some(TaxTypeEnum.appSimpleAssessment), reference = Some("CS700100A")), journeyId), 0.5.seconds)
+      }
+    }
+  }
+
   private def mockLatestPayments(future: Future[Either[String, Option[PaymentRecordListFromApi]]]): Unit =
     (mockConnector
       .getSelfAssessmentPayments(_: String, _: JourneyId)(_: HeaderCarrier))
@@ -95,5 +149,13 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       .getPayByCardUrl(_: Long, _: SaUtr, _: JourneyId)(_: HeaderCarrier))
       .expects(*, *, journeyId, hc)
       .returning(future)
+
+  private def mockPayCardUrlSimpleAssessment(future: Future[PayApiPayByCardResponse]) : Unit =
+    (mockConnector.
+      getPayByCardUrlSimpleAssessment(_: Long, _: String, _: Int, _: JourneyId)(_: HeaderCarrier))
+      .expects(*,*,*,journeyId, hc)
+      .returning(future)
+
+
 
 }

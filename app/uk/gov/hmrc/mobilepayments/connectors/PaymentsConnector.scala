@@ -22,6 +22,7 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
 import uk.gov.hmrc.mobilepayments.domain.dto.request.PayApiPayByCardRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardAPISimpleAssessmentRequest
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -73,6 +74,17 @@ class PaymentsConnector @Inject() (
     http.POST[PayApiPayByCardRequest, PayApiPayByCardResponse](
       url = s"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}",
       PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl)
+    )
+
+  def getPayByCardUrlSimpleAssessment(
+      amount: Long,
+      reference: String,
+      taxYear: Int,
+      journeyId: JourneyId
+    )(implicit headerCarrier: HeaderCarrier) : Future[PayApiPayByCardResponse] =
+    http.POST[PayByCardAPISimpleAssessmentRequest,PayApiPayByCardResponse](
+      url = s"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}",
+      PayByCardAPISimpleAssessmentRequest(reference, reference, taxYear, amount, returnUrl, backUrl)
     )
 
 }
