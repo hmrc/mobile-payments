@@ -21,8 +21,7 @@ import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
-import uk.gov.hmrc.mobilepayments.domain.dto.request.PayApiPayByCardRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardAPISimpleAssessmentRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayApiPayByCardRequest, PayByCardAPISimpleAssessmentRequest}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 

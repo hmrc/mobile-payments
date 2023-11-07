@@ -26,8 +26,7 @@ import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequest, TaxTypeEnum}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardRequestGeneric
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequest, PayByCardRequestGeneric, TaxTypeEnum}
 
 import scala.concurrent.{Await, Future}
 
@@ -91,8 +90,7 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return pay by card URL" in {
       mockPayByCardUrl(Future successful PayApiPayByCardResponse("/payByCard"))
 
-      val result = Await.result(sut.getPayByCardUrlGeneric(
-        PayByCardRequestGeneric(2000,Some(TaxTypeEnum.appSelfAssessment),reference = Some(saUtr.value)), journeyId), 0.5.seconds)
+      val result = Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,Some(TaxTypeEnum.appSelfAssessment),reference = Some(saUtr.value)), journeyId), 0.5.seconds)
       result.payByCardUrl shouldBe "/payByCard"
     }
 
@@ -104,15 +102,12 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
           PayByCardRequestGeneric(2000,Some(TaxTypeEnum.appSelfAssessment),reference = Some(saUtr.value)), journeyId), 0.5.seconds)
       }
     }
-
     "return a Malformed Request Exception when the reference isn't sent with the request" in {
       intercept[MalformedRequestException]{
         Await.result(sut.getPayByCardUrlGeneric(
           PayByCardRequestGeneric(2000, Some(TaxTypeEnum.appSelfAssessment)), journeyId), 0.5.seconds)
       }
-
     }
-
   }
 
   "when getPayByCardUrlGeneric invoked with simple assessment and connector returns success with URL then" should {
@@ -155,7 +150,4 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       getPayByCardUrlSimpleAssessment(_: Long, _: String, _: Int, _: JourneyId)(_: HeaderCarrier))
       .expects(*,*,*,journeyId, hc)
       .returning(future)
-
-
-
 }

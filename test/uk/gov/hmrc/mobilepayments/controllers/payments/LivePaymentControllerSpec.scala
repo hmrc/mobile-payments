@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardRequestGeneric
+import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequestGeneric
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}

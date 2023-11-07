@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment
+package uk.gov.hmrc.mobilepayments.domain.dto.request
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
 
-case class PayByCardRequestGeneric(amountInPence: Long, taxType: Option[TaxTypeEnum.Value] = None, taxYear: Option[Int] = None, reference: Option[String] = None)
+case class PayByCardRequestGeneric(
+   amountInPence:                       Long,
+   taxType: Option[TaxTypeEnum.Value] = None,
+   taxYear: Option[Int] =               None,
+   reference: Option[String] =          None)
 
 object PayByCardRequestGeneric {
-
   implicit val format:Format[PayByCardRequestGeneric] = Json.format[PayByCardRequestGeneric]
-
 }

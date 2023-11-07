@@ -25,8 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardRequestGeneric
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequest, PayByCardRequestGeneric}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController

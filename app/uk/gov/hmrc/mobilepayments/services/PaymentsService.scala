@@ -21,8 +21,7 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
 import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
-import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
-import uk.gov.hmrc.mobilepayments.domain.dto.request.simpleAssessment.PayByCardRequestGeneric
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequestGeneric, TaxTypeEnum}
 import uk.gov.hmrc.mobilepayments.domain.{Payment, PaymentRecordListFromApi}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId

@@ -24,7 +24,7 @@ final case class PayApiPayByCardRequest(
   utr:                                    String,
   amountInPence:                          Long,
   @Named("payByCardReturnUrl") returnUrl: String,
-  @Named("payByCardBackUrl") backUrl: String)
+  @Named("payByCardBackUrl") backUrl:     String)
 
 object PayApiPayByCardRequest {
   implicit val format: OFormat[PayApiPayByCardRequest] = Json.format[PayApiPayByCardRequest]
