@@ -527,8 +527,8 @@ class LivePaymentControllerSpec
 
   private def stubPaymentEvent() =
     (mockAuditService
-      .sendPaymentEvent(_: BigDecimal, _: SaUtr, _: String)(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *, *)
+      .sendPaymentEvent(_: Option[BigDecimal], _: Option[SaUtr], _: Option[String], _: String)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *, *)
       .returning(Future successful Success)
 
   private def mockGetUrlConsumed(f: Future[UrlConsumedResponse]) =

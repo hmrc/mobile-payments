@@ -37,16 +37,19 @@ import scala.concurrent.{Await, Future}
 
 class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
-  private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
-  private val amount:        BigDecimal           = 102.85
-  private val amountInPence: BigDecimal           = (amount * 100).longValue
-  private val saUtr:         SaUtr                = SaUtr("CS700100A")
-  private val bankId:        String               = "asd-123"
-  private val sessionDataId: String               = "51cc67d6-21da-11ec-9621-0242ac130002"
-  private val returnUrl:     String               = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
-  private val paymentUrl:    Uri                  = "https://some-bank.com?param=dosomething"
+  private val mockConnector:              OpenBankingConnector             = mock[OpenBankingConnector]
+  private val amount:                     BigDecimal                       = 102.85
+  private val amountInPence:              BigDecimal                       = (amount * 100).longValue
+  private val saUtr:                      SaUtr                            = SaUtr("CS700100A")
+  private val bankId:                     String                           = "asd-123"
+  private val sessionDataId:              String                           = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val returnUrl:                  String                           = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+  private val paymentUrl:                 Uri                              = "https://some-bank.com?param=dosomething"
   private val selfAssessmentSpecificData: SelfAssessmentOriginSpecificData = SelfAssessmentOriginSpecificData(saUtr)
-  private val simpleAssessmentSpecificData: SimpleAssessmentOriginSpecificData = SimpleAssessmentOriginSpecificData(saUtr.value)
+
+  private val simpleAssessmentSpecificData: SimpleAssessmentOriginSpecificData = SimpleAssessmentOriginSpecificData(
+    saUtr.value
+  )
 
   private val sut = new OpenBankingService(mockConnector, returnUrl)
 
@@ -98,7 +101,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   "Calling createSession with amount, saUtr and taxType set to appSelfAssessment" should {
     "return MalformedRequestException" in {
-      intercept[MalformedRequestException]{
+      intercept[MalformedRequestException] {
         Await.result(sut.createSession(createSessionIncorrectFieldsSA, journeyId), 0.5.seconds)
       }
     }
@@ -233,11 +236,13 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount shouldEqual BigDecimal.valueOf(125.64)
+      result.amount.get shouldEqual 125.64
+      result.amountInPence.get shouldEqual BigDecimal.valueOf(12564)
       result.bankId shouldEqual None
       result.state shouldEqual "SessionInitiated"
       result.paymentDate shouldEqual None
-      result.saUtr.value shouldEqual "CS700100A"
+      result.saUtr.get.value shouldEqual "CS700100A"
+      result.reference.get shouldEqual "CS700100AK"
     }
   }
 
@@ -247,11 +252,13 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount shouldEqual BigDecimal.valueOf(125.64)
+      result.amount.get shouldEqual 125.64
+      result.amountInPence.get shouldEqual 12564
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "BankSelected"
       result.paymentDate shouldEqual None
-      result.saUtr.value shouldEqual "CS700100A"
+      result.saUtr.get.value shouldEqual "CS700100A"
+      result.reference.get shouldEqual "CS700100AK"
     }
   }
 
@@ -259,14 +266,15 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return session" in {
       mockSession(Future successful sessionPaymentFinishedDataResponse)
 
-      println("DATA = " + sessionPaymentFinishedDataResponse)
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount shouldEqual BigDecimal.valueOf(125.64)
+      result.amount.get shouldEqual 125.64
+      result.amountInPence.get shouldEqual 12564
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "PaymentFinished"
       result.paymentDate shouldEqual Some(LocalDate.now())
-      result.saUtr.value shouldEqual "CS700100A"
+      result.saUtr.get.value shouldEqual "CS700100A"
+      result.reference.get shouldEqual "CS700100AK"
     }
   }
 
@@ -276,11 +284,13 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount shouldEqual BigDecimal.valueOf(125.64)
+      result.amount.get shouldEqual 125.64
+      result.amountInPence.get shouldEqual 12564
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "PaymentFinalised"
       result.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
-      result.saUtr.value shouldEqual "CS700100A"
+      result.saUtr.get.value shouldEqual "CS700100A"
+      result.reference.get shouldEqual "CS700100AK"
     }
   }
 
@@ -307,17 +317,16 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       .returning(future)
 
   private def mockCreateSessionSimpleAssessment(future: Future[CreateSessionDataResponse]): Unit =
-  (mockConnector
-    .createSession(_: BigDecimal, _: OriginSpecificData, _: JourneyId)(_: HeaderCarrier))
-    .expects(amountInPence, simpleAssessmentSpecificData, journeyId, hc)
-    .returning(future)
+    (mockConnector
+      .createSession(_: BigDecimal, _: OriginSpecificData, _: JourneyId)(_: HeaderCarrier))
+      .expects(amountInPence, simpleAssessmentSpecificData, journeyId, hc)
+      .returning(future)
 
   private def mockCreateSessionSelfAssessment(future: Future[CreateSessionDataResponse]): Unit =
     (mockConnector
       .createSession(_: BigDecimal, _: OriginSpecificData, _: JourneyId)(_: HeaderCarrier))
       .expects(amountInPence, selfAssessmentSpecificData, journeyId, hc)
       .returning(future)
-
 
   private def mockSelectBank(future: Future[HttpResponse]): Unit =
     (mockConnector

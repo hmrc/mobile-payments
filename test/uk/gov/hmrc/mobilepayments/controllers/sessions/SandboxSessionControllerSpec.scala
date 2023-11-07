@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData with ShutteringMock {
 
-  private val sessionDataId:   String          = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
@@ -81,9 +81,11 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
       response.state shouldEqual "BankSelected"
-      response.amount shouldEqual 125.64
+      response.amount.get shouldEqual 125.64
+      response.amountInPence.get shouldEqual 12564
       response.bankId shouldEqual Some("obie-barclays-personal")
-      response.saUtr.value shouldEqual "1555369056"
+      response.saUtr.get.value shouldEqual "1555369056"
+      response.reference.get shouldEqual "1555369056K"
     }
   }
 
@@ -99,9 +101,11 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       status(result) shouldBe 200
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
-      response.amount shouldEqual 125.64
+      response.amount.get shouldEqual 125.64
+      response.amountInPence.get shouldEqual 12564
       response.bankId shouldEqual Some("obie-barclays-personal")
-      response.saUtr.value shouldEqual "1555369056"
+      response.saUtr.get.value shouldEqual "1555369056"
+      response.reference.get shouldEqual "1555369056K"
       response.email.get shouldEqual "test@test.com"
       response.state shouldEqual "PaymentFinished"
     }

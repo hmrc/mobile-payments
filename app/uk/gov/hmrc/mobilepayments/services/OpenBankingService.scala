@@ -19,6 +19,7 @@ package uk.gov.hmrc.mobilepayments.services
 import com.google.inject.{Inject, Singleton}
 import openbanking.cor.model._
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import payapi.corcommon.model.Origins.AppSa
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
@@ -93,7 +94,10 @@ class OpenBankingService @Inject() (
     connector
       .getSession(sessionDataId, journeyId)
       .map { data: SessionData[OriginSpecificSessionData] =>
-        val ptaSa = data.originSpecificData.asInstanceOf[AppSaSessionData]
+        val maybeSaUtr =
+          if (data.originSpecificData.origin == AppSa)
+            Some(SaUtr(data.originSpecificData.asInstanceOf[AppSaSessionData].saUtr.value))
+          else None
 
         val bankId: Option[String] = data.sessionState match {
           case SessionInitiated => None
@@ -137,12 +141,14 @@ class OpenBankingService @Inject() (
 
         SessionDataResponse(
           sessionDataId = data._id.value,
-          amount        = data.amount.inPounds,
+          amount        = Some(data.amount.inPounds),
+          amountInPence = Some(data.amount.value),
           bankId        = bankId,
           state         = state,
           createdOn     = data.createdOn,
           paymentDate   = paymentDate,
-          saUtr         = SaUtr(ptaSa.saUtr.value),
+          saUtr         = maybeSaUtr,
+          reference     = Some(data.originSpecificData.paymentReference.value),
           email         = email,
           emailSent     = emailSent
         )

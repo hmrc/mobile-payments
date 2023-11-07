@@ -43,7 +43,7 @@ trait AuditStub extends MockFactory {
           "mobile-payments",
           "initiateOpenBankingPayment",
           "mobile-initiate-open-banking-payment",
-          obj("amount" -> amount, "utr" -> saUtr.utr, "journeyId" -> journeyId)
+          obj("amount" -> amount, "utr" -> saUtr.utr, "reference" -> saUtr.utr, "journeyId" -> journeyId)
         ),
         *,
         *

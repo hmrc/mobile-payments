@@ -37,10 +37,12 @@ Get Session
 {
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
   "amount": 125.64,
+  "amountInPence": 12564,
   "state": "BankSelected",
   "bankId": "some-bank-id",
   "createdOn": "2021-11-03T10:15:30",
-  "saUtr": "CS700100A"
+  "saUtr": "CS700100A",
+  "reference": "CS700100AK"
 }
 ```
 
@@ -49,11 +51,13 @@ Get Session
 {
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
   "amount": 125.64,
+  "amountInPence": 12564,
   "state": "PaymentFinalised",
   "bankId": "some-bank-id",
   "paymentDate": "2021-12-01",
   "createdOn": "2021-11-03T10:15:30",
-  "saUtr": "CS700100A"
+  "saUtr": "CS700100A",
+  "reference": "CS700100AK"
 }
 ```
 

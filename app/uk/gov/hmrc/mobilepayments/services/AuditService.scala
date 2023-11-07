@@ -34,8 +34,9 @@ class AuditService @Inject() (
   @Named("appName") val appName: String) {
 
   def sendPaymentEvent(
-    amount:           BigDecimal,
-    saUtr:            SaUtr,
+    amount:           Option[BigDecimal],
+    saUtr:            Option[SaUtr],
+    reference:        Option[String],
     journeyId:        String
   )(implicit hc:      HeaderCarrier,
     executionContext: ExecutionContext
@@ -47,8 +48,9 @@ class AuditService @Inject() (
         tags = hc.toAuditTags(AuditService.transactionName, AuditService.paymentPath),
         detail = obj(
           AuditService.journeyIdKey -> journeyId,
-          AuditService.utrKey       -> saUtr.utr,
-          AuditService.amountKey    -> AmountInPence(amount).value
+          AuditService.utrKey       -> saUtr.map(_.utr).getOrElse("").toString,
+          AuditService.referenceKey -> reference.getOrElse("").toString,
+          AuditService.amountKey    -> AmountInPence(amount.get).value
         )
       )
     )
@@ -59,6 +61,7 @@ class AuditService @Inject() (
     val transactionName  = "mobile-initiate-open-banking-payment"
     val amountKey        = "amount"
     val utrKey           = "utr"
+    val referenceKey     = "reference"
     val journeyIdKey     = "journeyId"
   }
 }
