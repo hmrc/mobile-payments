@@ -526,7 +526,7 @@ class LivePaymentControllerSpec
     "return 200" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockPayByCardUrlGeneric(Future successful payByCardSimpleAssessmentResponse)
+      mockPayByCardUrlGeneric(Future successful payByCardResponse)
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -535,7 +535,7 @@ class LivePaymentControllerSpec
       val result = sut.getPayByCardURLGeneric(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[PayByCardResponse]
-      response.payByCardUrl shouldBe "/pay/initiate-journey?traceId=12345678"
+      response.payByCardUrl shouldBe "/pay/choose-a-way-to-pay?traceId=12345678"
     }
   }
 
@@ -561,7 +561,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
       val result = sut.getPayByCardURLGeneric(journeyId)(request)
       status(result) shouldBe 401
@@ -574,7 +574,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
       val result = sut.getPayByCardURLGeneric(journeyId)(request)
       status(result) shouldBe 401
@@ -589,7 +589,7 @@ class LivePaymentControllerSpec
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
       val result = sut.getPayByCardURLGeneric(journeyId)(request)
       status(result) shouldBe 500

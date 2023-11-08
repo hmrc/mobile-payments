@@ -638,7 +638,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with the pay by card url without the domain prefix when the taxType is set to appSimpleAssessment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForPayByCardSimpleAssessment(200, payApiPayByCardSimpleAssessmentResponseJson)
+      stubForPayByCardSimpleAssessment(200, payApiPayByCardResponseJson)
 
       val request: WSRequest = wsUrl(
         s"/payments/pay-by-card?journeyId=$journeyId"
@@ -646,7 +646,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
       val response = await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> "12345678")))
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[PayByCardResponse]
-      parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=12345678"
+      parsedResponse.payByCardUrl shouldBe "/pay/initiate-journey?traceId=83303543"
     }
 
     "return 404 when a 404 is returned from payments" in {

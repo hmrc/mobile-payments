@@ -361,22 +361,21 @@ paths:
                 - $ref: '#/components/schemas/MobilePaymentsPaymentsPayByCardrequestGeneric'
                 - example:
                     amountInPence: 120000
-                    taxType: "appSimpleAssessment"
+                    taxType: appSimpleAssessment
                     taxYear: 2023
-                    reference: "123456"
+                    reference: CS700100A
             examples:
               example-simple-assessment:
                 value:
                   amountInPence: 120000
-                  taxType: "appSimpleAssessment"
+                  taxType: appSimpleAssessment
                   taxYear: 2023
-                  reference: "123456"
+                  reference: CS700100A
               example-self-assessment:
                 value:
                   amountInPence: 120000
-                  taxType: "appSelfAssessment"
-                  taxYear: 2023
-                  reference: "123456"
+                  taxType: appSelfAssessment
+                  reference: 123456
         required: true
       responses:
         '200':

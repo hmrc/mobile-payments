@@ -19,10 +19,10 @@ package uk.gov.hmrc.mobilepayments.domain.dto.request
 import play.api.libs.json.{Format, Json}
 
 case class PayByCardRequestGeneric(
-   amountInPence:                       Long,
-   taxType: Option[TaxTypeEnum.Value] = None,
-   taxYear: Option[Int] =               None,
-   reference: Option[String] =          None)
+  amountInPence: Long,
+  taxType:       TaxTypeEnum.Value,
+  taxYear:       Option[Int] = None,
+  reference:     String)
 
 object PayByCardRequestGeneric {
   implicit val format:Format[PayByCardRequestGeneric] = Json.format[PayByCardRequestGeneric]

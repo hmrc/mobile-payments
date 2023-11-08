@@ -70,22 +70,19 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
                             )(implicit executionContext: ExecutionContext,
                               headerCarrier: HeaderCarrier): Future[PayByCardResponse] = {
     request.taxType match {
-      case Some(TaxTypeEnum.appSelfAssessment) =>
+      case TaxTypeEnum.appSelfAssessment =>
         (request.amountInPence, request.reference) match {
-          case (amountInPence, Some(reference)) =>
+          case (amountInPence, reference) =>
             connector.getPayByCardUrl(amountInPence, SaUtr(reference), journeyId)
               .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
-          case _ => throw new MalformedRequestException("Malformed Json")
         }
-      case Some(TaxTypeEnum.appSimpleAssessment) =>
+      case TaxTypeEnum.appSimpleAssessment =>
         (request.reference, request.amountInPence, request.taxYear) match {
-          case(Some(reference), amountInPence, Some(taxYear)) =>
+          case (reference, amountInPence, Some(taxYear)) =>
             connector.getPayByCardUrlSimpleAssessment(amountInPence, reference, taxYear, journeyId)
             .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
-          case _ => throw new MalformedRequestException("Malformed Json")
+          case _ => throw new MalformedRequestException("Malformed Json: taxYear must also be provided")
         }
-      case _ => throw new BadRequestException("Incorrect Tax Type returned")
-
     }
   }
 
