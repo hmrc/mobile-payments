@@ -336,6 +336,70 @@ paths:
       security:
         - userRestricted:
             - read:native-apps-api-orchestration
+  /mobile/payments/payments/pay-by-card:
+    post:
+      tags:
+        - mobile
+      summary: Get a URL to complete payment journey through the web with pre-populated amount for simple assessment of self assessment
+      operationId: GetaURLtocompletepaymentjourneythroughthewebwithpre-populatedamountforsimpleassessmentorselfassessment
+      parameters:
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobilePaymentsPaymentsPayByCardrequestGeneric'
+                - example:
+                    amountInPence: 120000
+                    taxType: appSimpleAssessment
+                    taxYear: 2023
+                    reference: CS700100A
+            examples:
+              example-simple-assessment:
+                value:
+                  amountInPence: 120000
+                  taxType: appSimpleAssessment
+                  taxYear: 2023
+                  reference: CS700100A
+              example-self-assessment:
+                value:
+                  amountInPence: 120000
+                  taxType: appSelfAssessment
+                  reference: 123456
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsPayByCardresponse'
+                  - example:
+                      payByCardUrl: /pay/choose-a-way-to-pay?traceId=12345678
+              examples:
+                example-12:
+                  value:
+                    payByCardUrl: /pay/choose-a-way-to-pay?traceId=12345678
+        '404':
+          description: No recent payments were found
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
   /mobile/payments/payments/{sessionDataId}:
     get:
       tags:
@@ -1075,6 +1139,27 @@ components:
           format: int32
       example:
         amountInPence: 120000
+    MobilePaymentsPaymentsPayByCardrequestGeneric:
+      title: MobilePaymentsPaymentsPayByCardrequestGeneric
+      required:
+        - amountInPence
+      type: object
+      properties:
+        amountInPence:
+          type: integer
+          format: int32
+        taxType:
+          type: string
+        taxYear:
+          type: integer
+          format: int32
+        reference:
+          type: string
+      example:
+        amountInPence: 120000
+        taxType: appSimpleAssessment
+        taxYear: 2023
+        reference: CS700100A
     MobilePaymentsPaymentsPayByCardresponse:
       title: MobilePaymentsPaymentsPayByCardresponse
       required:

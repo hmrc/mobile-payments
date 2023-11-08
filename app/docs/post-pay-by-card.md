@@ -19,14 +19,6 @@ Post Pay By Card
 
   a string which is included for journey tracking purposes but has no functional impact
 
-* **Path Variables**
-
-  **Required:**
-
-  `/:utr`
-
-  the UTR of the user
-
 * **Body**
 
   **Required:**
@@ -36,7 +28,18 @@ Post Pay By Card
 
 ```json
 {
-  "amountInPence": 120000
+  "amountInPence": 120000,
+  "taxType": "appSelfAssessment",
+  "reference": "123456789"
+}
+```
+
+```json
+{
+  "amountInPence": 120000,
+  "taxType": "appSimpleAssessment",
+  "taxYear": 2023,
+  "reference": "123456789"
 }
 ```
 

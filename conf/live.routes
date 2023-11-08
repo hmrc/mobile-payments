@@ -1,6 +1,7 @@
 GET         /banks                                       uk.gov.hmrc.mobilepayments.controllers.banks.LiveBankController.getBanks(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 POST        /banks/:sessionDataId                        uk.gov.hmrc.mobilepayments.controllers.banks.LiveBankController.selectBank(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 
+POST        /payments/pay-by-card                        uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.getPayByCardURLGeneric(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 GET         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.getPaymentStatus(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 GET         /payments/:sessionDataId/url-consumed        uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.urlConsumed(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 POST        /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.createPayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
