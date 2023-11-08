@@ -65,17 +65,15 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
       .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
 
   def getPayByCardUrlGeneric(
-                              request: PayByCardRequestGeneric,
-                              journeyId: JourneyId
-                            )(implicit executionContext: ExecutionContext,
-                              headerCarrier: HeaderCarrier): Future[PayByCardResponse] = {
+    request:                   PayByCardRequestGeneric,
+    journeyId:                 JourneyId
+  )(implicit executionContext: ExecutionContext,
+    headerCarrier:             HeaderCarrier
+  ): Future[PayByCardResponse] = {
     request.taxType match {
       case TaxTypeEnum.appSelfAssessment =>
-        (request.amountInPence, request.reference) match {
-          case (amountInPence, reference) =>
-            connector.getPayByCardUrl(amountInPence, SaUtr(reference), journeyId)
-              .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
-        }
+            connector.getPayByCardUrl(request.amountInPence, SaUtr(request.reference), journeyId)
+            .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
       case TaxTypeEnum.appSimpleAssessment =>
         (request.reference, request.amountInPence, request.taxYear) match {
           case (reference, amountInPence, Some(taxYear)) =>
