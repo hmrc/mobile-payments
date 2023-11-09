@@ -85,11 +85,18 @@ class SandboxPaymentController @Inject() (
       }
     }
 
-  def latestPayments(
+  def latestPaymentsLegacy(
     utr:       String,
     journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      withErrorWrapper {
+        Future successful Ok(sampleLatestPaymentsJson)
+      }
+    }
+
+  def latestPayments(journeyId: JourneyId): Action[JsValue] =
+    validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       withErrorWrapper {
         Future successful Ok(sampleLatestPaymentsJson)
       }

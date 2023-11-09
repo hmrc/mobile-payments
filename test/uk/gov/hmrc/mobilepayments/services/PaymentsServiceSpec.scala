@@ -41,7 +41,9 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return successful payments made within the last 14 days" in {
       mockLatestPayments(Future successful Right(Some(paymentsResponse())))
 
-      val result = Await.result(sut.getLatestPayments(saUtr.value, journeyId), 0.5.seconds)
+      val result =
+        Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId),
+                     0.5.seconds)
       result.toOption.get.get.payments.size               shouldBe 1
       result.toOption.get.get.payments.head.amountInPence shouldBe 11100
     }
@@ -49,21 +51,21 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return None if no successful payments made within the last 14 days" in {
       mockLatestPayments(Future successful Right(Some(paymentsResponse("2022-05-01"))))
 
-      val result = Await.result(sut.getLatestPayments(saUtr.value, journeyId), 0.5.seconds)
+      val result = Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
       result.toOption.get shouldBe None
     }
 
     "return None if no payments made within the last 14 days" in {
       mockLatestPayments(Future successful Right(None))
 
-      val result = Await.result(sut.getLatestPayments(saUtr.value, journeyId), 0.5.seconds)
+      val result = Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
       result.toOption.get shouldBe None
     }
 
     "return Error if exception returned from PaymentsConnector" in {
       mockLatestPayments(Future successful Left("Error while calling pay api"))
 
-      val result = Await.result(sut.getLatestPayments(saUtr.value, journeyId), 0.5.seconds)
+      val result = Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
       result.swap.getOrElse("") shouldBe "Error while calling pay api"
     }
   }
@@ -129,8 +131,8 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private def mockLatestPayments(future: Future[Either[String, Option[PaymentRecordListFromApi]]]): Unit =
     (mockConnector
-      .getSelfAssessmentPayments(_: String, _: JourneyId)(_: HeaderCarrier))
-      .expects(*, journeyId, hc)
+      .getPayments(_: Option[String], _: Option[String], _: Option[TaxTypeEnum.Value], _: JourneyId)(_: HeaderCarrier))
+      .expects(*, *, *, journeyId, hc)
       .returning(future)
 
   private def mockPayByCardUrl(future: Future[PayApiPayByCardResponse]): Unit =

@@ -33,12 +33,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class PaymentsService @Inject() (connector: PaymentsConnector) {
 
   def getLatestPayments(
-    utr:                       String,
+    utr:                       Option[String],
+    reference:                 Option[String],
+    taxType:                   Option[TaxTypeEnum.Value],
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
   ): Future[Either[String, Option[LatestPaymentsResponse]]] =
-    connector.getSelfAssessmentPayments(utr, journeyId) map {
+    connector.getPayments(utr, reference, taxType, journeyId) map {
       case Right(payments) => {
         val recentPayments: List[Payment] =
           payments.map(paymentsList => filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsList)).getOrElse(List.empty)

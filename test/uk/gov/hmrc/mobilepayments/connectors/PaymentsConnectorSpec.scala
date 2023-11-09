@@ -23,6 +23,7 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
+import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
 import scala.concurrent.Future
@@ -34,35 +35,45 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   val sut = new PaymentsConnector(mockHttp, "baseUrl", "returnUrl", "backUrl")
   val utr = "12344566"
 
-  "getSelfAssessmentPayments" should {
-    "return payments if successful" in {
+  "getPayments" should {
+    "return self assessment payments with utr if successful" in {
       performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).toOption.get.get.payments.size shouldBe 3
+      await(sut.getPayments(Some(utr), None, None, journeyId)).toOption.get.get.payments.size shouldBe 3
+    }
+
+    "return self assessment payments if successful" in {
+      performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).toOption.get.get.payments.size shouldBe 3
+    }
+
+    "return simple assessment payments if successful" in {
+      performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
+      await(sut.getPayments(None, Some("p302Ref"), Some(TaxTypeEnum.appSimpleAssessment), journeyId)).toOption.get.get.payments.size shouldBe 3
     }
 
     "return None on NotFoundException" in {
       performUnsuccessfulGET(new NotFoundException("not found"))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).toOption.get shouldBe None
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).toOption.get shouldBe None
     }
 
     "return None on NOT_FOUND response" in {
       performSuccessfulGET(Future successful HttpResponse(NOT_FOUND, ""))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).toOption.get shouldBe None
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).toOption.get shouldBe None
     }
 
     "return Error on BAD_REQUEST Response" in {
       performSuccessfulGET(Future successful HttpResponse(BAD_REQUEST, ""))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).swap.getOrElse("") shouldBe "invalid request sent"
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap.getOrElse("") shouldBe "invalid request sent"
     }
 
     "return Error on Unknown response" in {
       performSuccessfulGET(Future successful HttpResponse(OK, "{unknownValue: \"\"}"))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).swap.getOrElse("") shouldBe "unable to parse data from payment api"
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap.getOrElse("") shouldBe "unable to parse data from payment api"
     }
 
     "return Error on Exception" in {
       performUnsuccessfulGET(new InternalServerException("Internal Error"))(mockHttp)
-      await(sut.getSelfAssessmentPayments(utr, journeyId)).swap.getOrElse("") shouldBe "exception thrown from payment api"
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap.getOrElse("") shouldBe "exception thrown from payment api"
     }
 
   }

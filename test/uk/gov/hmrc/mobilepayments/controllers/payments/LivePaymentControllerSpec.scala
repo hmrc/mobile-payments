@@ -28,6 +28,7 @@ import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequestGeneric
+import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
@@ -342,7 +343,7 @@ class LivePaymentControllerSpec
       val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
-      val result = sut.latestPayments(utr, journeyId)(request)
+      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[LatestPaymentsResponse]
       response.payments.size               shouldBe 2
@@ -360,7 +361,7 @@ class LivePaymentControllerSpec
       val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
-      val result = sut.latestPayments(utr, journeyId)(request)
+      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
       status(result) shouldBe 404
     }
   }
@@ -374,7 +375,7 @@ class LivePaymentControllerSpec
       val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
-      val result = sut.latestPayments(utr, journeyId)(request)
+      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
       status(result) shouldBe 500
     }
   }
@@ -386,7 +387,7 @@ class LivePaymentControllerSpec
       val request = FakeRequest("GET", "/payments/latest-payments/123123123")
         .withHeaders(acceptJsonHeader)
 
-      val result = sut.latestPayments("123123123", journeyId)(request)
+      val result = sut.latestPaymentsLegacy("123123123", journeyId)(request)
       status(result) shouldBe 403
 
     }
@@ -399,7 +400,7 @@ class LivePaymentControllerSpec
       val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
         .withHeaders(acceptJsonHeader)
 
-      val result = sut.latestPayments(utr, journeyId)(request)
+      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
       status(result) shouldBe 401
     }
   }
@@ -619,7 +620,8 @@ class LivePaymentControllerSpec
 
   private def stubPaymentEvent() =
     (mockAuditService
-      .sendPaymentEvent(_: Option[BigDecimal], _: Option[SaUtr], _: Option[String], _: String)(_: HeaderCarrier, _: ExecutionContext))
+      .sendPaymentEvent(_: Option[BigDecimal], _: Option[SaUtr], _: Option[String], _: String)(_: HeaderCarrier,
+                                                                                               _: ExecutionContext))
       .expects(*, *, *, *, *, *)
       .returning(Future successful Success)
 
@@ -643,8 +645,11 @@ class LivePaymentControllerSpec
 
   private def mockGetLatestPayments(future: Future[Either[String, Option[LatestPaymentsResponse]]]) =
     (mockPaymentsService
-      .getLatestPayments(_: String, _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
-      .expects(*, *, *, *)
+      .getLatestPayments(_: Option[String], _: Option[String], _: Option[TaxTypeEnum.Value], _: JourneyId)(
+        _: ExecutionContext,
+        _: HeaderCarrier
+      ))
+      .expects(*, *, *, *, *, *)
       .returning(future)
 
   private def mockPayByCardUrl(future: Future[PayByCardResponse]): Unit =

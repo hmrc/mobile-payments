@@ -570,6 +570,73 @@ paths:
       security:
         - userRestricted:
             - read:native-apps-api-orchestration
+  /mobile/payments/payments/latest-payments:
+    post:
+      tags:
+        - mobile
+      summary: Fetch the latest payments for a given tax type and reference.
+      operationId: Fetchthelatestpaymentsforagiventaxtypeandreference.
+      parameters:
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobilePaymentsLatestPaymentsRequest'
+                - example:
+                    reference: CS700100A
+                    taxType: appSimpleAssessment
+            examples:
+              simpleAssessmentRequest:
+                value:
+                  reference: CS700100A
+                  taxType: appSimpleAssessment
+              selfAssessmentRequest:
+                value:
+                  reference: D11223344
+                  taxType: appSelfAssessment
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MobilePaymentsPaymentsLatestPaymentsresponse'
+                  - example:
+                      payments:
+                        - amountInPence: 12000
+                          date: 2022-06-01
+                        - amountInPence: 74000
+                          date: 2022-06-07
+              examples:
+                example-10:
+                  value:
+                    payments:
+                      - amountInPence: 12000
+                        date: 2022-06-01
+                      - amountInPence: 74000
+                        date: 2022-06-07
+        '404':
+          description: No recent payments were found
+          headers: { }
+          content: { }
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
   /mobile/payments/payments/latest-payments/{utr}:
     get:
       tags:
@@ -1287,6 +1354,20 @@ components:
       example:
         amountInPence: 12000
         date: 2022-06-01
+    MobilePaymentsLatestPaymentsRequest:
+      title: MobilePaymentsLatestPaymentsrequest
+      required:
+        - taxType
+        - reference
+      type: object
+      properties:
+        taxType:
+          type: string
+        reference:
+          type: string
+      example:
+        taxType: appSelfAssessment
+        reference: A11332244
 tags:
   - name: mobile
     description: ''

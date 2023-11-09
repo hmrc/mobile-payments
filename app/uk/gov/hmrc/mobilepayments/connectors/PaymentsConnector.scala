@@ -21,7 +21,7 @@ import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayApiPayByCardRequest, PayByCardAPISimpleAssessmentRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.request._
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -38,14 +38,20 @@ class PaymentsConnector @Inject() (
 
   val logger = Logger(this.getClass)
 
-  def getSelfAssessmentPayments(
-    utr:                    String,
+  def getPayments(
+    utr:                    Option[String],
+    reference:              Option[String],
+    taxType:                Option[TaxTypeEnum.Value] = Some(TaxTypeEnum.appSelfAssessment),
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[Either[String, Option[PaymentRecordListFromApi]]] =
-    http.GET[HttpResponse](
-      url = s"$serviceUrl/pay-api/v2/payment/search/$utr?taxType=selfAssessment&journeyId=${journeyId.value}"
-    ) map { response =>
+  ): Future[Either[String, Option[PaymentRecordListFromApi]]] = {
+    val url = {
+      if (utr.isDefined)
+        s"$serviceUrl/pay-api/v2/payment/search/${utr.getOrElse("")}?taxType=selfAssessment&journeyId=${journeyId.value}"
+      else
+        s"$serviceUrl/pay-api/v2/payment/search/${reference.getOrElse("")}?taxType=${convertTaxTypeToPaymentsFormat(taxType.get)}&journeyId=${journeyId.value}"
+    }
+    http.GET[HttpResponse](url) map { response =>
       response.status match {
         case OK =>
           Try(response.json.as[PaymentRecordListFromApi]) match {
@@ -63,6 +69,7 @@ class PaymentsConnector @Inject() (
         Left("exception thrown from payment api")
       }
     }
+  }
 
   def getPayByCardUrl(
     amount:                 Long,
@@ -85,5 +92,11 @@ class PaymentsConnector @Inject() (
       url = s"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}",
       PayByCardAPISimpleAssessmentRequest(reference, reference, taxYear, amount, returnUrl, backUrl)
     )
+
+  private def convertTaxTypeToPaymentsFormat(taxType: TaxTypeEnum.Value): String =
+    taxType match {
+      case TaxTypeEnum.appSelfAssessment   => "selfAssessment"
+      case TaxTypeEnum.appSimpleAssessment => "simpleAssessment"
+    }
 
 }
