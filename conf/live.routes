@@ -2,11 +2,11 @@ GET         /banks                                       uk.gov.hmrc.mobilepayme
 POST        /banks/:sessionDataId                        uk.gov.hmrc.mobilepayments.controllers.banks.LiveBankController.selectBank(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 
 POST        /payments/pay-by-card                        uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.getPayByCardURLGeneric(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
-GET         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.getPaymentStatus(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+POST        /payments/latest-payments                 uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.latestPayments(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 GET         /payments/:sessionDataId/url-consumed        uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.urlConsumed(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
+GET         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.getPaymentStatus(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 POST        /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.createPayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 PUT         /payments/:sessionDataId                     uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.updatePayment(sessionDataId: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
-POST        /payments/latest-payments/v2                 uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.latestPayments(journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 GET         /payments/latest-payments/:utr               uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.latestPaymentsLegacy(utr: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 POST        /payments/pay-by-card/:utr                   uk.gov.hmrc.mobilepayments.controllers.payments.LivePaymentController.getPayByCardURL(utr: String, journeyId: uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId)
 
