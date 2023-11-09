@@ -5,7 +5,7 @@ Get Latest Payments
 
 * **URL**
 
-  `/payments/latest-payments/v2`
+  `/payments/latest-payments`
 
 * **Method:**
 

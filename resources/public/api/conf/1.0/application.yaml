@@ -570,7 +570,7 @@ paths:
       security:
         - userRestricted:
             - read:native-apps-api-orchestration
-  /mobile/payments/payments/latest-payments/v2:
+  /mobile/payments/payments/latest-payments:
     post:
       tags:
         - mobile
