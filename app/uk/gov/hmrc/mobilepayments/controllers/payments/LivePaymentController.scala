@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequest
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{LatestPaymentsRequest, PayByCardRequest}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -144,7 +144,7 @@ class LivePaymentController @Inject() (
       }
     }
 
-  def latestPayments(
+  def latestPaymentsLegacy(
     utr:       String,
     journeyId: JourneyId
   ): Action[AnyContent] =
@@ -153,10 +153,31 @@ class LivePaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-            paymentsService.getLatestPayments(utr, journeyId) map {
+            paymentsService.getLatestPayments(Some(utr), None, None, journeyId) map {
               case Right(None)     => NotFound
               case Right(payments) => Ok(Json.toJson(payments))
               case Left(e)         => InternalServerError(e)
+            }
+          }
+        }
+      }
+    }
+
+  def latestPayments(journeyId: JourneyId): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            withValidJson[LatestPaymentsRequest] { latestPaymentsRequest =>
+              paymentsService.getLatestPayments(None,
+                                                Some(latestPaymentsRequest.reference),
+                                                Some(latestPaymentsRequest.taxType),
+                                                journeyId) map {
+                case Right(None)     => NotFound
+                case Right(payments) => Ok(Json.toJson(payments))
+                case Left(e)         => InternalServerError(e)
+              }
             }
           }
         }

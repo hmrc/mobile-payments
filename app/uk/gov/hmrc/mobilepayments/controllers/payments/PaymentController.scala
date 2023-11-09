@@ -42,10 +42,14 @@ trait PaymentController {
     journeyId:     JourneyId
   ): Action[AnyContent]
 
-  def latestPayments(
+  def latestPaymentsLegacy(
     utr:       String,
     journeyId: JourneyId
   ): Action[AnyContent]
+
+  def latestPayments(
+    journeyId: JourneyId
+  ): Action[JsValue]
 
   def getPayByCardURL(
     utr:       String,

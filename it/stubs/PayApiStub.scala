@@ -11,12 +11,14 @@ object PayApiStub {
 
   def stubForGetPayments(
     statusCode: Int    = 200,
-    response:   String = "{}"
+    response:   String = "{}",
+    taxType:    String = "selfAssessment",
+    reference:  String = utr
   ): StubMapping =
     stubFor(
       get(
         urlEqualTo(
-          s"/pay-api/v2/payment/search/$utr?taxType=selfAssessment&journeyId=$journeyId"
+          s"/pay-api/v2/payment/search/$reference?taxType=$taxType&journeyId=$journeyId"
         )
       ).willReturn(
         aResponse()

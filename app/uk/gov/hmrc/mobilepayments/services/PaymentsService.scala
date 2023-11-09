@@ -20,6 +20,7 @@ import payapi.corcommon.model.PaymentStatuses.Successful
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
+import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
 import uk.gov.hmrc.mobilepayments.domain.{Payment, PaymentRecordListFromApi}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
@@ -31,12 +32,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class PaymentsService @Inject() (connector: PaymentsConnector) {
 
   def getLatestPayments(
-    utr:                       String,
+    utr:                       Option[String],
+    reference:                 Option[String],
+    taxType:                   Option[TaxTypeEnum.Value],
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
   ): Future[Either[String, Option[LatestPaymentsResponse]]] =
-    connector.getSelfAssessmentPayments(utr, journeyId) map {
+    connector.getPayments(utr, reference, taxType, journeyId) map {
       case Right(payments) => {
         val recentPayments: List[Payment] =
           payments.map(paymentsList => filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsList)).getOrElse(List.empty)

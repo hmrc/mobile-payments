@@ -5,11 +5,11 @@ Get Latest Payments
 
 * **URL**
 
-  `/payments/latest-payments/:utr`
+  `/payments/latest-payments/v2`
 
 * **Method:**
 
-  `GET`
+  `POST`
 
 * **URL Params**
 
@@ -18,14 +18,23 @@ Get Latest Payments
   `journeyId=[String]`
 
   a string which is included for journey tracking purposes but has no functional impact
-* 
-* **Path Variables**
+
+* **Body**
 
   **Required:**
 
-  `/:utr`
+  `taxType`
+  the type of tax to return payments for - Currently "appSelfAssessment" and "appSimpleAssessment" are supported
 
-  the UTR of the user
+  `reference`
+  the reference used for the payments
+
+```json
+{
+  "taxType": "appSelfAssessment",
+  "reference": "1122334455"
+}
+```
 
 * **Success Responses:**
 

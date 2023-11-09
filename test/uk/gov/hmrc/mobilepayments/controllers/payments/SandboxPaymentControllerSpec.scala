@@ -128,7 +128,7 @@ class SandboxPaymentControllerSpec
       val request = FakeRequest("GET", s"/payments/latest-payments/$utr?journeyId=$journeyId")
         .withHeaders(acceptJsonHeader)
 
-      val result = sut.latestPayments(utr, journeyId)(request)
+      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[LatestPaymentsResponse]
       response.payments.size               shouldBe 2
@@ -142,7 +142,7 @@ class SandboxPaymentControllerSpec
 
       val request = FakeRequest("GET", s"/payments/latest-payments/$utr?journeyId=$journeyId")
 
-      val result = sut.latestPayments(utr, journeyId)(request)
+      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
       status(result) shouldBe 406
     }
   }

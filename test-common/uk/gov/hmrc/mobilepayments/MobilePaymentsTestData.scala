@@ -119,6 +119,8 @@ trait MobilePaymentsTestData {
   lazy val paymentInitiatedUpdateResponseJson:      String = json("payment-initiated-update-response")
   lazy val paymentStatusResponseJson:               String = json("payment-status-ob-response")
   lazy val payApiPayByCardResponseJson:             String = json("pay-api-pay-by-card-response")
+  lazy val latestPaymentsSelfAssessmentJson:        String = json("self-assessment-latest-payments-request")
+  lazy val latestPaymentsSimpleAssessmentJson:      String = json("simple-assessment-latest-payments-request")
 
   lazy val sessionDataPaymentFinalisedEmailSentResponseJson: String = json(
     "session-data-payment-finalised-email-sent-response"
