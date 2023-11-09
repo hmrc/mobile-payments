@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{LatestPaymentsRequest, PayByCardRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{LatestPaymentsRequest, PayByCardRequest, PayByCardRequestGeneric}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -207,4 +207,25 @@ class LivePaymentController @Inject() (
         }
       }
     }
+
+  def getPayByCardURLGeneric(journeyId: JourneyId): Action[JsValue] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      implicit val hc: HeaderCarrier =
+        fromRequest(request).copy(sessionId = Some(SessionId(journeyId.value)))
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            withValidJson[PayByCardRequestGeneric] { payByCardRequest =>
+              paymentsService
+                .getPayByCardUrlGeneric(
+                  payByCardRequest,
+                  journeyId
+                )
+                .map(response => Ok(Json.toJson(response)))
+            }
+          }
+        }
+      }
+    }
+
 }

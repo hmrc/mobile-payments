@@ -18,9 +18,10 @@ package uk.gov.hmrc.mobilepayments.services
 
 import payapi.corcommon.model.PaymentStatuses.Successful
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
-import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
+import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequestGeneric, TaxTypeEnum}
 import uk.gov.hmrc.mobilepayments.domain.{Payment, PaymentRecordListFromApi}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
@@ -64,6 +65,26 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
     connector
       .getPayByCardUrl(amountInPence, SaUtr(utr), journeyId)
       .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
+
+  def getPayByCardUrlGeneric(
+    request:                   PayByCardRequestGeneric,
+    journeyId:                 JourneyId
+  )(implicit executionContext: ExecutionContext,
+    headerCarrier:             HeaderCarrier
+  ): Future[PayByCardResponse] = {
+    request.taxType match {
+      case TaxTypeEnum.appSelfAssessment =>
+            connector.getPayByCardUrl(request.amountInPence, SaUtr(request.reference), journeyId)
+            .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
+      case TaxTypeEnum.appSimpleAssessment =>
+        (request.reference, request.amountInPence, request.taxYear) match {
+          case (reference, amountInPence, Some(taxYear)) =>
+            connector.getPayByCardUrlSimpleAssessment(amountInPence, reference, taxYear, journeyId)
+            .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
+          case _ => throw new MalformedRequestException("Malformed Json: taxYear must also be provided")
+        }
+    }
+  }
 
   private def filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsFromApi: PaymentRecordListFromApi) =
     paymentsFromApi.payments.filter(payment =>

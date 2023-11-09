@@ -82,6 +82,17 @@ class PaymentsConnector @Inject() (
       PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl)
     )
 
+  def getPayByCardUrlSimpleAssessment(
+      amount: Long,
+      reference: String,
+      taxYear: Int,
+      journeyId: JourneyId
+    )(implicit headerCarrier: HeaderCarrier) : Future[PayApiPayByCardResponse] =
+    http.POST[PayByCardAPISimpleAssessmentRequest,PayApiPayByCardResponse](
+      url = s"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}",
+      PayByCardAPISimpleAssessmentRequest(reference, reference, taxYear, amount, returnUrl, backUrl)
+    )
+
   private def convertTaxTypeToPaymentsFormat(taxType: TaxTypeEnum.Value): String =
     taxType match {
       case TaxTypeEnum.appSelfAssessment   => "selfAssessment"

@@ -27,6 +27,7 @@ API
 |---------------------------------------------|---------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | ```/banks```                                | GET                 | Fetch the list of supported banks. [More...](app/docs/get-banks.md)                                                           |
 | ```/banks/:sessionDataId```                 | POST                | Select a bank for a given session ID. [More...](app/docs/post-bank.md)                                                        |
+| ```/payments/pay-by-card``` | POST | Get a Web URL to complete the payment journey online with a pre-populated amount [More...](app/docs/post-pay-by-card.md)|
 | ```/payments/:sessionDataId```              | GET                 | Fetch the payment status for a given session ID. [More...](app/docs/get-payment.md)                                           |
 | ```/payments/:sessionDataId```              | POST                | Create a payment URL for a given session ID. [More...](app/docs/post-payment.md)                                              |
 | ```/payments/:sessionDataId```              | PUT                 | Update a payment URL for a given session ID. [More...](app/docs/put-payment.md)                                               |

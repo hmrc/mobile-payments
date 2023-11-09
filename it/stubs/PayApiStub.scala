@@ -42,4 +42,20 @@ object PayApiStub {
           .withBody(response)
       )
     )
+
+  def stubForPayByCardSimpleAssessment(
+                        statusCode: Int = 200,
+                        response: String = "{}"
+                      ): StubMapping =
+    stubFor(
+      post(
+        urlEqualTo(
+          s"/pay-api/app/simple-assessment/journey/start?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
 }
