@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.domain.dto.response
 
+import payapi.corcommon.model.Origin
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.domain.SaUtr
 
@@ -32,7 +33,8 @@ final case class SessionDataResponse(
   saUtr:         Option[SaUtr],
   reference:     Option[String],
   email:         Option[String],
-  emailSent:     Option[Boolean])
+  emailSent:     Option[Boolean],
+  origin:        Origin)
 
 object SessionDataResponse {
   implicit val format: Format[SessionDataResponse] = Json.format[SessionDataResponse]

@@ -19,7 +19,8 @@ package uk.gov.hmrc.mobilepayments.services
 import com.google.inject.{Inject, Singleton}
 import openbanking.cor.model._
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import payapi.corcommon.model.Origins.AppSa
+import payapi.corcommon.model.Origin
+import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
@@ -150,7 +151,8 @@ class OpenBankingService @Inject() (
           saUtr         = maybeSaUtr,
           reference     = Some(data.originSpecificData.paymentReference.value),
           email         = email,
-          emailSent     = emailSent
+          emailSent     = emailSent,
+          origin        = data.originSpecificData.origin
         )
       }
 
@@ -220,14 +222,20 @@ class OpenBankingService @Inject() (
 
   def sendEmail(
     sessionDataId:          String,
-    journeyId:              JourneyId
+    journeyId:              JourneyId,
+    origin:                 Origin
   )(implicit headerCarrier: HeaderCarrier,
     executionContext:       ExecutionContext
-  ): Future[Unit] =
+  ): Future[Unit] = {
+    val taxType: String = origin match {
+      case AppSa => "Self Assessment"
+      case AppSimpleAssessment => "Simple Assessment"
+    }
     for {
-      _ <- connector.sendEmail(sessionDataId, journeyId)
+      _ <- connector.sendEmail(sessionDataId, journeyId, taxType)
       _ <- connector.setEmailSentFlag(sessionDataId, journeyId)
     } yield ()
+  }
 
   def clearEmail(
     sessionDataId:          String,

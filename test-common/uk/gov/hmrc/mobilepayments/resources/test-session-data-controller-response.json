@@ -12,5 +12,6 @@
   "state": "BankSelected",
   "createdOn": "2021-11-03T10:15:30",
   "saUtr": "CS700100A",
-  "reference": "CS700100AK"
+  "reference": "CS700100AK",
+  "origin": "AppSa"
 }
