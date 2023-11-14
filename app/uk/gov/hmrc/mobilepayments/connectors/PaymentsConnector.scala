@@ -36,7 +36,7 @@ class PaymentsConnector @Inject() (
   @Named("payByCardBackUrl") backUrl:     String
 )(implicit ex:                            ExecutionContext) {
 
-  val logger = Logger(this.getClass)
+  val logger: Logger = Logger(this.getClass)
 
   def getPayments(
     utr:                    Option[String],
