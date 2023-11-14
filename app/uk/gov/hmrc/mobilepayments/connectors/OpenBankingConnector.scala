@@ -129,8 +129,6 @@ class OpenBankingConnector @Inject() (
         SetEmailRequest(email)
       )
 
-  AppSa
-
   def sendEmail(
     sessionDataId:          String,
     journeyId:              JourneyId,
