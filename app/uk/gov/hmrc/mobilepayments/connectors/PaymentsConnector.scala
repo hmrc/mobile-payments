@@ -90,13 +90,13 @@ class PaymentsConnector @Inject() (
     )(implicit headerCarrier: HeaderCarrier) : Future[PayApiPayByCardResponse] =
     http.POST[PayByCardAPISimpleAssessmentRequest,PayApiPayByCardResponse](
       url = s"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}",
-      PayByCardAPISimpleAssessmentRequest(reference, reference, taxYear, amount, returnUrl, backUrl)
+      PayByCardAPISimpleAssessmentRequest(reference, taxYear, amount, returnUrl, backUrl)
     )
 
   private def convertTaxTypeToPaymentsFormat(taxType: TaxTypeEnum.Value): String =
     taxType match {
       case TaxTypeEnum.appSelfAssessment   => "selfAssessment"
-      case TaxTypeEnum.appSimpleAssessment => "simpleAssessment"
+      case TaxTypeEnum.appSimpleAssessment => "other"
     }
 
 }
