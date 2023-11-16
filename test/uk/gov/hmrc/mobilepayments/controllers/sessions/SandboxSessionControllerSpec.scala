@@ -17,6 +17,7 @@
 package uk.gov.hmrc.mobilepayments.controllers.sessions
 import openbanking.cor.model.response.CreateSessionDataResponse
 import org.scalamock.handlers.CallHandler
+import payapi.corcommon.model.Origins.AppSa
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -86,7 +87,7 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       response.bankId shouldEqual Some("obie-barclays-personal")
       response.saUtr.get.value shouldEqual "1555369056"
       response.reference.get shouldEqual "1555369056K"
-      response.origin shouldEqual "AppSa"
+      response.origin shouldEqual AppSa
     }
   }
 

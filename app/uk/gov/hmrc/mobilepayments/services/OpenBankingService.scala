@@ -95,6 +95,7 @@ class OpenBankingService @Inject() (
     connector
       .getSession(sessionDataId, journeyId)
       .map { data: SessionData[OriginSpecificSessionData] =>
+        println(s"WILL H [GetSession Service]: $data")
         val maybeSaUtr =
           if (data.originSpecificData.origin == AppSa)
             Some(SaUtr(data.originSpecificData.asInstanceOf[AppSaSessionData].saUtr.value))

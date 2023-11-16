@@ -19,6 +19,7 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
 import payapi.corcommon.model.Origin
+import payapi.corcommon.model.Origins.AppSimpleAssessment
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
