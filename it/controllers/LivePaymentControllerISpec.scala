@@ -544,7 +544,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with the latest payments for the user when taxType is appSimpleAssessment" in {
       grantAccess()
       stubForShutteringDisabled
-      stubForGetPayments(200, paymentsResponseString(), "simpleAssessment", "22441133")
+      stubForGetPayments(200, paymentsResponseString(), "other", "22441133")
 
       val request: WSRequest = wsUrl(
         s"/payments/latest-payments?journeyId=$journeyId"

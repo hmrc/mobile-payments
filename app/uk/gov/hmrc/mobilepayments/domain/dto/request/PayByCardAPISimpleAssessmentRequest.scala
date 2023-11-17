@@ -22,7 +22,6 @@ import javax.inject.Named
 
 case class PayByCardAPISimpleAssessmentRequest(
   p302ref:                                  String,
-  p302ChargeRef:                            String,
   taxYear :                                 Int,
   amountInPence:                            Long,
   @Named("payByCardReturnUrl") returnUrl:   String,
