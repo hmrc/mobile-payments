@@ -216,12 +216,15 @@ class LivePaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[PayByCardRequestGeneric] { payByCardRequest =>
-              paymentsService
-                .getPayByCardUrlGeneric(
-                  payByCardRequest,
-                  journeyId
-                )
-                .map(response => Ok(Json.toJson(response)))
+              getNinoFromAuth.flatMap { nino =>
+                paymentsService
+                  .getPayByCardUrlGeneric(
+                    payByCardRequest,
+                    nino,
+                    journeyId
+                  )
+                  .map(response => Ok(Json.toJson(response)))
+              }
             }
           }
         }

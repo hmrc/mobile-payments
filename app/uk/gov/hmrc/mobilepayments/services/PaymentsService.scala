@@ -18,7 +18,7 @@ package uk.gov.hmrc.mobilepayments.services
 
 import payapi.corcommon.model.PaymentStatuses.Successful
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
 import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequestGeneric, TaxTypeEnum}
@@ -68,23 +68,25 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
 
   def getPayByCardUrlGeneric(
     request:                   PayByCardRequestGeneric,
+    nino:                      Option[String],
     journeyId:                 JourneyId
   )(implicit executionContext: ExecutionContext,
     headerCarrier:             HeaderCarrier
-  ): Future[PayByCardResponse] = {
+  ): Future[PayByCardResponse] =
     request.taxType match {
       case TaxTypeEnum.appSelfAssessment =>
-            connector.getPayByCardUrl(request.amountInPence, SaUtr(request.reference), journeyId)
-            .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
+        connector
+          .getPayByCardUrl(request.amountInPence, SaUtr(request.reference), journeyId)
+          .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
       case TaxTypeEnum.appSimpleAssessment =>
-        (request.reference, request.amountInPence, request.taxYear) match {
-          case (reference, amountInPence, Some(taxYear)) =>
-            connector.getPayByCardUrlSimpleAssessment(amountInPence, reference, taxYear, journeyId)
-            .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
+        (request.reference, request.amountInPence, request.taxYear, nino) match {
+          case (reference, amountInPence, Some(taxYear), Some(nino)) =>
+            connector
+              .getPayByCardUrlSimpleAssessment(amountInPence, nino, reference, taxYear, journeyId)
+              .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
           case _ => throw new MalformedRequestException("Malformed Json: taxYear must also be provided")
         }
     }
-  }
 
   private def filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsFromApi: PaymentRecordListFromApi) =
     paymentsFromApi.payments.filter(payment =>

@@ -104,4 +104,33 @@ object AuthStub {
           """.stripMargin)
         )
     )
+
+  def getNinoFromAuth(nino: String = "CS700100A"): StubMapping =
+    stubFor(
+      post(urlEqualTo("/auth/authorise"))
+        .atPriority(0)
+        .withRequestBody(
+          equalToJson(
+            s"""
+               |{
+               |  "authorise": [],
+               |  "retrieve": [
+               |    "nino"
+               |  ]
+               |}
+          """.stripMargin,
+            true,
+            false
+          )
+        )
+        .willReturn(
+          aResponse()
+            .withStatus(200)
+            .withBody(s"""
+                         |{
+                         |  "nino": "$nino"
+                         |}
+          """.stripMargin)
+        )
+    )
 }

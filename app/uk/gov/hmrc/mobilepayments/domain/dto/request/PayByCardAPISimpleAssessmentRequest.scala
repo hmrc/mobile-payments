@@ -21,12 +21,13 @@ import play.api.libs.json.{Format, Json}
 import javax.inject.Named
 
 case class PayByCardAPISimpleAssessmentRequest(
-  p302ref:                                  String,
-  taxYear :                                 Int,
-  amountInPence:                            Long,
-  @Named("payByCardReturnUrl") returnUrl:   String,
-  @Named("payByCardBackUrl") backUrl:       String)
+  p302ref:                                String,
+  nino:                                   String,
+  taxYear:                                Int,
+  amountInPence:                          Long,
+  @Named("payByCardReturnUrl") returnUrl: String,
+  @Named("payByCardBackUrl") backUrl:     String)
 
 object PayByCardAPISimpleAssessmentRequest {
-  implicit val format:Format[PayByCardAPISimpleAssessmentRequest] = Json.format[PayByCardAPISimpleAssessmentRequest]
+  implicit val format: Format[PayByCardAPISimpleAssessmentRequest] = Json.format[PayByCardAPISimpleAssessmentRequest]
 }

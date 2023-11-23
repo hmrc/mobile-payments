@@ -46,6 +46,7 @@ class LivePaymentControllerSpec
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
   private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
   private val utr:                    String             = "12212321"
+  private val nino:                   String             = "CS700100A"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
   implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
@@ -510,6 +511,7 @@ class LivePaymentControllerSpec
     "return 200" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
+      stubGetNinoFromAuth(Some(nino))
       mockPayByCardUrlGeneric(Future successful payByCardResponse)
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
@@ -527,11 +529,14 @@ class LivePaymentControllerSpec
     "return 200" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
+      stubGetNinoFromAuth(Some(nino))
       mockPayByCardUrlGeneric(Future successful payByCardResponse)
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> utr))
+        .withBody(
+          Json.obj("amountInPence" -> 1234, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> utr)
+        )
 
       val result = sut.getPayByCardURLGeneric(journeyId)(request)
       status(result) shouldBe 200
@@ -558,6 +563,23 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
+      stubGetNinoFromAuth(Some(nino))
+      mockPayByCardUrlGeneric(Future failed Upstream4xxResponse("Error", 401, 401))
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
+
+      val result = sut.getPayByCardURLGeneric(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get pay by card url generic invoked and no nino is found then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+      shutteringDisabled()
+      stubGetNinoFromAuth(None)
       mockPayByCardUrlGeneric(Future failed Upstream4xxResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
@@ -586,6 +608,7 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
+      stubGetNinoFromAuth(Some(nino))
       mockPayByCardUrlGeneric(Future failed Upstream5xxResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
@@ -660,9 +683,9 @@ class LivePaymentControllerSpec
 
   private def mockPayByCardUrlGeneric(future: Future[PayByCardResponse]): Unit =
     (mockPaymentsService
-      .getPayByCardUrlGeneric(_: PayByCardRequestGeneric, _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
-      .expects(*, journeyId, *, *)
+      .getPayByCardUrlGeneric(_: PayByCardRequestGeneric, _: Option[String], _: JourneyId)(_: ExecutionContext,
+                                                                                           _: HeaderCarrier))
+      .expects(*, *, journeyId, *, *)
       .returning(future)
-
 
 }

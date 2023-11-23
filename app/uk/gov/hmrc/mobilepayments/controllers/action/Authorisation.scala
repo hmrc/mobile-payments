@@ -25,7 +25,7 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength, Enrolments}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
+import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, NinoNotFoundOnAccount, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,10 +35,10 @@ trait Authorisation extends Results with AuthorisedFunctions {
   val confLevel: Int
   private val logger: Logger = Logger(this.getClass)
 
-  lazy val requiresAuth         = true
-  lazy val lowConfidenceLevel   = new AccountWithLowCL
-  lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
-  lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
+  lazy val requiresAuth                 = true
+  private lazy val lowConfidenceLevel   = new AccountWithLowCL
+  private lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
+  private lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
 
   def grantAccess(
     requestedUtr: Option[String]
@@ -125,6 +125,15 @@ trait AccessControl extends HeaderValidator with Authorisation {
               Json.toJson(ErrorAcceptHeaderInvalid.asInstanceOf[ErrorResponse])
             )
           )
+    }
+
+  def getNinoFromAuth(
+    implicit hc: HeaderCarrier,
+    ec:          ExecutionContext
+  ): Future[Option[String]] =
+    authorised().retrieve(nino) {
+      case foundNino => Future successful foundNino
+      case _         => throw new NinoNotFoundOnAccount
     }
 
 }

@@ -32,8 +32,9 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   val mockHttp:                   HttpClient    = mock[HttpClient]
   implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  val sut = new PaymentsConnector(mockHttp, "baseUrl", "returnUrl", "backUrl")
-  val utr = "12344566"
+  val sut  = new PaymentsConnector(mockHttp, "baseUrl", "returnUrl", "backUrl")
+  val utr  = "12344566"
+  val nino = "CS700100A"
 
   "getPayments" should {
     "return self assessment payments with utr if successful" in {
@@ -63,17 +64,20 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
 
     "return Error on BAD_REQUEST Response" in {
       performSuccessfulGET(Future successful HttpResponse(BAD_REQUEST, ""))(mockHttp)
-      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap.getOrElse("") shouldBe "invalid request sent"
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap
+        .getOrElse("") shouldBe "invalid request sent"
     }
 
     "return Error on Unknown response" in {
       performSuccessfulGET(Future successful HttpResponse(OK, "{unknownValue: \"\"}"))(mockHttp)
-      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap.getOrElse("") shouldBe "unable to parse data from payment api"
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap
+        .getOrElse("") shouldBe "unable to parse data from payment api"
     }
 
     "return Error on Exception" in {
       performUnsuccessfulGET(new InternalServerException("Internal Error"))(mockHttp)
-      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap.getOrElse("") shouldBe "exception thrown from payment api"
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).swap
+        .getOrElse("") shouldBe "exception thrown from payment api"
     }
 
   }
@@ -95,13 +99,13 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   "getPayByCardUrlSimpleAssessment" should {
     "return URL following successful response" in {
       performSuccessfulPOST(Future successful payApiPayByCardResponse)(mockHttp)
-      val result = await(sut.getPayByCardUrlSimpleAssessment(2000, SaUtr("CS700100A").value, 2023, journeyId))
+      val result = await(sut.getPayByCardUrlSimpleAssessment(2000, nino, SaUtr("CS700100A").value, 2023, journeyId))
       result.nextUrl shouldBe "https://www.staging.tax.service.gov.uk/pay/initiate-journey?traceId=83303543"
     }
     "return an error following error response" in {
       performUnsuccessfulPOST(new BadRequestException("Bad Request"))(mockHttp)
       intercept[BadRequestException] {
-        await(sut.getPayByCardUrlSimpleAssessment(2000, SaUtr("CS700100A").value, 2023, journeyId))
+        await(sut.getPayByCardUrlSimpleAssessment(2000, nino, SaUtr("CS700100A").value, 2023, journeyId))
       }
     }
   }

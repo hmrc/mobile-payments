@@ -39,4 +39,10 @@ trait AuthorisationStub extends MockFactory {
       .authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returning(Future failed UpstreamErrorResponse("Error", 401, 401))
+
+  def stubGetNinoFromAuth(response: Option[String])(implicit authConnector: AuthConnector) =
+    (authConnector
+      .authorise(_: Predicate, _: Retrieval[Option[String]])(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returning(Future successful response)
 }
