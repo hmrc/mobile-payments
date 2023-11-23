@@ -34,6 +34,7 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private val mockConnector: PaymentsConnector = mock[PaymentsConnector]
   private val saUtr:         SaUtr             = SaUtr("CS700100A")
+  private val nino:          Option[String]    = Some("CS700100A")
 
   private val sut = new PaymentsService(mockConnector)
 
@@ -51,21 +52,27 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return None if no successful payments made within the last 14 days" in {
       mockLatestPayments(Future successful Right(Some(paymentsResponse("2022-05-01"))))
 
-      val result = Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
+      val result =
+        Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId),
+                     0.5.seconds)
       result.toOption.get shouldBe None
     }
 
     "return None if no payments made within the last 14 days" in {
       mockLatestPayments(Future successful Right(None))
 
-      val result = Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
+      val result =
+        Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId),
+                     0.5.seconds)
       result.toOption.get shouldBe None
     }
 
     "return Error if exception returned from PaymentsConnector" in {
       mockLatestPayments(Future successful Left("Error while calling pay api"))
 
-      val result = Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
+      val result =
+        Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId),
+                     0.5.seconds)
       result.swap.getOrElse("") shouldBe "Error while calling pay api"
     }
   }
@@ -92,7 +99,12 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return pay by card URL" in {
       mockPayByCardUrl(Future successful PayApiPayByCardResponse("/payByCard"))
 
-      val result = Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,TaxTypeEnum.appSelfAssessment,reference = saUtr.value), journeyId), 0.5.seconds)
+      val result = Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
+                                                                                   TaxTypeEnum.appSelfAssessment,
+                                                                                   reference = saUtr.value),
+                                                           nino,
+                                                           journeyId),
+                                0.5.seconds)
       result.payByCardUrl shouldBe "/payByCard"
     }
 
@@ -100,8 +112,12 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        Await.result(sut.getPayByCardUrlGeneric(
-          PayByCardRequestGeneric(2000,TaxTypeEnum.appSelfAssessment,reference = saUtr.value), journeyId), 0.5.seconds)
+        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
+                                                                        TaxTypeEnum.appSelfAssessment,
+                                                                        reference = saUtr.value),
+                                                nino,
+                                                journeyId),
+                     0.5.seconds)
       }
     }
   }
@@ -110,7 +126,14 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return pay by card URL" in {
       mockPayCardUrlSimpleAssessment(Future successful PayApiPayByCardResponse("/payByCard"))
 
-      val result = Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000, TaxTypeEnum.appSimpleAssessment, taxYear = Some(2023), reference = "CS700100A"), journeyId), 0.5.seconds)
+      val result = Await.result(
+        sut.getPayByCardUrlGeneric(
+          PayByCardRequestGeneric(2000, TaxTypeEnum.appSimpleAssessment, taxYear = Some(2023), reference = "CS700100A"),
+          nino,
+          journeyId
+        ),
+        0.5.seconds
+      )
       result.payByCardUrl shouldBe "/payByCard"
     }
 
@@ -118,13 +141,26 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockPayCardUrlSimpleAssessment(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000, TaxTypeEnum.appSimpleAssessment, taxYear = Some(2023), reference = "CS700100A"), journeyId), 0.5.seconds)
+        Await.result(
+          sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
+                                                             TaxTypeEnum.appSimpleAssessment,
+                                                             taxYear   = Some(2023),
+                                                             reference = "CS700100A"),
+                                     nino,
+                                     journeyId),
+          0.5.seconds
+        )
       }
     }
 
     "return a Malformed Request Exception when the TaxYear isn't sent with the request" in {
       intercept[MalformedRequestException] {
-        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000, TaxTypeEnum.appSimpleAssessment, reference = "CS700100A"), journeyId), 0.5.seconds)
+        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
+                                                                        TaxTypeEnum.appSimpleAssessment,
+                                                                        reference = "CS700100A"),
+                                                nino,
+                                                journeyId),
+                     0.5.seconds)
       }
     }
   }
@@ -141,9 +177,9 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       .expects(*, *, journeyId, hc)
       .returning(future)
 
-  private def mockPayCardUrlSimpleAssessment(future: Future[PayApiPayByCardResponse]) : Unit =
-    (mockConnector.
-      getPayByCardUrlSimpleAssessment(_: Long, _: String, _: Int, _: JourneyId)(_: HeaderCarrier))
-      .expects(*,*,*,journeyId, hc)
+  private def mockPayCardUrlSimpleAssessment(future: Future[PayApiPayByCardResponse]): Unit =
+    (mockConnector
+      .getPayByCardUrlSimpleAssessment(_: Long, _: String, _: String, _: Int, _: JourneyId)(_: HeaderCarrier))
+      .expects(*, *, *, *, journeyId, hc)
       .returning(future)
 }

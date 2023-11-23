@@ -740,6 +740,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with the pay by card url without the domain prefix when the taxType is set to appSelfAssessment" in {
       grantAccess()
       stubForShutteringDisabled
+      getNinoFromAuth()
       stubForPayByCard(200, payApiPayByCardResponseJson)
 
       val request: WSRequest = wsUrl(
@@ -755,6 +756,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 200 with the pay by card url without the domain prefix when the taxType is set to appSimpleAssessment" in {
       grantAccess()
       stubForShutteringDisabled
+      getNinoFromAuth()
       stubForPayByCardSimpleAssessment(200, payApiPayByCardResponseJson)
 
       val request: WSRequest = wsUrl(
@@ -769,6 +771,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 404 when a 404 is returned from payments" in {
       grantAccess()
       stubForShutteringDisabled
+      getNinoFromAuth()
       stubForPayByCardSimpleAssessment(404)
 
       val request: WSRequest = wsUrl(
@@ -791,6 +794,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 401 when a 401 is returned from payments" in {
       grantAccess()
       stubForShutteringDisabled
+      getNinoFromAuth()
       stubForPayByCard(401)
 
       val request: WSRequest = wsUrl(
@@ -803,6 +807,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
     "return 500 when unknown error 500 returned from payments" in {
       grantAccess()
       stubForShutteringDisabled
+      getNinoFromAuth()
       stubForPayByCard(500)
 
       val request: WSRequest = wsUrl(

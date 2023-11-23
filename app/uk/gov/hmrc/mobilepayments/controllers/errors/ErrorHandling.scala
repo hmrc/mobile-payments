@@ -40,6 +40,8 @@ class FailToMatchTaxIdOnAuth extends GrantAccessException("Unauthorised! Failure
 
 class UtrNotFoundOnAccount extends GrantAccessException("Unauthorised! UTR not found on account!")
 
+class NinoNotFoundOnAccount extends GrantAccessException("Unauthorised! NINO not found on account!")
+
 case object ForbiddenAccess extends ErrorResponse(403, "UNAUTHORIZED", "Access denied!")
 
 case object ErrorUnauthorizedNoUtr extends ErrorResponse(401, "UNAUTHORIZED", "UTR does not exist on account")
