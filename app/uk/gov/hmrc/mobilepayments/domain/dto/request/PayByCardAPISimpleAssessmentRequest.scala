@@ -21,7 +21,7 @@ import play.api.libs.json.{Format, Json}
 import javax.inject.Named
 
 case class PayByCardAPISimpleAssessmentRequest(
-  p302ref:                                String,
+  p302Ref:                                String,
   nino:                                   String,
   taxYear:                                Int,
   amountInPence:                          Long,
