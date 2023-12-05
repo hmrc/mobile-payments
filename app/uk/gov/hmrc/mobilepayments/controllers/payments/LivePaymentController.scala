@@ -131,7 +131,6 @@ class LivePaymentController @Inject() (
               response <- openBankingService.getPaymentStatus(sessionDataId, journeyId)
               session  <- openBankingService.getSession(sessionDataId, journeyId)
             } yield {
-              println(s"WILL H: ${session.origin}")
               if ((response.status == Verified.toString || response.status == Completed.toString) &&
                   !session.emailSent
                     .getOrElse(false)) {
