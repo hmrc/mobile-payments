@@ -127,7 +127,6 @@ class LivePaymentController @Inject() (
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           withErrorWrapper {
-
             for {
               response <- openBankingService.getPaymentStatus(sessionDataId, journeyId)
               session  <- openBankingService.getSession(sessionDataId, journeyId)
@@ -135,7 +134,7 @@ class LivePaymentController @Inject() (
               if ((response.status == Verified.toString || response.status == Completed.toString) &&
                   !session.emailSent
                     .getOrElse(false)) {
-                openBankingService.sendEmail(sessionDataId, journeyId)
+                openBankingService.sendEmail(sessionDataId, journeyId, session.origin)
               }
               Ok(Json.toJson(response))
             }

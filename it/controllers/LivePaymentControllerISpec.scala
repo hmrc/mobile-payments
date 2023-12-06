@@ -304,7 +304,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
   }
 
   "GET /payments" should {
-    "GET /payments" should {
+
       "return 200 with status and trigger sending of email if payment status Verified or Complete " in {
         grantAccess()
         stubForShutteringDisabled
@@ -328,6 +328,24 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         stubForShutteringDisabled
         stubForGetPaymentStatus(response = paymentStatusResponseJson)
         stubForGetSession(response = sessionDataPaymentFinalisedEmailSentResponseJson)
+        stubForSendEmail()
+        stubForSetEmailSentFlag()
+
+        val request: WSRequest = wsUrl(
+          s"/payments/$sessionDataId?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+        val response = await(request.get())
+        response.status shouldBe 200
+        val parsedResponse = Json.parse(response.body).as[PaymentStatusResponse]
+        parsedResponse.status shouldEqual "Verified"
+        verifyEmailNotSend(sessionDataId)
+      }
+
+      "return 200 with status and origin is set to AppSimpleAssessment do not trigger sending of email if emailSent = true " in {
+        grantAccess()
+        stubForShutteringDisabled
+        stubForGetPaymentStatus(response = paymentStatusResponseJson)
+        stubForGetSession(response = sessionDataPaymentFinalisedSimpleAssessmentResponseJson)
         stubForSendEmail()
         stubForSetEmailSentFlag()
 
@@ -410,7 +428,6 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
         response.status shouldBe 521
       }
     }
-  }
 
   "GET /payments/latest-payments/:utr" should {
     "return 200 with the latest payments for the user" in {

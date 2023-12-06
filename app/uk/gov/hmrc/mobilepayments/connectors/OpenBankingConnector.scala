@@ -23,7 +23,7 @@ import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymen
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionDataRequest, InitiatePaymentRequest, OriginSpecificData, SelectBankRequest, SetEmailRequest}
+import uk.gov.hmrc.mobilepayments.domain.dto.request._
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.Bank
@@ -129,12 +129,13 @@ class OpenBankingConnector @Inject() (
 
   def sendEmail(
     sessionDataId:          String,
-    journeyId:              JourneyId
+    journeyId:              JourneyId,
+    taxType:                 String
   )(implicit headerCarrier: HeaderCarrier
   ): Future[Unit] =
     http.POST[InitiateEmailSendRequest, Unit](
       s"$serviceUrl/open-banking/session/$sessionDataId/send-email?journeyId=${journeyId.value}",
-      InitiateEmailSendRequest("en", "Self Assessment")
+      InitiateEmailSendRequest("en", taxType)
     )
 
   def setEmailSentFlag(

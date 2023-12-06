@@ -18,6 +18,8 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
+import payapi.corcommon.model.Origin
+import payapi.corcommon.model.Origins.AppSimpleAssessment
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -662,8 +664,8 @@ class LivePaymentControllerSpec
 
   private def mockSendEmail() =
     (mockOpenBankingService
-      .sendEmail(_: String, _: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
+      .sendEmail(_: String, _: JourneyId, _: Origin)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
       .returning(Future successful Success)
 
   private def mockGetLatestPayments(future: Future[Either[String, Option[LatestPaymentsResponse]]]) =

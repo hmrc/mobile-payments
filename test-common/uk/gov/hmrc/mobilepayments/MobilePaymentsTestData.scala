@@ -65,6 +65,9 @@ trait MobilePaymentsTestData {
   lazy val sessionDataResponse: SessionDataResponse =
     Json.fromJson[SessionDataResponse](js("session-data-controller-response")).get
 
+  lazy val sessionDataSimpleAssessmentResponse: SessionDataResponse =
+    Json.fromJson[SessionDataResponse](js("session-data-simple-assessment-controller-response")).get
+
   lazy val sessionDataPaymentFinalisedResponse: SessionDataResponse =
     Json.fromJson[SessionDataResponse](js("session-data-controller-payment-finalised-response")).get
 
@@ -124,6 +127,10 @@ trait MobilePaymentsTestData {
 
   lazy val sessionDataPaymentFinalisedEmailSentResponseJson: String = json(
     "session-data-payment-finalised-email-sent-response"
+  )
+
+  lazy val sessionDataPaymentFinalisedSimpleAssessmentResponseJson: String = json(
+    "session-data-payment-finalised-simple-assessment-email-sent-response"
   )
 
   private def json(fileName: String): String = {
