@@ -28,8 +28,7 @@ object LatestPaymentsResponse {
   implicit val format: Format[LatestPaymentsResponse] = Json.format[LatestPaymentsResponse]
 
   def fromPayments(payments: List[Payment]): LatestPaymentsResponse =
-    LatestPaymentsResponse(payments.map(p => LatestPayment.fromPayment(p)))
-
+    LatestPaymentsResponse(payments.map(p => LatestPayment.fromPayment(p)).sortBy(_.date.toEpochDay).reverse)
 }
 
 case class LatestPayment(

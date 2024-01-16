@@ -39,17 +39,17 @@ class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePayme
   "getPayments" should {
     "return self assessment payments with utr if successful" in {
       performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
-      await(sut.getPayments(Some(utr), None, None, journeyId)).toOption.get.get.payments.size shouldBe 3
+      await(sut.getPayments(Some(utr), None, None, journeyId)).toOption.get.get.payments.size shouldBe 4
     }
 
     "return self assessment payments if successful" in {
       performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
-      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).toOption.get.get.payments.size shouldBe 3
+      await(sut.getPayments(None, Some(utr), Some(TaxTypeEnum.appSelfAssessment), journeyId)).toOption.get.get.payments.size shouldBe 4
     }
 
     "return simple assessment payments if successful" in {
       performSuccessfulGET(Future successful HttpResponse(OK, paymentsResponseString()))(mockHttp)
-      await(sut.getPayments(None, Some("p302Ref"), Some(TaxTypeEnum.appSimpleAssessment), journeyId)).toOption.get.get.payments.size shouldBe 3
+      await(sut.getPayments(None, Some("p302Ref"), Some(TaxTypeEnum.appSimpleAssessment), journeyId)).toOption.get.get.payments.size shouldBe 4
     }
 
     "return None on NotFoundException" in {

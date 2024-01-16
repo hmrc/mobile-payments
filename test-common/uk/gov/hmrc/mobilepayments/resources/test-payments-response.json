@@ -3,6 +3,16 @@
   "searchTag": "101747641",
   "payments": [
     {
+      "id": "5bc75ae4190324b34a1b841d",
+      "reference": "1017476410407",
+      "transactionReference": "123456",
+      "amountInPence": 11200,
+      "commissionInPence": 230,
+      "status": "Successful",
+      "createdOn": "<DATE2>T08:58:34.015",
+      "taxType": "selfAssessment"
+    },
+    {
       "id": "5bc75ae4190000b34a1b841d",
       "reference": "1017476410407",
       "transactionReference": "123456",

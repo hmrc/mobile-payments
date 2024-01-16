@@ -28,6 +28,7 @@ import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequestGeneric, TaxTypeEnum}
 
+import java.time.LocalDate
 import scala.concurrent.{Await, Future}
 
 class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
@@ -45,12 +46,12 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       val result =
         Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId),
                      0.5.seconds)
-      result.toOption.get.get.payments.size               shouldBe 1
+      result.toOption.get.get.payments.size               shouldBe 2
       result.toOption.get.get.payments.head.amountInPence shouldBe 11100
     }
 
     "return None if no successful payments made within the last 14 days" in {
-      mockLatestPayments(Future successful Right(Some(paymentsResponse("2022-05-01"))))
+      mockLatestPayments(Future successful Right(Some(paymentsResponse(LocalDate.of(2022, 5, 1)))))
 
       val result =
         Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId),
