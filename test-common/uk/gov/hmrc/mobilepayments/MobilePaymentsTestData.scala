@@ -101,13 +101,15 @@ trait MobilePaymentsTestData {
   lazy val payByCardResponse: PayByCardResponse =
     Json.fromJson[PayByCardResponse](js("pay-by-card-response")).get
 
-  def paymentsResponseString(date: String = LocalDate.now().toString): String =
-    json(("payments-response")).replace("<DATE>", date)
+  def paymentsResponseString(date: LocalDate = LocalDate.now()): String =
+    json(("payments-response")).replace("<DATE>", date.toString).replace("<DATE2>", date.minusDays(10).toString)
 
-  def paymentsResponse(date: String = LocalDate.now().toString): PaymentRecordListFromApi =
+  def paymentsResponse(date: LocalDate = LocalDate.now()): PaymentRecordListFromApi =
     Json
       .fromJson[PaymentRecordListFromApi](
-        Json.parse(json("payments-response").replace("<DATE>", date))
+        Json.parse(
+          json("payments-response").replace("<DATE>", date.toString).replace("<DATE2>", date.minusDays(10).toString)
+        )
       )
       .get
 
