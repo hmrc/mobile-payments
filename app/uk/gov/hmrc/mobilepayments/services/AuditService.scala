@@ -17,10 +17,13 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
+import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
 import play.api.libs.json.Json.obj
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
+import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
+import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.play.audit.AuditExtensions.auditHeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -34,13 +37,12 @@ class AuditService @Inject() (
   @Named("appName") val appName: String) {
 
   def sendPaymentEvent(
-    amount:           Option[BigDecimal],
-    saUtr:            Option[SaUtr],
-    reference:        Option[String],
+    sessionData:      SessionDataResponse,
     journeyId:        String
   )(implicit hc:      HeaderCarrier,
     executionContext: ExecutionContext
-  ): Future[AuditResult] =
+  ): Future[AuditResult] = {
+    val taxType = if (sessionData.origin == AppSa) TaxTypeEnum.appSelfAssessment else TaxTypeEnum.appSimpleAssessment
     auditConnector.sendExtendedEvent(
       ExtendedDataEvent(
         appName,
@@ -48,12 +50,18 @@ class AuditService @Inject() (
         tags = hc.toAuditTags(AuditService.transactionName, AuditService.paymentPath),
         detail = obj(
           AuditService.journeyIdKey -> journeyId,
-          AuditService.utrKey       -> saUtr.map(_.utr).getOrElse("").toString,
-          AuditService.referenceKey -> reference.getOrElse("").toString,
-          AuditService.amountKey    -> AmountInPence(amount.get).value
+          if (sessionData.origin == AppSa) AuditService.utrKey -> sessionData.reference.getOrElse("").toString
+          else AuditService.utrKey                             -> "",
+          if (sessionData.origin == AppSimpleAssessment)
+            AuditService.p302ChargeRefKey    -> sessionData.reference.getOrElse("").toString
+          else AuditService.p302ChargeRefKey -> "",
+          AuditService.amountKey  -> AmountInPence(sessionData.amount.getOrElse(0)).value,
+          AuditService.taxTypeKey -> taxType,
+          AuditService.bankKey    -> sessionData.bankId.getOrElse("").toString
         )
       )
     )
+  }
 
   object AuditService {
     val paymentPath      = "/payment"
@@ -61,7 +69,9 @@ class AuditService @Inject() (
     val transactionName  = "mobile-initiate-open-banking-payment"
     val amountKey        = "amount"
     val utrKey           = "utr"
-    val referenceKey     = "reference"
     val journeyIdKey     = "journeyId"
+    val taxTypeKey       = "taxType"
+    val p302ChargeRefKey = "p302ChargeReference"
+    val bankKey          = "bank"
   }
 }

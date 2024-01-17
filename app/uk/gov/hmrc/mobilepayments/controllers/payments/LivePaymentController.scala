@@ -67,7 +67,7 @@ class LivePaymentController @Inject() (
             for {
               response <- openBankingService.initiatePayment(sessionDataId, journeyId)
               session  <- openBankingService.getSession(sessionDataId, journeyId)
-              _        <- auditService.sendPaymentEvent(session.amount, session.saUtr, session.reference, journeyId.value)
+              _        <- auditService.sendPaymentEvent(session, journeyId.value)
             } yield Ok(Json.toJson(response))
           }
         }

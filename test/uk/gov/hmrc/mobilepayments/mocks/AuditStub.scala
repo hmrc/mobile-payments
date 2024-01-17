@@ -30,10 +30,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait AuditStub extends MockFactory {
 
-  def stubPaymentEvent(
+  def stubSAPaymentEvent(
     amount:                  Long,
     saUtr:                   SaUtr,
-    journeyId:               String
+    journeyId:               String,
+    bank:                    String
   )(implicit auditConnector: AuditConnector
   ): Unit = {
     (auditConnector
@@ -43,7 +44,40 @@ trait AuditStub extends MockFactory {
           "mobile-payments",
           "initiateOpenBankingPayment",
           "mobile-initiate-open-banking-payment",
-          obj("amount" -> amount, "utr" -> saUtr.utr, "reference" -> saUtr.utr, "journeyId" -> journeyId)
+          obj("amount"              -> amount,
+              "utr"                 -> saUtr.utr,
+              "p302ChargeReference" -> "",
+              "bank"                -> bank,
+              "taxType"             -> "appSelfAssessment",
+              "journeyId"           -> journeyId)
+        ),
+        *,
+        *
+      )
+      .returning(Future successful Success)
+    ()
+  }
+
+  def stubSimpleAssessmentPaymentEvent(
+    amount:                  Long,
+    p302ChargeRef:           String,
+    journeyId:               String,
+    bank:                    String
+  )(implicit auditConnector: AuditConnector
+  ): Unit = {
+    (auditConnector
+      .sendExtendedEvent(_: ExtendedDataEvent)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(
+        dataEventWith(
+          "mobile-payments",
+          "initiateOpenBankingPayment",
+          "mobile-initiate-open-banking-payment",
+          obj("amount"              -> amount,
+              "utr"                 -> "",
+              "p302ChargeReference" -> p302ChargeRef,
+              "bank"                -> bank,
+              "taxType"             -> "appSimpleAssessment",
+              "journeyId"           -> journeyId)
         ),
         *,
         *
