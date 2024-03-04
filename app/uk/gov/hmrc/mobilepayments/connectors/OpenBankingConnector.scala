@@ -28,6 +28,7 @@ import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.Bank
 
+import java.time.LocalDate
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -125,6 +126,18 @@ class OpenBankingConnector @Inject() (
       .POST[SetEmailRequest, Unit](
         url = s"$serviceUrl/open-banking/session/$sessionDataId/set-email?journeyId=${journeyId.value}",
         SetEmailRequest(email)
+      )
+
+  def setFutureDate(
+    sessionDataId:          String,
+    maybeFutureDate:        LocalDate,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Unit] =
+    http
+      .POST[SetFutureDateRequest, Unit](
+        url = s"$serviceUrl/open-banking/session/$sessionDataId/update-date?journeyId=${journeyId.value}",
+        SetFutureDateRequest(maybeFutureDate)
       )
 
   def sendEmail(
