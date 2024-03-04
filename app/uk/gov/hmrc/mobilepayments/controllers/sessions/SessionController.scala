@@ -33,6 +33,11 @@ trait SessionController {
     journeyId:     JourneyId
   ): Action[JsValue]
 
+  def setFutureDate(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[JsValue]
+
   def clearEmail(
     sessionDataId: String,
     journeyId:     JourneyId

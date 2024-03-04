@@ -127,6 +127,18 @@ class OpenBankingConnector @Inject() (
         SetEmailRequest(email)
       )
 
+  def setFutureDate(
+    sessionDataId:          String,
+    maybeFutureDate:        String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier
+  ): Future[Unit] =
+    http
+      .POST[SetFutureDateRequest, Unit](
+        url = s"$serviceUrl/open-banking/session/$sessionDataId/update-date?journeyId=${journeyId.value}",
+        SetFutureDateRequest(maybeFutureDate)
+      )
+
   def sendEmail(
     sessionDataId:          String,
     journeyId:              JourneyId,

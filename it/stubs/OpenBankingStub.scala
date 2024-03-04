@@ -149,6 +149,22 @@ object OpenBankingStub {
       )
     )
 
+  def stubForSetFutureDate(
+                       statusCode: Int = 201,
+                       response: String = "{}"
+                     ): StubMapping =
+    stubFor(
+      post(
+        urlEqualTo(
+          s"/open-banking/session/$sessionDataId/update-date?journeyId=$journeyId"
+        )
+      ).willReturn(
+        aResponse()
+          .withStatus(statusCode)
+          .withBody(response)
+      )
+    )
+
   def stubForSendEmail(
     statusCode: Int    = 200,
     response:   String = "{}"

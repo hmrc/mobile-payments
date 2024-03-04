@@ -258,6 +258,41 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
     }
   }
 
+  "POST /set-future-date" should {
+    "return 201" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForSetFutureDate(response = Json.obj("maybeFutureDate" -> "2024-02-28").toString())
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-future-date?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("maybeFutureDate" -> "2024-02-28")))
+      response.status shouldBe 201
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-future-date?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader)
+      val response = await(request.post(Json.obj("maybeFutureDate" -> "2024-02-28")))
+      response.status shouldBe 401
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/set-future-date?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, contentHeader, authorisationJsonHeader)
+      val response = await(request.post(Json.obj("maybeFutureDate" -> "2024-02-28")))
+      response.status shouldBe 521
+    }
+  }
+
   "DELETE /sessions/:sessionDataId/clear-email" should {
     "return 204 when call is successful" in {
       grantAccess()
