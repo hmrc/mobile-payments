@@ -18,7 +18,9 @@ package uk.gov.hmrc.mobilepayments.domain.dto.request
 
 import play.api.libs.json.{Json, OFormat}
 
-case class SetFutureDateRequest(maybeFutureDate: String)
+import java.time.LocalDate
+
+case class SetFutureDateRequest(maybeFutureDate: LocalDate)
 
 object SetFutureDateRequest {
 

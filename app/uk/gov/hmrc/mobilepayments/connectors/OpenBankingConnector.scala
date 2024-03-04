@@ -28,6 +28,7 @@ import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.Bank
 
+import java.time.LocalDate
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -129,7 +130,7 @@ class OpenBankingConnector @Inject() (
 
   def setFutureDate(
     sessionDataId:          String,
-    maybeFutureDate:        String,
+    maybeFutureDate:        LocalDate,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
   ): Future[Unit] =

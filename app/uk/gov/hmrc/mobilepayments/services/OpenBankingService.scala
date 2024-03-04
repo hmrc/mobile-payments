@@ -214,7 +214,7 @@ class OpenBankingService @Inject() (
 
   def setFutureDate(
   sessionDataId:           String,
-  maybeFutureDate:         String,
+  maybeFutureDate:         LocalDate,
   journeyId:               JourneyId
  )(implicit headerCarrier: HeaderCarrier,
    executionContext:       ExecutionContext
