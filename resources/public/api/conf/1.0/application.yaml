@@ -921,6 +921,53 @@ paths:
       security:
         - userRestricted:
             - read:native-apps-api-orchestration
+  /mobile/payments/sessions/{sessionDataId}/set-future-date:
+    post:
+      tags:
+        - mobile
+      summary: Set a future date for the user's session
+      operationId: Setafuturedatefortheuser'ssession
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobilePaymentsSessionsSetFutureDaterequest'
+                - example:
+                    maybeFutureDate: 2024-02-28
+            examples:
+              example-9:
+                value:
+                  maybeFutureDate: 2024-02-28
+        required: true
+      responses:
+        '201':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
   /mobile/payments/sessions/{sessionDataId}/clear-email:
     delete:
       tags:
@@ -1339,6 +1386,16 @@ components:
           type: string
       example:
         email: test@test.com
+    MobilePaymentsSessionsSetFutureDaterequest:
+      title: MobilePaymentsSessionsSetFutureDaterequest
+      required:
+        - maybeFutureDate
+      type: object
+      properties:
+        maybeFutureDate:
+          type: string
+      example:
+        maybeFutureDate: 2024-02-28
     Payment:
       title: Payment
       required:
