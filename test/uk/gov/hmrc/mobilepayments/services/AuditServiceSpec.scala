@@ -47,7 +47,8 @@ class AuditServiceSpec extends BaseSpec with AuditStub {
     reference     = Some(saUtr.utr),
     email         = None,
     emailSent     = None,
-    origin        = AppSa
+    origin        = AppSa,
+    maybeFutureDate = None
   )
 
   private val appSimpleAssessmentSessionData =

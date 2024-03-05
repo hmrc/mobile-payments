@@ -34,7 +34,8 @@ final case class SessionDataResponse(
   reference:     Option[String],
   email:         Option[String],
   emailSent:     Option[Boolean],
-  origin:        Origin)
+  origin:        Origin,
+  maybeFutureDate: Option[LocalDate])
 
 object SessionDataResponse {
   implicit val format: Format[SessionDataResponse] = Json.format[SessionDataResponse]

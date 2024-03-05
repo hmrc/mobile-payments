@@ -29,6 +29,7 @@ import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.mocks.ShutteringMock
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData with ShutteringMock {
@@ -88,6 +89,7 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       response.saUtr.get.value shouldEqual "1555369056"
       response.reference.get shouldEqual "1555369056K"
       response.origin shouldEqual AppSa
+      response.maybeFutureDate shouldEqual Some(LocalDate.parse("2024-02-28"))
     }
   }
 
@@ -110,6 +112,7 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       response.reference.get shouldEqual "1555369056K"
       response.email.get shouldEqual "test@test.com"
       response.state shouldEqual "PaymentFinished"
+      response.maybeFutureDate shouldEqual None
     }
   }
 
