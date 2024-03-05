@@ -42,7 +42,8 @@ Get Session
   "bankId": "some-bank-id",
   "createdOn": "2021-11-03T10:15:30",
   "saUtr": "CS700100A",
-  "reference": "CS700100AK"
+  "reference": "CS700100AK",
+  "maybeFutureDate": "2024-02-28"
 }
 ```
 
@@ -57,7 +58,8 @@ Get Session
   "paymentDate": "2021-12-01",
   "createdOn": "2021-11-03T10:15:30",
   "saUtr": "CS700100A",
-  "reference": "CS700100AK"
+  "reference": "CS700100AK",
+  "maybeFutureDate": "2024-02-28"
 }
 ```
 
