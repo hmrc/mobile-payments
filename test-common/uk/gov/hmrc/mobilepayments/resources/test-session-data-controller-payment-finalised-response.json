@@ -15,5 +15,6 @@
   "paymentDate": "2021-12-01",
   "saUtr": "CS700100A",
   "reference": "CS700100AK",
-  "origin": "AppSa"
+  "origin": "AppSa",
+  "maybeFutureDate": "2024-02-28"
 }

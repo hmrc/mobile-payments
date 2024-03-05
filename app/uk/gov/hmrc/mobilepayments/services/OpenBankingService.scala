@@ -152,7 +152,8 @@ class OpenBankingService @Inject() (
           reference     = Some(data.originSpecificData.paymentReference.value),
           email         = email,
           emailSent     = emailSent,
-          origin        = data.originSpecificData.origin
+          origin        = data.originSpecificData.origin,
+          maybeFutureDate = data.futureDatedPayment.map(_.chosenDate)
         )
       }
 

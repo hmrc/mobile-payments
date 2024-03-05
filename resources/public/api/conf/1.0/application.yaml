@@ -858,6 +858,7 @@ paths:
                       createdOn: 2021-11-03T10:15:30
                       saUtr: CS700100A
                       reference: CS700100AK
+                      maybeFutureDate: 2024-02-28
               examples:
                 example-8:
                   value:
@@ -870,6 +871,7 @@ paths:
                     createdOn: 2021-11-03T10:15:30
                     saUtr: CS700100A
                     reference: CS700100AK
+                    maybeFutureDate: 2024-02-28
       deprecated: false
       security:
         - userRestricted:
@@ -1366,6 +1368,8 @@ components:
           type: string
         reference:
           type: string
+        maybeFutureDate:
+          type: string
       example:
         sessionDataId: 51cc67d6-21da-11ec-9621-0242ac130002
         amount: 125.64
@@ -1376,6 +1380,7 @@ components:
         createdOn: 2021-11-03T10:15:30
         saUtr: CS700100A
         reference: CS700100AK
+        maybeFutureDate: 2024-02-28
     MobilePaymentsSessionsSetEmailrequest:
       title: MobilePaymentsSessionsSetEmailrequest
       required:
