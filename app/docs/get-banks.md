@@ -37,14 +37,16 @@ Get Banks
           "name": "Barclays Personal",
           "friendlyName": "Barclays Personal",
           "iconUrl": "https://logo.com",
-          "group": "Barclays"
+          "group": "Barclays",
+          "hasFdp": false
         },
         {
           "bankId": "obie-barclays-business",
           "name": "Barclays Business",
           "friendlyName": "Barclays Business",
           "iconUrl": "https://logo.com",
-          "group": "Barclays"
+          "group": "Barclays",
+          "hasFdp": false
         }
       ]
     },
@@ -58,14 +60,16 @@ Get Banks
           "name": "Lloyds Personal",
           "friendlyName": "Lloyds Personal",
           "iconUrl": "https://logo.com",
-          "group": "Lloyds"
+          "group": "Lloyds",
+          "hasFdp": false
         },
         {
           "bankId": "obie-lloyds-business",
           "name": "Lloyds Business",
           "friendlyName": "Lloyds Business",
           "iconUrl": "https://logo.com",
-          "group": "Lloyds"
+          "group": "Lloyds",
+          "hasFdp": false
         }
       ]
     },
@@ -79,21 +83,24 @@ Get Banks
           "name": "Monzo Personal",
           "friendlyName": "Monzo Persnal",
           "iconUrl": "https://logo.com",
-          "group": "Monzo"
+          "group": "Monzo",
+          "hasFdp": false
         },
         {
           "bankId": "obie-monzo-business",
           "name": "Monzo Business",
           "friendlyName": "Monzo Business",
           "iconUrl": "https://logo.com",
-          "group": "Monzo"
+          "group": "Monzo",
+          "hasFdp": false
         },
         {
           "bankId": "obie-monzo-special",
           "name": "Monzo Special",
           "friendlyName": "Monzo Special",
           "iconUrl": "https://logo.com",
-          "group": "Monzo"
+          "group": "Monzo",
+          "hasFdp": false
         }
       ]
     },
@@ -107,14 +114,16 @@ Get Banks
           "name": "Natwest Personal",
           "friendlyName": "Natwest Personal",
           "iconUrl": "https://logo.com",
-          "group": "Natwest"
+          "group": "Natwest",
+          "hasFdp": false
         },
         {
           "bankId": "obie-natwest-business",
           "name": "Natwest Business",
           "friendlyName": "Natwest Business",
           "iconUrl": "https://logo.com",
-          "group": "Natwest"
+          "group": "Natwest",
+          "hasFdp": false
         }
       ]
     },
@@ -128,14 +137,16 @@ Get Banks
           "name": "HSBC Personal",
           "friendlyName": "HSBC Personal",
           "iconUrl": "https://logo.com",
-          "group": "HSBC"
+          "group": "HSBC",
+          "hasFdp": false
         },
         {
           "bankId": "obie-hsbc-business",
           "name": "HSBC Business",
           "friendlyName": "HSBC Business",
           "iconUrl": "https://logo.com",
-          "group": "HSBC"
+          "group": "HSBC",
+          "hasFdp": false
         }
       ]
     },
@@ -149,14 +160,16 @@ Get Banks
           "name": "Santander Personal",
           "friendlyName": "Santander Personal",
           "iconUrl": "https://logo.com",
-          "group": "Santander"
+          "group": "Santander",
+          "hasFdp": false
         },
         {
           "bankId": "obie-santander-business",
           "name": "Santander Business",
           "friendlyName": "Santander Business",
           "iconUrl": "https://logo.com",
-          "group": "Santander"
+          "group": "Santander",
+          "hasFdp": false
         }
       ]
     },
@@ -170,7 +183,8 @@ Get Banks
           "name": "Chase",
           "friendlyName": "Chase",
           "iconUrl": "https://logo.com",
-          "group": "Chase Bank"
+          "group": "Chase Bank",
+          "hasFdp": false
         }
       ]
     },
@@ -184,21 +198,24 @@ Get Banks
           "name": "RBS Personal",
           "friendlyName": "RBS Personal",
           "iconUrl": "https://logo.com",
-          "group": "RBS"
+          "group": "RBS",
+          "hasFdp": false
         },
         {
           "bankId": "obie-rbs-business",
           "name": "RBS Business",
           "friendlyName": "RBS Business",
           "iconUrl": "https://logo.com",
-          "group": "RBS"
+          "group": "RBS",
+          "hasFdp": false
         },
         {
           "bankId": "obie-rbs-bankline",
           "name": "RBS Bankline",
           "friendlyName": "RBS Bankline",
           "iconUrl": "https://logo.com",
-          "group": "RBS"
+          "group": "RBS",
+          "hasFdp": false
         }
       ]
     },
@@ -212,7 +229,8 @@ Get Banks
           "name": "M&S Bank",
           "friendlyName": "M&S Bank",
           "iconUrl": "https://logo.com",
-          "group": "M&S Bank"
+          "group": "M&S Bank",
+          "hasFdp": false
         }
       ]
     }
