@@ -52,11 +52,13 @@ paths:
                               friendlyName: Barclays Personal
                               iconUrl: https://logo.com
                               group: Barclays
+                              hasFdp: false
                             - bankId: obie-barclays-business
                               name: Barclays Business
                               friendlyName: Barclays Business
                               iconUrl: https://logo.com
                               group: Barclays
+                              hasFdp: true
                         - bankGroupName: Lloyds
                           bankGroupNameFormatted: Lloyds
                           iconUrl: https://logo.com
@@ -66,11 +68,13 @@ paths:
                               friendlyName: Lloyds Personal
                               iconUrl: https://logo.com
                               group: Lloyds
+                              hasFdp: false
                             - bankId: obie-lloyds-business
                               name: Lloyds Business
                               friendlyName: Lloyds Business
                               iconUrl: https://logo.com
                               group: Lloyds
+                              hasFdp: true
                         - bankGroupName: Monzo
                           bankGroupNameFormatted: Monzo
                           iconUrl: https://logo.com
@@ -80,16 +84,19 @@ paths:
                               friendlyName: Monzo Persnal
                               iconUrl: https://logo.com
                               group: Monzo
+                              hasFdp: false
                             - bankId: obie-monzo-business
                               name: Monzo Business
                               friendlyName: Monzo Business
                               iconUrl: https://logo.com
                               group: Monzo
+                              hasFdp: true
                             - bankId: obie-monzo-special
                               name: Monzo Special
                               friendlyName: Monzo Special
                               iconUrl: https://logo.com
                               group: Monzo
+                              hasFdp: false
                         - bankGroupName: Natwest
                           bankGroupNameFormatted: Natwest
                           iconUrl: https://logo.com
@@ -99,11 +106,13 @@ paths:
                               friendlyName: Natwest Personal
                               iconUrl: https://logo.com
                               group: Natwest
+                              hasFdp: false
                             - bankId: obie-natwest-business
                               name: Natwest Business
                               friendlyName: Natwest Business
                               iconUrl: https://logo.com
                               group: Natwest
+                              hasFdp: false
                         - bankGroupName: HSBC
                           bankGroupNameFormatted: HSBC
                           iconUrl: https://logo.com
@@ -113,11 +122,13 @@ paths:
                               friendlyName: HSBC Personal
                               iconUrl: https://logo.com
                               group: HSBC
+                              hasFdp: true
                             - bankId: obie-hsbc-business
                               name: HSBC Business
                               friendlyName: HSBC Business
                               iconUrl: https://logo.com
                               group: HSBC
+                              hasFdp: false
                         - bankGroupName: Santander
                           bankGroupNameFormatted: Santander
                           iconUrl: https://logo.com
@@ -127,11 +138,13 @@ paths:
                               friendlyName: Santander Personal
                               iconUrl: https://logo.com
                               group: Santander
+                              hasFdp: false
                             - bankId: obie-santander-business
                               name: Santander Business
                               friendlyName: Santander Business
                               iconUrl: https://logo.com
                               group: Santander
+                              hasFdp: false
                         - bankGroupName: Chase Bank
                           bankGroupNameFormatted: Chase Bank
                           iconUrl: https://logo.com
@@ -141,6 +154,7 @@ paths:
                               friendlyName: Chase
                               iconUrl: https://logo.com
                               group: Chase Bank
+                              hasFdp: false
                         - bankGroupName: RBS
                           bankGroupNameFormatted: RBS
                           iconUrl: https://logo.com
@@ -150,16 +164,19 @@ paths:
                               friendlyName: RBS Personal
                               iconUrl: https://logo.com
                               group: RBS
+                              hasFdp: true
                             - bankId: obie-rbs-business
                               name: RBS Business
                               friendlyName: RBS Business
                               iconUrl: https://logo.com
                               group: RBS
+                              hasFdp: false
                             - bankId: obie-rbs-bankline
                               name: RBS Bankline
                               friendlyName: RBS Bankline
                               iconUrl: https://logo.com
                               group: RBS
+                              hasFdp: true
                         - bankGroupName: M&S Bank
                           bankGroupNameFormatted: M&S Bank
                           iconUrl: https://logo.com
@@ -169,6 +186,7 @@ paths:
                               friendlyName: M&S Bank
                               iconUrl: https://logo.com
                               group: M&S Bank
+                              hasFdp: false
               examples:
                 example-1:
                   value:
@@ -182,11 +200,13 @@ paths:
                             friendlyName: Barclays Personal
                             iconUrl: https://logo.com
                             group: Barclays
+                            hasFdp: false
                           - bankId: obie-barclays-business
                             name: Barclays Business
                             friendlyName: Barclays Business
                             iconUrl: https://logo.com
                             group: Barclays
+                            hasFdp: false
                       - bankGroupName: Lloyds
                         bankGroupNameFormatted: Lloyds
                         iconUrl: https://logo.com
@@ -196,11 +216,13 @@ paths:
                             friendlyName: Lloyds Personal
                             iconUrl: https://logo.com
                             group: Lloyds
+                            hasFdp: false
                           - bankId: obie-lloyds-business
                             name: Lloyds Business
                             friendlyName: Lloyds Business
                             iconUrl: https://logo.com
                             group: Lloyds
+                            hasFdp: false
                       - bankGroupName: Monzo
                         bankGroupNameFormatted: Monzo
                         iconUrl: https://logo.com
@@ -210,16 +232,19 @@ paths:
                             friendlyName: Monzo Persnal
                             iconUrl: https://logo.com
                             group: Monzo
+                            hasFdp: false
                           - bankId: obie-monzo-business
                             name: Monzo Business
                             friendlyName: Monzo Business
                             iconUrl: https://logo.com
                             group: Monzo
+                            hasFdp: true
                           - bankId: obie-monzo-special
                             name: Monzo Special
                             friendlyName: Monzo Special
                             iconUrl: https://logo.com
                             group: Monzo
+                            hasFdp: false
                       - bankGroupName: Natwest
                         bankGroupNameFormatted: Natwest
                         iconUrl: https://logo.com
@@ -229,11 +254,13 @@ paths:
                             friendlyName: Natwest Personal
                             iconUrl: https://logo.com
                             group: Natwest
+                            hasFdp: false
                           - bankId: obie-natwest-business
                             name: Natwest Business
                             friendlyName: Natwest Business
                             iconUrl: https://logo.com
                             group: Natwest
+                            hasFdp: false
                       - bankGroupName: HSBC
                         bankGroupNameFormatted: HSBC
                         iconUrl: https://logo.com
@@ -243,11 +270,13 @@ paths:
                             friendlyName: HSBC Personal
                             iconUrl: https://logo.com
                             group: HSBC
+                            hasFdp: false
                           - bankId: obie-hsbc-business
                             name: HSBC Business
                             friendlyName: HSBC Business
                             iconUrl: https://logo.com
                             group: HSBC
+                            hasFdp: false
                       - bankGroupName: Santander
                         bankGroupNameFormatted: Santander
                         iconUrl: https://logo.com
@@ -257,11 +286,13 @@ paths:
                             friendlyName: Santander Personal
                             iconUrl: https://logo.com
                             group: Santander
+                            hasFdp: false
                           - bankId: obie-santander-business
                             name: Santander Business
                             friendlyName: Santander Business
                             iconUrl: https://logo.com
                             group: Santander
+                            hasFdp: false
                       - bankGroupName: Chase Bank
                         bankGroupNameFormatted: Chase Bank
                         iconUrl: https://logo.com
@@ -271,6 +302,7 @@ paths:
                             friendlyName: Chase
                             iconUrl: https://logo.com
                             group: Chase Bank
+                            hasFdp: false
                       - bankGroupName: RBS
                         bankGroupNameFormatted: RBS
                         iconUrl: https://logo.com
@@ -280,16 +312,19 @@ paths:
                             friendlyName: RBS Personal
                             iconUrl: https://logo.com
                             group: RBS
+                            hasFdp: false
                           - bankId: obie-rbs-business
                             name: RBS Business
                             friendlyName: RBS Business
                             iconUrl: https://logo.com
                             group: RBS
+                            hasFdp: false
                           - bankId: obie-rbs-bankline
                             name: RBS Bankline
                             friendlyName: RBS Bankline
                             iconUrl: https://logo.com
                             group: RBS
+                            hasFdp: false
                       - bankGroupName: M&S Bank
                         bankGroupNameFormatted: M&S Bank
                         iconUrl: https://logo.com
@@ -299,6 +334,7 @@ paths:
                             friendlyName: M&S Bank
                             iconUrl: https://logo.com
                             group: M&S Bank
+                            hasFdp: false
       deprecated: false
       security:
         - userRestricted:
@@ -1110,11 +1146,13 @@ components:
                 friendlyName: Barclays Personal
                 iconUrl: https://logo.com
                 group: Barclays
+                hasFdp: false
               - bankId: obie-barclays-business
                 name: Barclays Business
                 friendlyName: Barclays Business
                 iconUrl: https://logo.com
                 group: Barclays
+                hasFdp: false
           - bankGroupName: Lloyds
             bankGroupNameFormatted: Lloyds
             iconUrl: https://logo.com
@@ -1124,11 +1162,13 @@ components:
                 friendlyName: Lloyds Personal
                 iconUrl: https://logo.com
                 group: Lloyds
+                hasFdp: true
               - bankId: obie-lloyds-business
                 name: Lloyds Business
                 friendlyName: Lloyds Business
                 iconUrl: https://logo.com
                 group: Lloyds
+                hasFdp: false
           - bankGroupName: Monzo
             bankGroupNameFormatted: Monzo
             iconUrl: https://logo.com
@@ -1138,16 +1178,19 @@ components:
                 friendlyName: Monzo Persnal
                 iconUrl: https://logo.com
                 group: Monzo
+                hasFdp: false
               - bankId: obie-monzo-business
                 name: Monzo Business
                 friendlyName: Monzo Business
                 iconUrl: https://logo.com
                 group: Monzo
+                hasFdp: false
               - bankId: obie-monzo-special
                 name: Monzo Special
                 friendlyName: Monzo Special
                 iconUrl: https://logo.com
                 group: Monzo
+                hasFdp: true
           - bankGroupName: Natwest
             bankGroupNameFormatted: Natwest
             iconUrl: https://logo.com
@@ -1157,11 +1200,13 @@ components:
                 friendlyName: Natwest Personal
                 iconUrl: https://logo.com
                 group: Natwest
+                hasFdp: false
               - bankId: obie-natwest-business
                 name: Natwest Business
                 friendlyName: Natwest Business
                 iconUrl: https://logo.com
                 group: Natwest
+                hasFdp: false
           - bankGroupName: HSBC
             bankGroupNameFormatted: HSBC
             iconUrl: https://logo.com
@@ -1171,11 +1216,13 @@ components:
                 friendlyName: HSBC Personal
                 iconUrl: https://logo.com
                 group: HSBC
+                hasFdp: false
               - bankId: obie-hsbc-business
                 name: HSBC Business
                 friendlyName: HSBC Business
                 iconUrl: https://logo.com
                 group: HSBC
+                hasFdp: false
           - bankGroupName: Santander
             bankGroupNameFormatted: Santander
             iconUrl: https://logo.com
@@ -1185,11 +1232,13 @@ components:
                 friendlyName: Santander Personal
                 iconUrl: https://logo.com
                 group: Santander
+                hasFdp: false
               - bankId: obie-santander-business
                 name: Santander Business
                 friendlyName: Santander Business
                 iconUrl: https://logo.com
                 group: Santander
+                hasFdp: true
           - bankGroupName: Chase Bank
             bankGroupNameFormatted: Chase Bank
             iconUrl: https://logo.com
@@ -1199,6 +1248,7 @@ components:
                 friendlyName: Chase
                 iconUrl: https://logo.com
                 group: Chase Bank
+                hasFdp: false
           - bankGroupName: RBS
             bankGroupNameFormatted: RBS
             iconUrl: https://logo.com
@@ -1208,16 +1258,19 @@ components:
                 friendlyName: RBS Personal
                 iconUrl: https://logo.com
                 group: RBS
+                hasFdp: true
               - bankId: obie-rbs-business
                 name: RBS Business
                 friendlyName: RBS Business
                 iconUrl: https://logo.com
                 group: RBS
+                hasFdp: false
               - bankId: obie-rbs-bankline
                 name: RBS Bankline
                 friendlyName: RBS Bankline
                 iconUrl: https://logo.com
                 group: RBS
+                hasFdp: false
           - bankGroupName: M&S Bank
             bankGroupNameFormatted: M&S Bank
             iconUrl: https://logo.com
@@ -1227,6 +1280,7 @@ components:
                 friendlyName: M&S Bank
                 iconUrl: https://logo.com
                 group: M&S Bank
+                hasFdp: true
     MobilePaymentsPaymentsLatestPaymentsresponse:
       title: MobilePaymentsPaymentsLatestPaymentsresponse
       required:

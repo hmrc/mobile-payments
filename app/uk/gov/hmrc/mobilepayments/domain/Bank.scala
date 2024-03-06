@@ -23,7 +23,8 @@ case class Bank(
   name:         String,
   friendlyName: String,
   iconUrl:      String,
-  group:        String)
+  group:        String,
+  hasFdp:       Boolean)
 
 object Bank {
   implicit val format: Format[Bank] = Json.format[Bank]
