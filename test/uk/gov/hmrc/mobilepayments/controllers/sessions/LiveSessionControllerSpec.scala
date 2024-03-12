@@ -117,7 +117,6 @@ class LiveSessionControllerSpec
         .withBody(Json.obj("bad-key" -> 1234, "saUtr" -> "CS700100A"))
 
       val result = sut.createSession(journeyId)(request)
-      result.map(test2 => println("RESULT" + test2))
       status(result) shouldBe 400
     }
   }
