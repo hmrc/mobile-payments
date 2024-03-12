@@ -19,7 +19,6 @@ package uk.gov.hmrc.mobilepayments.services
 import com.google.inject.{Inject, Singleton}
 import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
 import play.api.libs.json.Json.obj
-import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum

@@ -78,11 +78,16 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
     }
   }
 
-  "when getPayByCardUrl invoked and connector returns success with URL then" should {
+  "when getPayByCardUrl invoked with self assessment and connector returns success with URL then" should {
     "return pay by card URL" in {
       mockPayByCardUrl(Future successful PayApiPayByCardResponse("/payByCard"))
 
-      val result = Await.result(sut.getPayByCardUrl(saUtr.value, 2000, journeyId), 0.5.seconds)
+      val result = Await.result(
+        sut.getPayByCardUrl(PayByCardRequestGeneric(2000, TaxTypeEnum.appSelfAssessment, reference = saUtr.value),
+                            nino,
+                            journeyId),
+        0.5.seconds
+      )
       result.payByCardUrl shouldBe "/payByCard"
     }
 
@@ -90,34 +95,11 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 400, 400))
 
       intercept[UpstreamErrorResponse] {
-        Await.result(sut.getPayByCardUrl(saUtr.value, 2000, journeyId), 0.5.seconds)
-      }
-    }
-
-  }
-
-  "when getPayByCardUrlGeneric invoked with self assessment and connector returns success with URL then" should {
-    "return pay by card URL" in {
-      mockPayByCardUrl(Future successful PayApiPayByCardResponse("/payByCard"))
-
-      val result = Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
-                                                                                   TaxTypeEnum.appSelfAssessment,
-                                                                                   reference = saUtr.value),
-                                                           nino,
-                                                           journeyId),
-                                0.5.seconds)
-      result.payByCardUrl shouldBe "/payByCard"
-    }
-
-    "return an error when connector fails" in {
-      mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 400, 400))
-
-      intercept[UpstreamErrorResponse] {
-        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
-                                                                        TaxTypeEnum.appSelfAssessment,
-                                                                        reference = saUtr.value),
-                                                nino,
-                                                journeyId),
+        Await.result(sut.getPayByCardUrl(PayByCardRequestGeneric(2000,
+                                                                 TaxTypeEnum.appSelfAssessment,
+                                                                 reference = saUtr.value),
+                                         nino,
+                                         journeyId),
                      0.5.seconds)
       }
     }
@@ -128,7 +110,7 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockPayCardUrlSimpleAssessment(Future successful PayApiPayByCardResponse("/payByCard"))
 
       val result = Await.result(
-        sut.getPayByCardUrlGeneric(
+        sut.getPayByCardUrl(
           PayByCardRequestGeneric(2000, TaxTypeEnum.appSimpleAssessment, taxYear = Some(2023), reference = "CS700100A"),
           nino,
           journeyId
@@ -143,12 +125,12 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       intercept[UpstreamErrorResponse] {
         Await.result(
-          sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
-                                                             TaxTypeEnum.appSimpleAssessment,
-                                                             taxYear   = Some(2023),
-                                                             reference = "CS700100A"),
-                                     nino,
-                                     journeyId),
+          sut.getPayByCardUrl(PayByCardRequestGeneric(2000,
+                                                      TaxTypeEnum.appSimpleAssessment,
+                                                      taxYear   = Some(2023),
+                                                      reference = "CS700100A"),
+                              nino,
+                              journeyId),
           0.5.seconds
         )
       }
@@ -156,11 +138,11 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
     "return a Malformed Request Exception when the TaxYear isn't sent with the request" in {
       intercept[MalformedRequestException] {
-        Await.result(sut.getPayByCardUrlGeneric(PayByCardRequestGeneric(2000,
-                                                                        TaxTypeEnum.appSimpleAssessment,
-                                                                        reference = "CS700100A"),
-                                                nino,
-                                                journeyId),
+        Await.result(sut.getPayByCardUrl(PayByCardRequestGeneric(2000,
+                                                                 TaxTypeEnum.appSimpleAssessment,
+                                                                 reference = "CS700100A"),
+                                         nino,
+                                         journeyId),
                      0.5.seconds)
       }
     }

@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
@@ -107,26 +107,26 @@ class LiveSessionControllerSpec
     }
   }
 
-  //TODO Uncomment once the backwards compatibility has been done
-//  "when create session invoked with malformed json then" should {
-//    "return 400" in {
-//      stubAuthorisationGrantAccess(authorisedResponse)
-//      shutteringDisabled()
-////      mockCreateSession(Future failed Upstream4xxResponse("Error", 400, 400))
-//      val request = FakeRequest("POST", "/sessions")
-//        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-//        .withBody(Json.obj("bad-key" -> 1234, "saUtr" -> "CS700100A"))
-//
-//      val result = sut.createSession(journeyId)(request)
-//      status(result) shouldBe 400
-//    }
-//  }
+  "when create session invoked with malformed json then" should {
+    "return 400" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+      shutteringDisabled()
+      mockCreateSession(Future failed UpstreamErrorResponse("Error", 400, 400))
+      val request = FakeRequest("POST", "/sessions")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("bad-key" -> 1234, "saUtr" -> "CS700100A"))
+
+      val result = sut.createSession(journeyId)(request)
+      result.map(test2 => println("RESULT" + test2))
+      status(result) shouldBe 400
+    }
+  }
 
   "when create session invoked and service returns 401 then" should {
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockCreateSession(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockCreateSession(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", "/sessions")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -154,7 +154,7 @@ class LiveSessionControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockCreateSession(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockCreateSession(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", "/sessions")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
@@ -214,7 +214,7 @@ class LiveSessionControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetSession(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockGetSession(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("Get", s"/sessions/$sessionDataId")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
@@ -240,7 +240,7 @@ class LiveSessionControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetSession(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockGetSession(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("Get", s"/sessions/$sessionDataId")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
@@ -269,7 +269,7 @@ class LiveSessionControllerSpec
     "return 404" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSetEmail(Future failed Upstream4xxResponse("Error", 404, 404))
+      mockSetEmail(Future failed UpstreamErrorResponse("Error", 404, 404))
 
       val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -284,7 +284,7 @@ class LiveSessionControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSetEmail(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockSetEmail(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -312,7 +312,7 @@ class LiveSessionControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSetEmail(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockSetEmail(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-email")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -341,7 +341,7 @@ class LiveSessionControllerSpec
     "return 404" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockClearEmail(Future failed Upstream4xxResponse("Error", 404, 404))
+      mockClearEmail(Future failed UpstreamErrorResponse("Error", 404, 404))
 
       val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
         .withHeaders(acceptJsonHeader)
@@ -355,7 +355,7 @@ class LiveSessionControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockClearEmail(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockClearEmail(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
         .withHeaders(acceptJsonHeader)
@@ -381,7 +381,7 @@ class LiveSessionControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockClearEmail(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockClearEmail(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-email")
         .withHeaders(acceptJsonHeader)
