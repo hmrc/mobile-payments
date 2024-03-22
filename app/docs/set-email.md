@@ -5,7 +5,7 @@ Post Email
 
 * **URL**
 
-  `/session/:sessionDataId/set-email`
+  `/sessions/:sessionDataId/set-email`
 
 * **Method:**
 
