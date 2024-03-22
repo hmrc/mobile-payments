@@ -5,7 +5,7 @@ Clear Email
 
 * **URL**
 
-  `/session/:sessionDataId/clear-email`
+  `/sessions/:sessionDataId/clear-email`
 
 * **Method:**
 

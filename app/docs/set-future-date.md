@@ -5,7 +5,7 @@ Post Future Date
 
 * **URL**
 
-  `/session/:sessionDataId/set-future-date`
+  `/sessions/:sessionDataId/set-future-date`
 
 * **Method:**
 
