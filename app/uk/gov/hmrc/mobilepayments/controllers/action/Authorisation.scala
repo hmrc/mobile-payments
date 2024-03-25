@@ -21,11 +21,10 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
-import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength, Enrolments}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, NinoNotFoundOnAccount, UtrNotFoundOnAccount}
+import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,37 +34,27 @@ trait Authorisation extends Results with AuthorisedFunctions {
   val confLevel: Int
   private val logger: Logger = Logger(this.getClass)
 
-  lazy val requiresAuth                 = true
-  private lazy val lowConfidenceLevel   = new AccountWithLowCL
-  private lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
-  private lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
+  lazy val requiresAuth               = true
+  private lazy val lowConfidenceLevel = new AccountWithLowCL
 
   def grantAccess(
-    requestedUtr: Option[String]
-  )(implicit hc:  HeaderCarrier,
-    ec:           ExecutionContext
+  )(implicit hc: HeaderCarrier,
+    ec:          ExecutionContext
   ): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
-      .retrieve(confidenceLevel and allEnrolments) {
-        case foundConfidenceLevel ~ enrolments =>
-          if (requestedUtr.isDefined) {
-            val activatedUtr = getActivatedSaUtr(enrolments)
-            if (activatedUtr.isEmpty) throw utrNotFoundOnAccount
-            if (!activatedUtr.getOrElse(SaUtr("")).utr.equals(requestedUtr.getOrElse(""))) throw failedToMatchUtr
-          }
-          if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
-          else Future successful true
+      .retrieve(confidenceLevel) { foundConfidenceLevel =>
+        if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
+        else Future successful true
       }
 
   def invokeAuthBlock[A](
     request:     Request[A],
-    block:       Request[A] => Future[Result],
-    saUtr:       Option[String]
+    block:       Request[A] => Future[Result]
   )(implicit ec: ExecutionContext
   ): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
-    grantAccess(saUtr)
+    grantAccess()
       .flatMap { _ =>
         block(request)
       }
@@ -103,8 +92,7 @@ trait AccessControl extends HeaderValidator with Authorisation {
   def parser: BodyParser[AnyContent]
 
   def validateAcceptWithAuth(
-    rules:       Option[String] => Boolean,
-    saUtr:       Option[String] = None
+    rules:       Option[String] => Boolean
   )(implicit ec: ExecutionContext
   ): ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
@@ -117,7 +105,7 @@ trait AccessControl extends HeaderValidator with Authorisation {
         block:   Request[A] => Future[Result]
       ): Future[Result] =
         if (rules(request.headers.get("Accept"))) {
-          if (requiresAuth) invokeAuthBlock(request, block, saUtr)
+          if (requiresAuth) invokeAuthBlock(request, block)
           else block(request)
         } else
           Future.successful(
@@ -131,9 +119,6 @@ trait AccessControl extends HeaderValidator with Authorisation {
     implicit hc: HeaderCarrier,
     ec:          ExecutionContext
   ): Future[Option[String]] =
-    authorised().retrieve(nino) {
-      case foundNino => Future successful foundNino
-      case _         => throw new NinoNotFoundOnAccount
-    }
+    authorised().retrieve(nino)(foundNino => Future successful foundNino)
 
 }

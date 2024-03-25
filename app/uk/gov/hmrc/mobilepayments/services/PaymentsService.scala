@@ -56,17 +56,6 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
     }
 
   def getPayByCardUrl(
-    utr:                       String,
-    amountInPence:             Long,
-    journeyId:                 JourneyId
-  )(implicit executionContext: ExecutionContext,
-    headerCarrier:             HeaderCarrier
-  ): Future[PayByCardResponse] =
-    connector
-      .getPayByCardUrl(amountInPence, SaUtr(utr), journeyId)
-      .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
-
-  def getPayByCardUrlGeneric(
     request:                   PayByCardRequestGeneric,
     nino:                      Option[String],
     journeyId:                 JourneyId

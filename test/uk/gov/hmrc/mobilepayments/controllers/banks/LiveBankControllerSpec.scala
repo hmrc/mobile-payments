@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
@@ -70,7 +70,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 404" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetBanks(Future failed Upstream4xxResponse("Error", 404, 404))
+      mockGetBanks(Future failed UpstreamErrorResponse("Error", 404, 404))
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders(acceptJsonHeader)
@@ -84,7 +84,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetBanks(Future failed new Upstream4xxResponse("Error", 401, 401))
+      mockGetBanks(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders(acceptJsonHeader)
@@ -110,7 +110,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetBanks(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockGetBanks(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("GET", "/banks")
         .withHeaders(acceptJsonHeader)
@@ -139,7 +139,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 404" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSelectBank(Future failed Upstream4xxResponse("Error", 404, 404))
+      mockSelectBank(Future failed UpstreamErrorResponse("Error", 404, 404))
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -154,7 +154,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSelectBank(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockSelectBank(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -182,7 +182,7 @@ class LiveBankControllerSpec extends BaseSpec with AuthorisationStub with Mobile
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockSelectBank(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockSelectBank(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", s"/banks/$sessionDataId")
         .withHeaders(acceptJsonHeader, contentHeader)

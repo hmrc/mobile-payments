@@ -20,7 +20,7 @@ import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream5xxResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -43,7 +43,7 @@ class ShutteringConnector @Inject() (
         s"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId"
       )
       .recover {
-        case e: Upstream5xxResponse =>
+        case e: UpstreamErrorResponse =>
           logger.warn(s"Internal Server Error received from mobile-shuttering:\n $e \nAssuming unshuttered.")
           Shuttering.shutteringDisabled
 

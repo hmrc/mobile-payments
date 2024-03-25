@@ -61,6 +61,10 @@ trait ErrorHandling {
         logger.warn("Resource not found!")
         Status(ErrorNotFound.httpStatusCode)
 
+      case ex: UpstreamErrorResponse if ex.statusCode == 400 =>
+        logger.warn("Malformed JSON")
+        Status(ErrorMalformedRequest.httpStatusCode)
+
       case ex: MissingBearerToken =>
         logger.warn("Upstream service returned 401")
         Status(ErrorUnauthorizedUpstream.httpStatusCode)

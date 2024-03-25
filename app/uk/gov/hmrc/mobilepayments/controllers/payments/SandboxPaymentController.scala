@@ -103,7 +103,6 @@ class SandboxPaymentController @Inject() (
     }
 
   override def getPayByCardURL(
-    utr:       String,
     journeyId: JourneyId
   ): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
