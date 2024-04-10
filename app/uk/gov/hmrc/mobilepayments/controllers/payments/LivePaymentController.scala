@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
-import uk.gov.hmrc.mobilepayments.domain.dto.request.{LatestPaymentsRequest, PayByCardRequest, PayByCardRequestGeneric}
+import uk.gov.hmrc.mobilepayments.domain.dto.request.{LatestPaymentsRequest, PayByCardRequestGeneric}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -143,25 +143,6 @@ class LivePaymentController @Inject() (
       }
     }
 
-  def latestPaymentsLegacy(
-    utr:       String,
-    journeyId: JourneyId
-  ): Action[AnyContent] =
-    validateAcceptWithAuth(acceptHeaderValidationRules, Some(utr)).async { implicit request =>
-      implicit val hc: HeaderCarrier = fromRequest(request)
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          withErrorWrapper {
-            paymentsService.getLatestPayments(Some(utr), None, None, journeyId) map {
-              case Right(None)     => NotFound
-              case Right(payments) => Ok(Json.toJson(payments))
-              case Left(e)         => InternalServerError(e)
-            }
-          }
-        }
-      }
-    }
-
   def latestPayments(journeyId: JourneyId): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -183,31 +164,7 @@ class LivePaymentController @Inject() (
       }
     }
 
-  def getPayByCardURL(
-    utr:       String,
-    journeyId: JourneyId
-  ): Action[JsValue] =
-    validateAcceptWithAuth(acceptHeaderValidationRules, Some(utr)).async(parse.json) { implicit request =>
-      implicit val hc: HeaderCarrier =
-        fromRequest(request).copy(sessionId = Some(SessionId(journeyId.value)))
-      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
-        withShuttering(shuttered) {
-          withErrorWrapper {
-            withValidJson[PayByCardRequest] { payByCardRequest =>
-              paymentsService
-                .getPayByCardUrl(
-                  utr,
-                  payByCardRequest.amountInPence,
-                  journeyId
-                )
-                .map(response => Ok(Json.toJson(response)))
-            }
-          }
-        }
-      }
-    }
-
-  def getPayByCardURLGeneric(journeyId: JourneyId): Action[JsValue] =
+  def getPayByCardURL(journeyId: JourneyId): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier =
         fromRequest(request).copy(sessionId = Some(SessionId(journeyId.value)))
@@ -217,7 +174,7 @@ class LivePaymentController @Inject() (
             withValidJson[PayByCardRequestGeneric] { payByCardRequest =>
               getNinoFromAuth.flatMap { nino =>
                 paymentsService
-                  .getPayByCardUrlGeneric(
+                  .getPayByCardUrl(
                     payByCardRequest,
                     nino,
                     journeyId

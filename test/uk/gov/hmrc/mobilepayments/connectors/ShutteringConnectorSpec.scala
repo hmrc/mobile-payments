@@ -39,7 +39,7 @@ class ShutteringConnectorSpec extends BaseSpec with ConnectorStub with MobilePay
 
   "when getShutteringStatus call returns Upstream5xxResponse it" should {
     "return shuttering false" in {
-      performUnsuccessfulGET(Upstream5xxResponse("error", 500, 500))(mockHttp)
+      performUnsuccessfulGET(UpstreamErrorResponse("error", 500, 500))(mockHttp)
       await(sut.getShutteringStatus(journeyId)).shuttered shouldBe false
     }
   }

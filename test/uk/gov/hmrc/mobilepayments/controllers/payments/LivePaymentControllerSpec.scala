@@ -19,13 +19,11 @@ package uk.gov.hmrc.mobilepayments.controllers.payments
 import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
 import payapi.corcommon.model.Origin
-import payapi.corcommon.model.Origins.AppSimpleAssessment
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
-import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
@@ -87,7 +85,7 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockInitiatePayment(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader)
@@ -113,7 +111,7 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockInitiatePayment(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockInitiatePayment(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", s"/payments/$sessionDataId")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
@@ -144,7 +142,7 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockUpdatePayment(Future failed Upstream4xxResponse("Error", 401, 401))
+      mockUpdatePayment(Future failed UpstreamErrorResponse("Error", 401, 401))
 
       val request = FakeRequest("PUT", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -170,7 +168,7 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockUpdatePayment(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockUpdatePayment(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("PUT", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader, contentHeader)
@@ -217,7 +215,7 @@ class LivePaymentControllerSpec
     "return 404" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetPaymentStatus(Future.failed(Upstream4xxResponse("Error", 404, 404)))
+      mockGetPaymentStatus(Future.failed(UpstreamErrorResponse("Error", 404, 404)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader)
@@ -231,7 +229,7 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetPaymentStatus(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+      mockGetPaymentStatus(Future.failed(UpstreamErrorResponse("Error", 401, 401)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader)
@@ -257,7 +255,7 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetPaymentStatus(Future.failed(new Upstream5xxResponse("Error", 502, 502)))
+      mockGetPaymentStatus(Future.failed(UpstreamErrorResponse("Error", 502, 502)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId")
         .withHeaders(acceptJsonHeader)
@@ -287,7 +285,7 @@ class LivePaymentControllerSpec
     "return 404" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetUrlConsumed(Future.failed(Upstream4xxResponse("Error", 404, 404)))
+      mockGetUrlConsumed(Future.failed(UpstreamErrorResponse("Error", 404, 404)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed")
         .withHeaders(acceptJsonHeader)
@@ -301,7 +299,7 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetUrlConsumed(Future.failed(new Upstream4xxResponse("Error", 401, 401)))
+      mockGetUrlConsumed(Future.failed(UpstreamErrorResponse("Error", 401, 401)))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed")
         .withHeaders(acceptJsonHeader)
@@ -327,7 +325,7 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockGetUrlConsumed(Future failed Upstream5xxResponse("Error", 502, 502))
+      mockGetUrlConsumed(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("GET", s"/payments/$sessionDataId/url-consumed")
         .withHeaders(acceptJsonHeader)
@@ -343,10 +341,11 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(Some(latestPaymentsResponse)))
 
-      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
-        .withHeaders(acceptJsonHeader)
+      val request = FakeRequest("POST", s"/payments/latest-payments")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
+      val result = sut.latestPayments(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[LatestPaymentsResponse]
       response.payments.size               shouldBe 2
@@ -361,10 +360,11 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Right(None))
 
-      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
-        .withHeaders(acceptJsonHeader)
+      val request = FakeRequest("POST", s"/payments/latest-payments")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
+      val result = sut.latestPayments(journeyId)(request)
       status(result) shouldBe 404
     }
   }
@@ -375,50 +375,47 @@ class LivePaymentControllerSpec
       shutteringDisabled()
       mockGetLatestPayments(Future successful Left("Unknown response"))
 
-      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
-        .withHeaders(acceptJsonHeader)
+      val request = FakeRequest("POST", s"/payments/latest-payments")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
+      val result = sut.latestPayments(journeyId)(request)
       status(result) shouldBe 500
     }
   }
 
-  "when get latest payments invoked and valid utr for authorised user found but for a different utr" should {
-    "return 403" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-
-      val request = FakeRequest("GET", "/payments/latest-payments/123123123")
-        .withHeaders(acceptJsonHeader)
-
-      val result = sut.latestPaymentsLegacy("123123123", journeyId)(request)
-      status(result) shouldBe 403
-
-    }
-  }
-
-  "when get latest payments invoked and no UTR is found on account" should {
-    "return 401" in {
-      stubAuthorisationGrantAccess(authorisedNoEnrolmentsResponse)
-
-      val request = FakeRequest("GET", s"/payments/latest-payments/$utr")
-        .withHeaders(acceptJsonHeader)
-
-      val result = sut.latestPaymentsLegacy(utr, journeyId)(request)
-      status(result) shouldBe 401
-    }
-  }
-
-  "when get pay by card url invoked and service returns success then" should {
+  "when get pay by card url invoked with self assessment and service returns success then" should {
     "return 200" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
+      stubGetNinoFromAuth(Some(nino))
       mockPayByCardUrl(Future successful payByCardResponse)
 
-      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      val result = sut.getPayByCardURL(journeyId)(request)
+      status(result) shouldBe 200
+      val response = contentAsJson(result).as[PayByCardResponse]
+      response.payByCardUrl shouldBe "/pay/choose-a-way-to-pay?traceId=12345678"
+    }
+  }
+
+  "when get pay by card url invoked with simple assessment and service returns success then" should {
+    "return 200" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+      shutteringDisabled()
+      stubGetNinoFromAuth(Some(nino))
+      mockPayByCardUrl(Future successful payByCardResponse)
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(
+          Json.obj("amountInPence" -> 1234, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> utr)
+        )
+
+      val result = sut.getPayByCardURL(journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[PayByCardResponse]
       response.payByCardUrl shouldBe "/pay/choose-a-way-to-pay?traceId=12345678"
@@ -430,11 +427,11 @@ class LivePaymentControllerSpec
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
 
-      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("bad-key" -> 1234))
 
-      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      val result = sut.getPayByCardURL(journeyId)(request)
       status(result) shouldBe 400
     }
   }
@@ -443,13 +440,30 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockPayByCardUrl(Future failed Upstream4xxResponse("Error", 401, 401))
+      stubGetNinoFromAuth(Some(nino))
+      mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 401, 401))
 
-      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      val result = sut.getPayByCardURL(journeyId)(request)
+      status(result) shouldBe 401
+    }
+  }
+
+  "when get pay by card url invoked and no nino is found then" should {
+    "return 401" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+      shutteringDisabled()
+      stubGetNinoFromAuth(None)
+      mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 401, 401))
+
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
+
+      val result = sut.getPayByCardURL(journeyId)(request)
       status(result) shouldBe 401
     }
   }
@@ -458,11 +472,11 @@ class LivePaymentControllerSpec
     "return 401" in {
       stubAuthorisationWithAuthorisationException()
 
-      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
+      val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
+        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.getPayByCardURL(utr, journeyId)(request)
+      val result = sut.getPayByCardURL(journeyId)(request)
       status(result) shouldBe 401
     }
   }
@@ -471,153 +485,14 @@ class LivePaymentControllerSpec
     "return 500" in {
       stubAuthorisationGrantAccess(authorisedResponse)
       shutteringDisabled()
-      mockPayByCardUrl(Future failed Upstream5xxResponse("Error", 502, 502))
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
-
-      val result = sut.getPayByCardURL(utr, journeyId)(request)
-      status(result) shouldBe 500
-    }
-  }
-
-  "when get pay by card url invoked and valid utr for authorised user found but for a different utr" should {
-    "return 403" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-
-      val request = FakeRequest("POST", "/payments/pay-by-card/123123123")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
-
-      val result = sut.getPayByCardURL("123123123", journeyId)(request)
-      status(result) shouldBe 403
-
-    }
-  }
-
-  "when get pay by card url invoked and no UTR is found on account" should {
-    "return 401" in {
-      stubAuthorisationGrantAccess(authorisedNoEnrolmentsResponse)
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card/$utr")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234))
-
-      val result = sut.getPayByCardURL(utr, journeyId)(request)
-      status(result) shouldBe 401
-    }
-  }
-
-  "when get pay by card url generic invoked with self assessment and service returns success then" should {
-    "return 200" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-      shutteringDisabled()
       stubGetNinoFromAuth(Some(nino))
-      mockPayByCardUrlGeneric(Future successful payByCardResponse)
+      mockPayByCardUrl(Future failed UpstreamErrorResponse("Error", 502, 502))
 
       val request = FakeRequest("POST", s"/payments/pay-by-card")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
         .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
 
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
-      status(result) shouldBe 200
-      val response = contentAsJson(result).as[PayByCardResponse]
-      response.payByCardUrl shouldBe "/pay/choose-a-way-to-pay?traceId=12345678"
-    }
-  }
-
-  "when get pay by card url generic invoked with simple assessment and service returns success then" should {
-    "return 200" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-      shutteringDisabled()
-      stubGetNinoFromAuth(Some(nino))
-      mockPayByCardUrlGeneric(Future successful payByCardResponse)
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(
-          Json.obj("amountInPence" -> 1234, "taxType" -> "appSimpleAssessment", "taxYear" -> 2023, "reference" -> utr)
-        )
-
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
-      status(result) shouldBe 200
-      val response = contentAsJson(result).as[PayByCardResponse]
-      response.payByCardUrl shouldBe "/pay/choose-a-way-to-pay?traceId=12345678"
-    }
-  }
-
-  "when get pay by card url generic invoked with malformed json then" should {
-    "return 400" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-      shutteringDisabled()
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("bad-key" -> 1234))
-
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
-      status(result) shouldBe 400
-    }
-  }
-
-  "when get pay by card url generic invoked and service returns 401 then" should {
-    "return 401" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-      shutteringDisabled()
-      stubGetNinoFromAuth(Some(nino))
-      mockPayByCardUrlGeneric(Future failed Upstream4xxResponse("Error", 401, 401))
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
-
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
-      status(result) shouldBe 401
-    }
-  }
-
-  "when get pay by card url generic invoked and no nino is found then" should {
-    "return 401" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-      shutteringDisabled()
-      stubGetNinoFromAuth(None)
-      mockPayByCardUrlGeneric(Future failed Upstream4xxResponse("Error", 401, 401))
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
-
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
-      status(result) shouldBe 401
-    }
-  }
-
-  "when get pay by card url generic invoked and auth fails then" should {
-    "return 401" in {
-      stubAuthorisationWithAuthorisationException()
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
-
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
-      status(result) shouldBe 401
-    }
-  }
-
-  "when get pay by card url generic invoked and service returns 5XX then" should {
-    "return 500" in {
-      stubAuthorisationGrantAccess(authorisedResponse)
-      shutteringDisabled()
-      stubGetNinoFromAuth(Some(nino))
-      mockPayByCardUrlGeneric(Future failed Upstream5xxResponse("Error", 502, 502))
-
-      val request = FakeRequest("POST", s"/payments/pay-by-card")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
-        .withBody(Json.obj("amountInPence" -> 1234, "taxType" -> "appSelfAssessment", "reference" -> utr))
-
-      val result = sut.getPayByCardURLGeneric(journeyId)(request)
+      val result = sut.getPayByCardURL(journeyId)(request)
       status(result) shouldBe 500
     }
   }
@@ -678,14 +553,8 @@ class LivePaymentControllerSpec
 
   private def mockPayByCardUrl(future: Future[PayByCardResponse]): Unit =
     (mockPaymentsService
-      .getPayByCardUrl(_: String, _: Long, _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
-      .expects(*, *, journeyId, *, *)
-      .returning(future)
-
-  private def mockPayByCardUrlGeneric(future: Future[PayByCardResponse]): Unit =
-    (mockPaymentsService
-      .getPayByCardUrlGeneric(_: PayByCardRequestGeneric, _: Option[String], _: JourneyId)(_: ExecutionContext,
-                                                                                           _: HeaderCarrier))
+      .getPayByCardUrl(_: PayByCardRequestGeneric, _: Option[String], _: JourneyId)(_: ExecutionContext,
+                                                                                    _: HeaderCarrier))
       .expects(*, *, journeyId, *, *)
       .returning(future)
 
