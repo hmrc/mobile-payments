@@ -29,30 +29,27 @@ import java.util.UUID
 class AuditServiceSpec extends BaseSpec with AuditStub {
 
   private implicit val mockConnector: AuditConnector = mock[AuditConnector]
-  private val amount:                 BigDecimal     = 154.63
   private val amountInPence:          Long           = 15463L
   private val saUtr:                  SaUtr          = SaUtr("CS700100A")
   private val p302ChargeRef:          String         = "5544332211"
   private val bank:                   String         = "barclays-personal"
 
   private val appSaSessionData: SessionDataResponse = SessionDataResponse(
-    sessionDataId = UUID.randomUUID().toString,
-    amount        = Some(amount),
-    amountInPence = Some(amount * 100),
-    bankId        = Some("barclays-personal"),
-    state         = "",
-    createdOn     = LocalDateTime.now(),
-    paymentDate   = None,
-    saUtr         = None,
-    reference     = Some(saUtr.utr),
-    email         = None,
-    emailSent     = None,
-    origin        = AppSa,
+    sessionDataId   = UUID.randomUUID().toString,
+    amountInPence   = amountInPence,
+    bankId          = Some("barclays-personal"),
+    state           = "",
+    createdOn       = LocalDateTime.now(),
+    paymentDate     = None,
+    reference       = saUtr.utr,
+    email           = None,
+    emailSent       = None,
+    origin          = AppSa,
     maybeFutureDate = None
   )
 
   private val appSimpleAssessmentSessionData =
-    appSaSessionData.copy(reference = Some(p302ChargeRef), origin = AppSimpleAssessment)
+    appSaSessionData.copy(reference = p302ChargeRef, origin = AppSimpleAssessment)
 
   private val sut = new AuditService(mockConnector, "mobile-payments")
 
