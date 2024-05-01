@@ -20,7 +20,6 @@ import com.google.inject.{Inject, Singleton}
 import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
 import play.api.libs.json.Json.obj
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mobilepayments.domain.AmountInPence
 import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.play.audit.AuditExtensions.auditHeaderCarrier
@@ -49,12 +48,12 @@ class AuditService @Inject() (
         tags = hc.toAuditTags(AuditService.transactionName, AuditService.paymentPath),
         detail = obj(
           AuditService.journeyIdKey -> journeyId,
-          if (sessionData.origin == AppSa) AuditService.utrKey -> sessionData.reference.getOrElse("").toString
+          if (sessionData.origin == AppSa) AuditService.utrKey -> sessionData.reference.toString
           else AuditService.utrKey                             -> "",
           if (sessionData.origin == AppSimpleAssessment)
-            AuditService.p302ChargeRefKey    -> sessionData.reference.getOrElse("").toString
+            AuditService.p302ChargeRefKey    -> sessionData.reference.toString
           else AuditService.p302ChargeRefKey -> "",
-          AuditService.amountKey  -> AmountInPence(sessionData.amount.getOrElse(0)).value,
+          AuditService.amountKey  -> sessionData.amountInPence,
           AuditService.taxTypeKey -> taxType,
           AuditService.bankKey    -> sessionData.bankId.getOrElse("").toString
         )

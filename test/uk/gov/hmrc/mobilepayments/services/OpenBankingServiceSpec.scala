@@ -236,13 +236,11 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount.get shouldEqual 125.64
-      result.amountInPence.get shouldEqual BigDecimal.valueOf(12564)
+      result.amountInPence shouldEqual BigDecimal.valueOf(12564)
       result.bankId shouldEqual None
       result.state shouldEqual "SessionInitiated"
       result.paymentDate shouldEqual None
-      result.saUtr.get.value shouldEqual "CS700100A"
-      result.reference.get shouldEqual "CS700100AK"
+      result.reference shouldEqual "CS700100AK"
     }
   }
 
@@ -252,13 +250,11 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount.get shouldEqual 125.64
-      result.amountInPence.get shouldEqual 12564
+      result.amountInPence shouldEqual 12564
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "BankSelected"
       result.paymentDate shouldEqual None
-      result.saUtr.get.value shouldEqual "CS700100A"
-      result.reference.get shouldEqual "CS700100AK"
+      result.reference shouldEqual "CS700100AK"
     }
   }
 
@@ -268,13 +264,11 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount.get shouldEqual 125.64
-      result.amountInPence.get shouldEqual 12564
+      result.amountInPence shouldEqual 12564
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "PaymentFinished"
       result.paymentDate shouldEqual Some(LocalDate.now())
-      result.saUtr.get.value shouldEqual "CS700100A"
-      result.reference.get shouldEqual "CS700100AK"
+      result.reference shouldEqual "CS700100AK"
     }
   }
 
@@ -284,13 +278,11 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
-      result.amount.get shouldEqual 125.64
-      result.amountInPence.get shouldEqual 12564
+      result.amountInPence shouldEqual 12564
       result.bankId shouldEqual Some("a-bank-id")
       result.state shouldEqual "PaymentFinalised"
       result.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
-      result.saUtr.get.value shouldEqual "CS700100A"
-      result.reference.get shouldEqual "CS700100AK"
+      result.reference shouldEqual "CS700100AK"
     }
   }
 

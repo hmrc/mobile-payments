@@ -144,12 +144,10 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 200
       val parsedResponse = Json.parse(response.body).as[SessionDataResponse]
       parsedResponse.sessionDataId shouldEqual sessionDataId
-      parsedResponse.amount.get shouldEqual 125.64
-      parsedResponse.amountInPence.get shouldEqual 12564
+      parsedResponse.amountInPence shouldEqual 12564
       parsedResponse.bankId shouldEqual Some("a-bank-id")
       parsedResponse.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
-      parsedResponse.saUtr.get.value shouldEqual "CS700100A"
-      parsedResponse.reference.get shouldEqual "CS700100AK"
+      parsedResponse.reference shouldEqual "CS700100AK"
       parsedResponse.email.get shouldEqual "test@test.com"
     }
 

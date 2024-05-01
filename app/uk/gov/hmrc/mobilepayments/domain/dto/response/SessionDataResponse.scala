@@ -24,14 +24,12 @@ import java.time.{LocalDate, LocalDateTime}
 
 final case class SessionDataResponse(
   sessionDataId: String,
-  amount:        Option[BigDecimal],
-  amountInPence: Option[BigDecimal],
+  amountInPence: BigDecimal,
   bankId:        Option[String],
   state:         String,
   createdOn:     LocalDateTime,
   paymentDate:   Option[LocalDate],
-  saUtr:         Option[SaUtr],
-  reference:     Option[String],
+  reference:     String,
   email:         Option[String],
   emailSent:     Option[Boolean],
   origin:        Origin,

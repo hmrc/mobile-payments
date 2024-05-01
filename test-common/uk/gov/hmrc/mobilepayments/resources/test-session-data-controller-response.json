@@ -1,6 +1,5 @@
 {
   "sessionDataId": "51cc67d6-21da-11ec-9621-0242ac130002",
-  "amount": 125.64,
   "amountInPence": 12564,
   "taxType": "selfAssessment",
   "searchOptions": {
@@ -11,7 +10,6 @@
   "bankId": "some-bank-id",
   "state": "BankSelected",
   "createdOn": "2021-11-03T10:15:30",
-  "saUtr": "CS700100A",
   "reference": "CS700100AK",
   "origin": "AppSa"
 }

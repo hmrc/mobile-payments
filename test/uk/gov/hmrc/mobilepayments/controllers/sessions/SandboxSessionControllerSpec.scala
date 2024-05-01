@@ -83,11 +83,9 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
       response.state shouldEqual "BankSelected"
-      response.amount.get shouldEqual 125.64
-      response.amountInPence.get shouldEqual 12564
+      response.amountInPence shouldEqual 12564
       response.bankId shouldEqual Some("obie-barclays-personal")
-      response.saUtr.get.value shouldEqual "1555369056"
-      response.reference.get shouldEqual "1555369056K"
+      response.reference shouldEqual "1555369056K"
       response.origin shouldEqual AppSa
       response.maybeFutureDate shouldEqual Some(LocalDate.parse("2024-02-28"))
     }
@@ -105,11 +103,9 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       status(result) shouldBe 200
       val response = contentAsJson(result).as[SessionDataResponse]
       response.sessionDataId shouldEqual sessionDataId
-      response.amount.get shouldEqual 125.64
-      response.amountInPence.get shouldEqual 12564
+      response.amountInPence shouldEqual 12564
       response.bankId shouldEqual Some("obie-barclays-personal")
-      response.saUtr.get.value shouldEqual "1555369056"
-      response.reference.get shouldEqual "1555369056K"
+      response.reference shouldEqual "1555369056K"
       response.email.get shouldEqual "test@test.com"
       response.state shouldEqual "PaymentFinished"
       response.maybeFutureDate shouldEqual None

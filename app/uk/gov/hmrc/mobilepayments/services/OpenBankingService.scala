@@ -95,11 +95,6 @@ class OpenBankingService @Inject() (
     connector
       .getSession(sessionDataId, journeyId)
       .map { data: SessionData[OriginSpecificSessionData] =>
-        val maybeSaUtr =
-          if (data.originSpecificData.origin == AppSa)
-            Some(SaUtr(data.originSpecificData.asInstanceOf[AppSaSessionData].saUtr.value))
-          else None
-
         val bankId: Option[String] = data.sessionState match {
           case SessionInitiated => None
           case t: BankSelected     => Some(t.bankId.value)
@@ -141,18 +136,16 @@ class OpenBankingService @Inject() (
         }
 
         SessionDataResponse(
-          sessionDataId = data._id.value,
-          amount        = Some(data.amount.inPounds),
-          amountInPence = Some(data.amount.value),
-          bankId        = bankId,
-          state         = state,
-          createdOn     = data.createdOn,
-          paymentDate   = paymentDate,
-          saUtr         = maybeSaUtr,
-          reference     = Some(data.originSpecificData.paymentReference.value),
-          email         = email,
-          emailSent     = emailSent,
-          origin        = data.originSpecificData.origin,
+          sessionDataId   = data._id.value,
+          amountInPence   = data.amount.value,
+          bankId          = bankId,
+          state           = state,
+          createdOn       = data.createdOn,
+          paymentDate     = paymentDate,
+          reference       = data.originSpecificData.paymentReference.value,
+          email           = email,
+          emailSent       = emailSent,
+          origin          = data.originSpecificData.origin,
           maybeFutureDate = data.futureDatedPayment.map(_.chosenDate)
         )
       }
@@ -214,11 +207,11 @@ class OpenBankingService @Inject() (
   ): Future[Unit] = connector.setEmail(sessionDataId, email, journeyId)
 
   def setFutureDate(
-  sessionDataId:           String,
-  maybeFutureDate:         LocalDate,
-  journeyId:               JourneyId
- )(implicit headerCarrier: HeaderCarrier,
-   executionContext:       ExecutionContext
+    sessionDataId:          String,
+    maybeFutureDate:        LocalDate,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
   ): Future[Unit] = connector.setFutureDate(sessionDataId, maybeFutureDate, journeyId)
 
   private def groupBanks(banks: List[Bank])(implicit hc: HeaderCarrier): Future[List[BankGroupData]] =
@@ -237,7 +230,7 @@ class OpenBankingService @Inject() (
     executionContext:       ExecutionContext
   ): Future[Unit] = {
     val taxType: String = origin match {
-      case AppSa => "Self Assessment"
+      case AppSa               => "Self Assessment"
       case AppSimpleAssessment => "Simple Assessment"
     }
     for {
