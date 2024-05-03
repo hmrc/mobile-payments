@@ -1,4 +1,4 @@
-Clear Email
+Clear Future Date
 ----
 
 ### Clear the future date for a given session ID.

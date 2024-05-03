@@ -334,9 +334,7 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
       val request: WSRequest = wsUrl(s"/sessions/$sessionDataId/clear-future-date?journeyId=$journeyId")
         .addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
-      println(request)
       val response = await(request.delete())
-      println(response)
       response.status shouldBe 204
     }
 
