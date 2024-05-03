@@ -135,6 +135,26 @@ class LiveSessionController @Inject() (
       }
     }
 
+  override def clearFutureDate(
+                                sessionDataId: String,
+                                journeyId: JourneyId
+                              ): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
+      implicit val hc: HeaderCarrier = fromRequest(request)
+      shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          withErrorWrapper {
+            openBankingService
+              .clearFutureDate(
+                sessionDataId,
+                journeyId
+              )
+              .map(_ => NoContent)
+          }
+        }
+      }
+    }
+
   override def clearEmail(
     sessionDataId: String,
     journeyId:     JourneyId

@@ -42,4 +42,9 @@ trait SessionController {
     sessionDataId: String,
     journeyId:     JourneyId
   ): Action[AnyContent]
+
+  def clearFutureDate(
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent]
 }

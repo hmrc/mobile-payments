@@ -214,6 +214,13 @@ class OpenBankingService @Inject() (
     executionContext:       ExecutionContext
   ): Future[Unit] = connector.setFutureDate(sessionDataId, maybeFutureDate, journeyId)
 
+  def clearFutureDate(
+    sessionDataId:          String,
+    journeyId:              JourneyId
+  )(implicit headerCarrier: HeaderCarrier,
+    executionContext:       ExecutionContext
+  ): Future[Unit] = connector.clearFutureDate(sessionDataId, journeyId)
+
   private def groupBanks(banks: List[Bank])(implicit hc: HeaderCarrier): Future[List[BankGroupData]] =
     Future successful banks
       .groupBy(_.group)

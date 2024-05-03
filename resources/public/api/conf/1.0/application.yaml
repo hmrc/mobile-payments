@@ -1006,6 +1006,39 @@ paths:
       security:
         - userRestricted:
             - read:native-apps-api-orchestration
+  /mobile/payments/sessions/{sessionDataId}/clear-future-date:
+    delete:
+      tags:
+        - mobile
+      summary: Clear a future date for the user's session
+      operationId: Clearafuturedatefortheuser'ssession
+      parameters:
+        - name: sessionDataId
+          in: path
+          description: The ID associated with the payment session.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 51cc67d6-21da-11ec-9621-0242ac130002
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 27085215-69a4-4027-8f72-b04b10ec16b0
+      responses:
+        '204':
+          description: ''
+          headers: {}
+          content: {}
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
   /mobile/payments/sessions/{sessionDataId}/clear-email:
     delete:
       tags:
