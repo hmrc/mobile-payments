@@ -325,4 +325,42 @@ class LiveSessionControllerISpec extends BaseISpec with MobilePaymentsTestData {
       response.status shouldBe 521
     }
   }
+
+  "DELETE /sessions/:sessionDataId/clear-future-date" should {
+    "return 204 when call is successful" in {
+      grantAccess()
+      stubForShutteringDisabled
+      stubForClearFutureDate()
+
+      val request: WSRequest = wsUrl(s"/sessions/$sessionDataId/clear-future-date?journeyId=$journeyId")
+        .addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      println(request)
+      val response = await(request.delete())
+      println(response)
+      response.status shouldBe 204
+    }
+
+    "return 401 when auth fails" in {
+      authorisationRejected()
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/clear-future-date?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader)
+      val response = await(request.delete())
+
+      response.status shouldBe 401
+    }
+
+    "return 521 when shuttered" in {
+      grantAccess()
+      stubForShutteringEnabled
+
+      val request: WSRequest = wsUrl(
+        s"/sessions/$sessionDataId/clear-future-date?journeyId=$journeyId"
+      ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
+      val response = await(request.delete())
+      response.status shouldBe 521
+    }
+  }
+
 }
