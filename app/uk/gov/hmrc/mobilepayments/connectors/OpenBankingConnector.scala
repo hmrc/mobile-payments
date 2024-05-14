@@ -21,6 +21,7 @@ import com.google.inject.name.Named
 import openbanking.cor.model.request.InitiateEmailSendRequest
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.mobilepayments.domain.dto.request._
@@ -146,8 +147,9 @@ class OpenBankingConnector @Inject() (
                      )(implicit headerCarrier: HeaderCarrier
                      ): Future[Unit] =
     http
-      .POSTEmpty[Unit](
-        s"$serviceUrl/open-banking/session/$sessionDataId/update-date?journeyId=${journeyId.value}"
+      .POST[JsValue,Unit](
+        url = s"$serviceUrl/open-banking/session/$sessionDataId/update-date?journeyId=${journeyId.value}",
+        body = Json.parse("{}")
       )
 
   def sendEmail(
