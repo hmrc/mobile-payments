@@ -23,6 +23,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.DefaultAwaitTimeout
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.AuthorisationStub
@@ -46,6 +47,6 @@ trait BaseSpec extends AnyWordSpec with MockFactory with Matchers with DefaultAw
     Set(Enrolment("IR-SA", identifiers = Seq(EnrolmentIdentifier("UTR", "12212321")), state = "Activated"))
 
   val confidenceLevel:         ConfidenceLevel = ConfidenceLevel.L200
-  val authorisedResponse:      GrantAccess     = confidenceLevel
-  val authorisedLowCLResponse: GrantAccess     = ConfidenceLevel.L50
+  val authorisedResponse:      GrantAccess     = confidenceLevel and Enrolments(enrolments)
+  val authorisedLowCLResponse: GrantAccess     = ConfidenceLevel.L50 and Enrolments(enrolments)
 }
