@@ -37,7 +37,8 @@ object AuthStub {
                |    }
                |    ],
                |  "retrieve": [
-               |    "confidenceLevel"
+               |    "confidenceLevel",
+               |    "allEnrolments"
                |  ]
                |}
           """.stripMargin,
@@ -50,6 +51,14 @@ object AuthStub {
             .withStatus(200)
             .withBody(s"""
                          |{
+                         |  "allEnrolments": [{
+                         |      "key": "IR-SA",
+                         |      "identifiers": [{
+                         |        "key": "UTR",
+                         |        "value": "1122334455"
+                         |      }],
+                         |      "state": "Activated"
+                         |  }],
                          |  "confidenceLevel": $confidenceLevel
                          |}
           """.stripMargin)
@@ -72,7 +81,8 @@ object AuthStub {
                |    }
                |    ],
                |  "retrieve": [
-               |    "confidenceLevel"
+               |    "confidenceLevel",
+               |    "allEnrolments"
                |  ]
                |}
           """.stripMargin,

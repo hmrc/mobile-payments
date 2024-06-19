@@ -21,9 +21,10 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength, Enrolments}
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -34,17 +35,26 @@ trait Authorisation extends Results with AuthorisedFunctions {
   val confLevel: Int
   private val logger: Logger = Logger(this.getClass)
 
-  lazy val requiresAuth               = true
-  private lazy val lowConfidenceLevel = new AccountWithLowCL
+  lazy val requiresAuth                 = true
+  private lazy val lowConfidenceLevel   = new AccountWithLowCL
+  private lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
+  private lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
 
   def grantAccess(
-  )(implicit hc: HeaderCarrier,
-    ec:          ExecutionContext
+    requestedUtr: Option[String] = None
+  )(implicit hc:  HeaderCarrier,
+    ec:           ExecutionContext
   ): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
-      .retrieve(confidenceLevel) { foundConfidenceLevel =>
-        if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
-        else Future successful true
+      .retrieve(confidenceLevel and allEnrolments) {
+        case foundConfidenceLevel ~ enrolments =>
+          if (requestedUtr.isDefined) {
+            val activatedUtr = getActivatedSaUtr(enrolments)
+            if (activatedUtr.isEmpty) throw utrNotFoundOnAccount
+            if (!activatedUtr.getOrElse(SaUtr("")).utr.equals(requestedUtr.getOrElse(""))) throw failedToMatchUtr
+          }
+          if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
+          else Future successful true
       }
 
   def invokeAuthBlock[A](
@@ -59,7 +69,7 @@ trait Authorisation extends Results with AuthorisedFunctions {
         block(request)
       }
       .recover {
-        case _: uk.gov.hmrc.http.Upstream4xxResponse =>
+        case e: UpstreamErrorResponse if (e.statusCode > 399 && e.statusCode < 500) =>
           logger.info("Unauthorized! Failed to grant access since 4xx response!")
           Unauthorized(Json.toJson(ErrorUnauthorized.asInstanceOf[ErrorResponse]))
 
