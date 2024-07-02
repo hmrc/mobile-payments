@@ -44,8 +44,3 @@ Post Session
 
     * **Code:** 406 NOT_ACCEPTABLE <br/>
       **Content:** `{"code":"NOT_ACCEPTABLE","message":Missing Accept Header"}`
-
-
-
-
-

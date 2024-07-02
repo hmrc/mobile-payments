@@ -35,11 +35,3 @@ Clear Email
 
     * **Code:** 406 NOT_ACCEPTABLE <br/>
       **Content:** `{"code":"NOT_ACCEPTABLE","message":Missing Accept Header"}`
-
-  OR when a user does not exist or server failure
-
-    * **Code:** 500 INTERNAL_SERVER_ERROR <br/>
-
-
-
-

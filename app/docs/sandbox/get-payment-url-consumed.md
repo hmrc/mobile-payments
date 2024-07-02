@@ -45,7 +45,3 @@ a boolean status that indicates whether the payment URL for a given session is s
 
     * **Code:** 406 NOT_ACCEPTABLE <br/>
       **Content:** `{"code":"NOT_ACCEPTABLE","message":Missing Accept Header"}`
-
-
-
-

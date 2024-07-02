@@ -46,7 +46,3 @@ a URL that the client app will navigate to in order to process the payment.
 
     * **Code:** 406 NOT_ACCEPTABLE <br/>
       **Content:** `{"code":"NOT_ACCEPTABLE","message":Missing Accept Header"}`
-
-
-
-
