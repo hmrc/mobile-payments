@@ -37,7 +37,7 @@ Get Banks
           "friendlyName": "Barclays Personal",
           "iconUrl": "https://public.ecospend.com/images/banks/Barclays_icon.svg",
           "group": "Barclays",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-barclays-business",
@@ -45,7 +45,7 @@ Get Banks
           "friendlyName": "Barclays Business",
           "iconUrl": "https://public.ecospend.com/images/banks/Barclays_icon.svg",
           "group": "Barclays",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/Barclays_icon.svg"
@@ -60,7 +60,7 @@ Get Banks
           "friendlyName": "Lloyds Personal",
           "iconUrl": "https://public.ecospend.com/images/banks/Lloyds_icon.svg",
           "group": "Lloyds",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-lloyds-business",
@@ -68,7 +68,7 @@ Get Banks
           "friendlyName": "Lloyds Business",
           "iconUrl": "https://public.ecospend.com/images/banks/Lloyds_icon.svg",
           "group": "Lloyds",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/Lloyds_icon.svg"
@@ -83,7 +83,7 @@ Get Banks
           "friendlyName": "Monzo Persnal",
           "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
           "group": "Monzo",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-monzo-business",
@@ -91,7 +91,7 @@ Get Banks
           "friendlyName": "Monzo Business",
           "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
           "group": "Monzo",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-monzo-special",
@@ -99,7 +99,7 @@ Get Banks
           "friendlyName": "Monzo Special",
           "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg",
           "group": "Monzo",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/Monzo_icon.svg"
@@ -114,7 +114,7 @@ Get Banks
           "friendlyName": "Natwest Personal",
           "iconUrl": "https://public.ecospend.com/images/banks/NatWest_icon.svg",
           "group": "Natwest",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-natwest-business",
@@ -122,7 +122,7 @@ Get Banks
           "friendlyName": "Natwest Business",
           "iconUrl": "https://public.ecospend.com/images/banks/NatWest_icon.svg",
           "group": "Natwest",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/NatWest_icon.svg"
@@ -137,7 +137,7 @@ Get Banks
           "friendlyName": "HSBC Personal",
           "iconUrl": "https://public.ecospend.com/images/banks/HSBC_icon.svg",
           "group": "HSBC",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-hsbc-business",
@@ -145,7 +145,7 @@ Get Banks
           "friendlyName": "HSBC Business",
           "iconUrl": "https://public.ecospend.com/images/banks/HSBC_icon.svg",
           "group": "HSBC",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/HSBC_icon.svg"
@@ -160,7 +160,7 @@ Get Banks
           "friendlyName": "Santander Personal",
           "iconUrl": "https://public.ecospend.com/images/banks/Santander_icon.svg",
           "group": "Santander",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-santander-business",
@@ -168,7 +168,7 @@ Get Banks
           "friendlyName": "Santander Business",
           "iconUrl": "https://public.ecospend.com/images/banks/Santander_icon.svg",
           "group": "Santander",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/Santander_icon.svg"
@@ -183,7 +183,7 @@ Get Banks
           "friendlyName": "Chase",
           "iconUrl": "https://public.ecospend.com/images/banks/Chase-Bank_icon.svg",
           "group": "Chase Bank",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/Chase-Bank_icon.svg"
@@ -198,7 +198,7 @@ Get Banks
           "friendlyName": "RBS Personal",
           "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
           "group": "RBS",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-rbs-business",
@@ -206,7 +206,7 @@ Get Banks
           "friendlyName": "RBS Business",
           "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
           "group": "RBS",
-          "hasFdp": false
+          "hasFdp": true
         },
         {
           "bankId": "obie-rbs-bankline",
@@ -214,7 +214,7 @@ Get Banks
           "friendlyName": "RBS Bankline",
           "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg",
           "group": "RBS",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/RBS_icon.svg"
@@ -229,7 +229,7 @@ Get Banks
           "friendlyName": "M&S Bank",
           "iconUrl": "https://public.ecospend.com/images/banks/M&S_icon.svg",
           "group": "M&S Bank",
-          "hasFdp": false
+          "hasFdp": true
         }
       ],
       "iconUrl": "https://public.ecospend.com/images/banks/M&S_icon.svg"
