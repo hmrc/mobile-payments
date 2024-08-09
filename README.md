@@ -72,8 +72,8 @@ To test different scenarios, add a header "SANDBOX-CONTROL" to specify the appro
 | ```sandbox/sessions```                                  | POST                | Acts as a stub for the related live endpoint. [More...](app/docs/sandbox/post-session.md)             |
 | ```sandbox/sessions/:sessionDataId```                   | GET                 | Acts as a stub for the related live endpoint. [More...](app/docs/sandbox/get-session.md)              |
 | ```sandbox/sessions/:sessionDataId/set-email```         | POST                | Acts as a stub for the related live endpoint. [More...](app/docs/sandbox/set-email.md)                |
-| ```sandbox/sessions/:sessionDataId/set-future-date```   | POST                | No sandbox endpoint                                                                                   |
-| ```sandbox/sessions/:sessionDataId/clear-future-date``` | DELETE              | No sandbox endpoint                                                                                   |
+| ```sandbox/sessions/:sessionDataId/set-future-date```   | POST                | Acts as a stub for the related live endpoint. [More...](app/docs/sandbox/set-future-date.md)          |
+| ```sandbox/sessions/:sessionDataId/clear-future-date``` | DELETE              | Acts as a stub for the related live endpoint. [More...](app/docs/sandbox/clear-future-date.md)        |
 | ```sandbox/sessions/:sessionDataId/clear-email```       | DELETE              | Acts as a stub for the related live endpoint. [More...](app/docs/sandbox/clear-email.md)              |
 
 
