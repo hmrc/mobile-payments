@@ -22,8 +22,7 @@ import play.api.mvc._
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength, Enrolments}
-import uk.gov.hmrc.domain.SaUtr
+import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -37,22 +36,13 @@ trait Authorisation extends Results with AuthorisedFunctions {
 
   lazy val requiresAuth                 = true
   private lazy val lowConfidenceLevel   = new AccountWithLowCL
-  private lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
-  private lazy val failedToMatchUtr     = new FailToMatchTaxIdOnAuth
 
-  def grantAccess(
-    requestedUtr: Option[String] = None
-  )(implicit hc:  HeaderCarrier,
+  def grantAccess()(implicit hc:  HeaderCarrier,
     ec:           ExecutionContext
   ): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
       .retrieve(confidenceLevel and allEnrolments) {
         case foundConfidenceLevel ~ enrolments =>
-          if (requestedUtr.isDefined) {
-            val activatedUtr = getActivatedSaUtr(enrolments)
-            if (activatedUtr.isEmpty) throw utrNotFoundOnAccount
-            if (!activatedUtr.getOrElse(SaUtr("")).utr.equals(requestedUtr.getOrElse(""))) throw failedToMatchUtr
-          }
           if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
           else Future successful true
       }
@@ -87,14 +77,6 @@ trait Authorisation extends Results with AuthorisedFunctions {
       }
   }
 
-  private def getActivatedSaUtr(enrolments: Enrolments): Option[SaUtr] =
-    enrolments.enrolments
-      .find(_.key == "IR-SA")
-      .flatMap { enrolment =>
-        enrolment.identifiers
-          .find(id => id.key == "UTR" && enrolment.state == "Activated")
-          .map(key => SaUtr(key.value))
-      }
 }
 
 trait AccessControl extends HeaderValidator with Authorisation {

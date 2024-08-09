@@ -169,6 +169,52 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
     }
   }
 
+  "when set future date invoked then" should {
+    "return 201" in {
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-future-date")
+        .withHeaders(acceptJsonHeader, sandboxHeader)
+        .withBody(Json.obj("maybeFutureDate" -> "2030-01-01"))
+
+      val result = sut.setFutureDate(sessionDataId, journeyId)(request)
+      status(result) shouldBe 201
+    }
+  }
+
+  "when set future date invoked and auth fails then" should {
+    "return 406" in {
+
+      val request = FakeRequest("POST", s"/sessions/$sessionDataId/set-future-date")
+        .withHeaders(sandboxHeader)
+        .withBody(Json.obj("maybeFutureDate" -> "2030-01-01"))
+
+      val result = sut.setFutureDate(sessionDataId, journeyId)(request)
+      status(result) shouldBe 406
+    }
+  }
+
+  "when clear future date invoked then" should {
+    "return 204" in {
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-future-date")
+        .withHeaders(acceptJsonHeader, sandboxHeader)
+
+      val result = sut.clearFutureDate(sessionDataId, journeyId)(request)
+      status(result) shouldBe 204
+    }
+  }
+
+  "when clear future date invoked and auth fails then" should {
+    "return 406" in {
+
+      val request = FakeRequest("DELETE", s"/sessions/$sessionDataId/clear-future-date")
+        .withHeaders(sandboxHeader)
+
+      val result = sut.clearFutureDate(sessionDataId, journeyId)(request)
+      status(result) shouldBe 406
+    }
+  }
+
   private def shutteringDisabled(): CallHandler[Future[Shuttering]] =
     mockShutteringResponse(Shuttering(shuttered = false))
 }

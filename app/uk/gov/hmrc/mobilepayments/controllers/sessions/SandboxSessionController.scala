@@ -101,16 +101,16 @@ class SandboxSessionController @Inject() (
 
   override def setFutureDate(
     sessionDataId: String,
-    journeyId: JourneyId
+    journeyId:     JourneyId
   ): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       Future successful Created
     }
 
   override def clearFutureDate(
-                                sessionDataId: String,
-                                journeyId:     JourneyId
-                              ): Action[AnyContent] =
+    sessionDataId: String,
+    journeyId:     JourneyId
+  ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful NoContent
     }
