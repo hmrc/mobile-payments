@@ -29,6 +29,7 @@ import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -87,6 +88,7 @@ class SandboxSessionController @Inject() (
         .parse(
           findResource(path = s"/resources/mobilepayments/$filename.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+            .replace("<FUTURE_DATE>", LocalDate.now().plusMonths(6).toString)
         )
         .as[SessionDataResponse]
     )
