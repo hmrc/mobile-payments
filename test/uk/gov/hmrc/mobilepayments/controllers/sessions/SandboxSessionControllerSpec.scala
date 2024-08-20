@@ -87,7 +87,7 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       response.bankId shouldEqual Some("obie-barclays-personal")
       response.reference shouldEqual "1555369056K"
       response.origin shouldEqual AppSa
-      response.maybeFutureDate shouldEqual Some(LocalDate.parse("2024-02-28"))
+      response.maybeFutureDate shouldEqual Some(LocalDate.now.plusMonths(6))
     }
   }
 
