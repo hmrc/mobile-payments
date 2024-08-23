@@ -17,7 +17,6 @@
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
 import openbanking.cor.model.response.InitiatePaymentResponse
-import org.joda.time.LocalDate
 import org.scalamock.handlers.CallHandler
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -29,6 +28,7 @@ import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, P
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class SandboxPaymentControllerSpec
