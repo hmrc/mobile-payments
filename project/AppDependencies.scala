@@ -11,7 +11,6 @@ object AppDependencies {
   private val scalaMockVersion = "5.2.0"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "bootstrap-backend-play-29" % bootstrapPlayVersion,
     "uk.gov.hmrc" %% "play-hmrc-api-play-29"     % playHmrcApiVersion,
     "eu.timepit"  %% "refined"                   % refinedVersion,
     "uk.gov.hmrc" %% "domain-play-29"            % domainVersion,
