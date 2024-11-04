@@ -26,9 +26,9 @@ import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class GuiceModule(
-  environment:   Environment,
-  configuration: Configuration)
-    extends AbstractModule {
+                   environment:   Environment,
+                   configuration: Configuration)
+  extends AbstractModule {
 
   val servicesConfig = new ServicesConfig(
     configuration
@@ -37,7 +37,6 @@ class GuiceModule(
   override def configure(): Unit = {
 
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
-    bind(classOf[CorePost]).to(classOf[WSHttpImpl])
     bindConfigInt("controllers.confidenceLevel")
     bindConfigString("openBankingPaymentReturnUrl", "openBankingPaymentReturnUrl")
     bindConfigString("sandboxOpenBankingPaymentUrl", "sandboxOpenBankingPaymentUrl")
@@ -64,8 +63,8 @@ class GuiceModule(
       .to(configuration.underlying.getInt(path))
 
   private def bindConfigString(
-    name: String,
-    path: String
-  ): Unit =
+                                name: String,
+                                path: String
+                              ): Unit =
     bindConstant().annotatedWith(named(name)).to(configuration.underlying.getString(path))
 }

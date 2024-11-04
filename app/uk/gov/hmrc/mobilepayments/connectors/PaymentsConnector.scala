@@ -18,8 +18,10 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import play.api.Logger
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
+import play.api.libs.json.Json
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
 import uk.gov.hmrc.mobilepayments.domain.dto.request._
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
@@ -30,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class PaymentsConnector @Inject() (
-  http:                                   HttpClient,
+  http:                                   HttpClientV2,
   @Named("payments") serviceUrl:          String,
   @Named("payByCardReturnUrl") returnUrl: String,
   @Named("payByCardBackUrl") backUrl:     String
@@ -51,7 +53,7 @@ class PaymentsConnector @Inject() (
       else
         s"$serviceUrl/pay-api/v2/payment/search/${reference.getOrElse("")}?taxType=${convertTaxTypeToPaymentsFormat(taxType.get)}&journeyId=${journeyId.value}"
     }
-    http.GET[HttpResponse](url) map { response =>
+    http.get(url"$url").execute[HttpResponse] map { response =>
       response.status match {
         case OK =>
           Try(response.json.as[PaymentRecordListFromApi]) match {
@@ -76,11 +78,11 @@ class PaymentsConnector @Inject() (
     saUtr:                  SaUtr,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[PayApiPayByCardResponse] =
-    http.POST[PayApiPayByCardRequest, PayApiPayByCardResponse](
-      url = s"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}",
-      PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl)
-    )
+  ): Future[PayApiPayByCardResponse] = {
+    http.post(url"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}")
+      .withBody(Json.toJson(PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl)))
+      .execute[PayApiPayByCardResponse]
+  }
 
   def getPayByCardUrlSimpleAssessment(
     amount:                 Long,
@@ -89,11 +91,12 @@ class PaymentsConnector @Inject() (
     taxYear:                Int,
     journeyId:              JourneyId
   )(implicit headerCarrier: HeaderCarrier
-  ): Future[PayApiPayByCardResponse] =
-    http.POST[PayByCardAPISimpleAssessmentRequest, PayApiPayByCardResponse](
-      url = s"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}",
-      PayByCardAPISimpleAssessmentRequest(reference, nino, taxYear, amount, returnUrl, backUrl)
-    )
+  ): Future[PayApiPayByCardResponse] = {
+    http
+      .post(url"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}")
+      .withBody(Json.toJson(PayByCardAPISimpleAssessmentRequest(reference, nino, taxYear, amount, returnUrl, backUrl)))
+      .execute[PayApiPayByCardResponse]
+  }
 
   private def convertTaxTypeToPaymentsFormat(taxType: TaxTypeEnum.Value): String =
     taxType match {

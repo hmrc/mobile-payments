@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,21 +25,19 @@ import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 import scala.concurrent.Future
 
 class ShutteringConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData {
-  val mockHttp:                   HttpClient    = mock[HttpClient]
-  implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  val sut = new ShutteringConnector(mockHttp, "baseUrl")
+  val sut = new ShutteringConnector(mockHttp, "https://baseUrl")
 
   "when getShutteringStatus call is successful it" should {
     "return shuttering true" in {
-      performSuccessfulGET(Future.successful(shutteredResponse))(mockHttp)
+      performGET(Future.successful(shutteredResponse))
       await(sut.getShutteringStatus(journeyId)).shuttered shouldBe true
     }
   }
 
   "when getShutteringStatus call returns Upstream5xxResponse it" should {
     "return shuttering false" in {
-      performUnsuccessfulGET(UpstreamErrorResponse("error", 500, 500))(mockHttp)
+      performGET(Future.failed(UpstreamErrorResponse("error", 500, 500)))
       await(sut.getShutteringStatus(journeyId)).shuttered shouldBe false
     }
   }

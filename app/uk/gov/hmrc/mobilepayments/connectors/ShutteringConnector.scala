@@ -20,7 +20,8 @@ import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
@@ -28,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ShutteringConnector @Inject() (
-  http:                                   HttpClient,
+  http:                                   HttpClientV2,
   @Named("mobile-shuttering") serviceUrl: String) {
 
   val logger: Logger = Logger(this.getClass)
@@ -39,9 +40,8 @@ class ShutteringConnector @Inject() (
     ex:                     ExecutionContext
   ): Future[Shuttering] =
     http
-      .GET[Shuttering](
-        s"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId"
-      )
+      .get(url"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId")
+      .execute[Shuttering]
       .recover {
         case e: UpstreamErrorResponse =>
           logger.warn(s"Internal Server Error received from mobile-shuttering:\n $e \nAssuming unshuttered.")
