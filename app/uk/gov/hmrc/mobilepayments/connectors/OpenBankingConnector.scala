@@ -53,7 +53,6 @@ class OpenBankingConnector @Inject() (
     http.post(url"$serviceUrl/open-banking/session?journeyId=${journeyId.value}")
         .withBody(Json.toJson(CreateSessionDataRequest(amount, originSpecificData)))
         .execute[CreateSessionDataResponse]
-    //Seq(("X-Session-ID", journeyId.value))
   }
 
   def getSession(

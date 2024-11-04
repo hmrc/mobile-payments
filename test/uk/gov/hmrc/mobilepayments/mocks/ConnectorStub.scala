@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.mobilepayments.mocks
 
+import izumi.reflect.Tag
 import org.scalamock.scalatest.MockFactory
-import play.api.libs.json.Writes
+import play.api.libs.ws.BodyWritable
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ConnectorStub extends MockFactory {
 
-  def performSuccessfulGET[O](response: Future[O])(implicit http: HttpClientV2, mockRequestBuilder: RequestBuilder): Unit =
+  def performGET[O](response: Future[O])(implicit http: HttpClientV2, mockRequestBuilder: RequestBuilder): Unit =
     {
       (http
         .get(_: URL)(_: HeaderCarrier))
@@ -38,76 +38,38 @@ trait ConnectorStub extends MockFactory {
         .expects(*, *)
         .returns(response)
     }
-//    (
-//      http
-//        .GET[O](_: String, _: Seq[(String, String)], _: Seq[(String, String)])(
-//          _: HttpReads[O],
-//          _: HeaderCarrier,
-//          _: ExecutionContext
-//        )
-//      )
-//      .expects(*, *, *, *, *, *)
-//      .returns(response)
 
-  def performUnsuccessfulGET(response: Exception)(implicit http: HttpClient): Unit =
-    (
-      http
-        .GET[HttpResponse](_: String, _: Seq[(String, String)], _: Seq[(String, String)])(
-          _: HttpReads[HttpResponse],
-          _: HeaderCarrier,
-          _: ExecutionContext
-        )
-      )
-      .expects(*, *, *, *, *, *)
-      .returns(Future failed response)
+  def performPOST[T](
+                      response:           Future[T]
+                    )(implicit http:      HttpClientV2,
+                      mockRequestBuilder: RequestBuilder
+                    ): Unit = {
+    (http
+      .post(_: URL)(_: HeaderCarrier))
+      .expects(*, *)
+      .returns(mockRequestBuilder)
 
-  def performSuccessfulPOST[I, O](response: Future[O])(implicit http: HttpClient): Unit =
-    (
-      http
-        .POST[I, O](_: String, _: I, _: Seq[(String, String)])(
-          _: Writes[I],
-          _: HttpReads[O],
-          _: HeaderCarrier,
-          _: ExecutionContext
-        )
-      )
-      .expects(*, *, *, *, *, *, *)
+    (mockRequestBuilder
+      .withBody(_: T)(_: BodyWritable[T], _: Tag[T], _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returns(mockRequestBuilder)
+
+    (mockRequestBuilder
+      .execute[T](_: HttpReads[T], _: ExecutionContext))
+      .expects(*, *)
       .returns(response)
+  }
 
-  def performUnsuccessfulPOST[I, O](response: Exception)(implicit http: HttpClient): Unit =
-    (
-      http
-        .POST[I, O](_: String, _: I, _: Seq[(String, String)])(
-          _: Writes[I],
-          _: HttpReads[O],
-          _: HeaderCarrier,
-          _: ExecutionContext
-        )
-      )
-      .expects(*, *, *, *, *, *, *)
-      .returns(Future failed response)
+  def performDELETE[O](response: Future[O])(implicit http: HttpClientV2, mockRequestBuilder: RequestBuilder): Unit =
+    {
+      (http
+        .delete(_: URL)(_: HeaderCarrier))
+        .expects(*,*)
+        .returns(mockRequestBuilder)
+      (mockRequestBuilder
+        .execute[O](_: HttpReads[O], _: ExecutionContext))
+        .expects(*, *)
+        .returns(response)
+    }
 
-  def performSuccessfulDELETE[O](response: Future[O])(implicit http: HttpClient): Unit =
-    (
-      http
-        .DELETE[O](_: String, _: Seq[(String, String)])(
-          _: HttpReads[O],
-          _: HeaderCarrier,
-          _: ExecutionContext
-        )
-      )
-      .expects(*, *, *, *, *)
-      .returns(response)
-
-  def performUnsuccessfulDELETE[O](response: Exception)(implicit http: HttpClient): Unit =
-    (
-      http
-        .DELETE[O](_: String, _: Seq[(String, String)])(
-          _: HttpReads[O],
-          _: HeaderCarrier,
-          _: ExecutionContext
-        )
-      )
-      .expects(*, *, *, *, *)
-      .returns(Future failed response)
 }

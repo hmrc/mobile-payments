@@ -24,7 +24,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.DefaultAwaitTimeout
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
-import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.AuthorisationStub
@@ -34,6 +34,7 @@ import scala.concurrent.ExecutionContext
 trait BaseSpec extends AnyWordSpec with MockFactory with Matchers with DefaultAwaitTimeout with AuthorisationStub {
   implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   val mockHttp:                   HttpClientV2    = mock[HttpClientV2]
+  val mockRequestBuilder:         RequestBuilder  = mock[RequestBuilder]
   implicit lazy val hc: HeaderCarrier =
     HeaderCarrier(sessionId = Some(SessionId("13345a9d-0958-4931-ae83-5a36e4ccd979")))
   implicit lazy val system: ActorSystem = ActorSystem()
