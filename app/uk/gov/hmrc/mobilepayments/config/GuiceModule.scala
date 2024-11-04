@@ -20,14 +20,15 @@ import com.google.inject.name.Names.named
 import com.google.inject.AbstractModule
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.CorePost
 import uk.gov.hmrc.mobilepayments.controllers.api.ApiAccess
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class GuiceModule(
-  environment:   Environment,
-  configuration: Configuration)
-    extends AbstractModule {
+                   environment:   Environment,
+                   configuration: Configuration)
+  extends AbstractModule {
 
   val servicesConfig = new ServicesConfig(
     configuration
@@ -62,8 +63,8 @@ class GuiceModule(
       .to(configuration.underlying.getInt(path))
 
   private def bindConfigString(
-    name: String,
-    path: String
-  ): Unit =
+                                name: String,
+                                path: String
+                              ): Unit =
     bindConstant().annotatedWith(named(name)).to(configuration.underlying.getString(path))
 }

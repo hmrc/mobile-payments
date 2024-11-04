@@ -19,22 +19,35 @@ package uk.gov.hmrc.mobilepayments.mocks
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
+import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ConnectorStub extends MockFactory {
 
-  def performSuccessfulGET[O](response: Future[O])(implicit http: HttpClient): Unit =
-    (
-      http
-        .GET[O](_: String, _: Seq[(String, String)], _: Seq[(String, String)])(
-          _: HttpReads[O],
-          _: HeaderCarrier,
-          _: ExecutionContext
-        )
-      )
-      .expects(*, *, *, *, *, *)
-      .returns(response)
+  def performSuccessfulGET[O](response: Future[O])(implicit http: HttpClientV2, mockRequestBuilder: RequestBuilder): Unit =
+    {
+      (http
+        .get(_: URL)(_: HeaderCarrier))
+        .expects(*,*)
+        .returns(mockRequestBuilder)
+
+      (mockRequestBuilder
+        .execute[O](_: HttpReads[O], _: ExecutionContext))
+        .expects(*, *)
+        .returns(response)
+    }
+//    (
+//      http
+//        .GET[O](_: String, _: Seq[(String, String)], _: Seq[(String, String)])(
+//          _: HttpReads[O],
+//          _: HeaderCarrier,
+//          _: ExecutionContext
+//        )
+//      )
+//      .expects(*, *, *, *, *, *)
+//      .returns(response)
 
   def performUnsuccessfulGET(response: Exception)(implicit http: HttpClient): Unit =
     (
