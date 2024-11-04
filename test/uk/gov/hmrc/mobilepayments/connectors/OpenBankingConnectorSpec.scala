@@ -39,14 +39,14 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when getBanks call is successful it" should {
     "return banks" in {
-      performGET(Future successful banksResponse)(mockHttp, mockRequestBuilder)
+      performGET(Future successful banksResponse)
       await(sut.getBanks(journeyId)).size shouldBe 19
     }
   }
 
   "when getBanks call returns NotFoundException it" should {
     "return an error" in {
-      performGET(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performGET(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.getBanks(journeyId))
       }
@@ -55,7 +55,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when createSession call is successful it" should {
     "return session data" in {
-      performPOST(Future successful createSessionDataResponse)(mockHttp, mockRequestBuilder)
+      performPOST(Future successful createSessionDataResponse)
       val result = await(sut.createSession(amount, SelfAssessmentOriginSpecificData(SaUtr("CS700100A")), journeyId))
       result.sessionDataId.value shouldEqual sessionDataId
     }
@@ -63,7 +63,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when createSession call returns NotFoundException it" should {
     "return an error" in {
-      performPOST(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performPOST(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.createSession(amount, SelfAssessmentOriginSpecificData(SaUtr("CS700100A")), journeyId))
       }
@@ -72,7 +72,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when selectBank call is successful it" should {
     "return success" in {
-      performPOST(Future successful HttpResponse.apply(200, ""))(mockHttp, mockRequestBuilder)
+      performPOST(Future successful HttpResponse.apply(200, ""))
       val result = await(sut.selectBank(sessionDataId, "123-asd", journeyId))
       result.status shouldEqual 200
     }
@@ -80,7 +80,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when selectBank call returns NotFoundException it" should {
     "return error" in {
-      performPOST(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performPOST(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.selectBank(sessionDataId, "123-asd", journeyId))
       }
@@ -89,7 +89,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when initiatePayment call is successful it" should {
     "return payment url" in {
-      performPOST(Future successful paymentInitiatedResponse)(mockHttp, mockRequestBuilder)
+      performPOST(Future successful paymentInitiatedResponse)
       val result = await(sut.initiatePayment(sessionDataId, returnUrl, journeyId))
       result.paymentUrl.toString() shouldEqual "https://some-bank.com?param=dosomething"
     }
@@ -97,7 +97,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when initiatePayment call returns NotFoundException it" should {
     "return an error" in {
-      performPOST(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performPOST(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.initiatePayment(sessionDataId, returnUrl, journeyId))
       }
@@ -106,14 +106,14 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when getPaymentStatus call is successful it" should {
     "return banks" in {
-      performGET(Future successful paymentStatusOpenBankingResponse)(mockHttp, mockRequestBuilder)
+      performGET(Future successful paymentStatusOpenBankingResponse)
       await(sut.getPaymentStatus(sessionDataId, journeyId)).ecospendPaymentStatus shouldEqual "Verified"
     }
   }
 
   "when getPaymentStatus call returns NotFoundException it" should {
     "return an error" in {
-      performGET(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performGET(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.getPaymentStatus(sessionDataId, journeyId))
       }
@@ -123,7 +123,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
   "when urlConsumed call is successful it" should {
     Seq(true, false).foreach { consumed =>
       s"return $consumed" in {
-        performGET(Future successful consumed)(mockHttp, mockRequestBuilder)
+        performGET(Future successful consumed)
         val result = await(sut.urlConsumed(sessionDataId, journeyId))
         result shouldBe consumed
       }
@@ -132,7 +132,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when urlConsumed call returns NotFoundException it" should {
     "return an error" in {
-      performGET(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performGET(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.urlConsumed(sessionDataId, journeyId))
       }
@@ -141,7 +141,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when clearPayment call is successful it" should {
     "return unit" in {
-      performDELETE(Future successful ())(mockHttp, mockRequestBuilder)
+      performDELETE(Future successful ())
       val result: Unit = await(sut.clearPayment(sessionDataId, journeyId))
       result shouldBe ()
     }
@@ -149,7 +149,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when clearPayment call returns NotFoundException it" should {
     "return an error" in {
-      performDELETE(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performDELETE(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.clearPayment(sessionDataId, journeyId))
       }
@@ -158,7 +158,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when getSession call is successful it" should {
     "return session" in {
-      performGET(Future successful sessionInitiatedDataResponse)(mockHttp, mockRequestBuilder)
+      performGET(Future successful sessionInitiatedDataResponse)
       val result = await(sut.getSession(sessionDataId, journeyId))
       result._id.value       shouldBe "51cc67d6-21da-11ec-9621-0242ac130002"
       result.sessionId.value shouldBe "a-session-id"
@@ -170,7 +170,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when getSession call returns NotFoundException it" should {
     "return an error" in {
-      performGET(Future.failed(new NotFoundException("not found")))(mockHttp, mockRequestBuilder)
+      performGET(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.getSession(sessionDataId, journeyId))
       }

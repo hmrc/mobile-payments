@@ -33,8 +33,8 @@ import scala.concurrent.ExecutionContext
 
 trait BaseSpec extends AnyWordSpec with MockFactory with Matchers with DefaultAwaitTimeout with AuthorisationStub {
   implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  val mockHttp:                   HttpClientV2    = mock[HttpClientV2]
-  val mockRequestBuilder:         RequestBuilder  = mock[RequestBuilder]
+  implicit val mockHttp:                   HttpClientV2    = mock[HttpClientV2]
+  implicit val mockRequestBuilder:         RequestBuilder  = mock[RequestBuilder]
   implicit lazy val hc: HeaderCarrier =
     HeaderCarrier(sessionId = Some(SessionId("13345a9d-0958-4931-ae83-5a36e4ccd979")))
   implicit lazy val system: ActorSystem = ActorSystem()

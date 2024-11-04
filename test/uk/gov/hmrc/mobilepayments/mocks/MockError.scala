@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package uk.gov.hmrc.mobilepayments.mocks
 
 import play.api.libs.json.{Format, Json}
