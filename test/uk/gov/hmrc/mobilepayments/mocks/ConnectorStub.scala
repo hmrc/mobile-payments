@@ -38,6 +38,27 @@ trait ConnectorStub extends MockFactory {
         .expects(*, *)
         .returns(response)
     }
+  def performSuccessfulPOST[T](
+                                response:           Future[T]
+                              )(implicit http:      HttpClientV2,
+                                mockRequestBuilder: RequestBuilder
+                              ): Unit = {
+    (http
+      .post(_: URL)(_: HeaderCarrier))
+      .expects(*, *)
+      .returns(mockRequestBuilder)
+
+    (mockRequestBuilder
+      .setHeader(_: (String,String))
+      .withBody(_: T)(_: BodyWritable[T], _: Tag[T], _: ExecutionContext))
+      .expects(*, *, *, *, *)
+      .returns(mockRequestBuilder)
+
+    (mockRequestBuilder
+      .execute[T](_: HttpReads[T], _: ExecutionContext))
+      .expects(*, *)
+      .returns(response)
+  }
 
   def performPOST[T](
                       response:           Future[T]

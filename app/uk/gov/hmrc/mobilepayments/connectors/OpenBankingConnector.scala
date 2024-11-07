@@ -51,6 +51,7 @@ class OpenBankingConnector @Inject() (
   )(implicit headerCarrier: HeaderCarrier
   ): Future[CreateSessionDataResponse] = {
     http.post(url"$serviceUrl/open-banking/session?journeyId=${journeyId.value}")
+        .setHeader(("X-Session-ID", journeyId.value))
         .withBody(Json.toJson(CreateSessionDataRequest(amount, originSpecificData)))
         .execute[CreateSessionDataResponse]
   }
