@@ -26,32 +26,40 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait ConnectorStub extends MockFactory {
 
-  def performGET[O](response: Future[O])(implicit http: HttpClientV2, mockRequestBuilder: RequestBuilder): Unit =
-    {
-      (http
-        .get(_: URL)(_: HeaderCarrier))
-        .expects(*,*)
-        .returns(mockRequestBuilder)
+  def performGET[O](
+    response:           Future[O]
+  )(implicit http:      HttpClientV2,
+    mockRequestBuilder: RequestBuilder
+  ): Unit = {
+    (http
+      .get(_: URL)(_: HeaderCarrier))
+      .expects(*, *)
+      .returns(mockRequestBuilder)
 
-      (mockRequestBuilder
-        .execute[O](_: HttpReads[O], _: ExecutionContext))
-        .expects(*, *)
-        .returns(response)
-    }
+    (mockRequestBuilder
+      .execute[O](_: HttpReads[O], _: ExecutionContext))
+      .expects(*, *)
+      .returns(response)
+  }
+
   def performSuccessfulPOST[T](
-                                response:           Future[T]
-                              )(implicit http:      HttpClientV2,
-                                mockRequestBuilder: RequestBuilder
-                              ): Unit = {
+    response:           Future[T]
+  )(implicit http:      HttpClientV2,
+    mockRequestBuilder: RequestBuilder
+  ): Unit = {
     (http
       .post(_: URL)(_: HeaderCarrier))
       .expects(*, *)
       .returns(mockRequestBuilder)
 
     (mockRequestBuilder
-      .setHeader(_: (String,String))
       .withBody(_: T)(_: BodyWritable[T], _: Tag[T], _: ExecutionContext))
-      .expects(*, *, *, *, *)
+      .expects(*, *, *, *)
+      .returns(mockRequestBuilder)
+
+    (mockRequestBuilder
+      .setHeader(_: (String, String)))
+      .expects(*)
       .returns(mockRequestBuilder)
 
     (mockRequestBuilder
@@ -61,10 +69,10 @@ trait ConnectorStub extends MockFactory {
   }
 
   def performPOST[T](
-                      response:           Future[T]
-                    )(implicit http:      HttpClientV2,
-                      mockRequestBuilder: RequestBuilder
-                    ): Unit = {
+    response:           Future[T]
+  )(implicit http:      HttpClientV2,
+    mockRequestBuilder: RequestBuilder
+  ): Unit = {
     (http
       .post(_: URL)(_: HeaderCarrier))
       .expects(*, *)
@@ -81,16 +89,19 @@ trait ConnectorStub extends MockFactory {
       .returns(response)
   }
 
-  def performDELETE[O](response: Future[O])(implicit http: HttpClientV2, mockRequestBuilder: RequestBuilder): Unit =
-    {
-      (http
-        .delete(_: URL)(_: HeaderCarrier))
-        .expects(*,*)
-        .returns(mockRequestBuilder)
-      (mockRequestBuilder
-        .execute[O](_: HttpReads[O], _: ExecutionContext))
-        .expects(*, *)
-        .returns(response)
-    }
+  def performDELETE[O](
+    response:           Future[O]
+  )(implicit http:      HttpClientV2,
+    mockRequestBuilder: RequestBuilder
+  ): Unit = {
+    (http
+      .delete(_: URL)(_: HeaderCarrier))
+      .expects(*, *)
+      .returns(mockRequestBuilder)
+    (mockRequestBuilder
+      .execute[O](_: HttpReads[O], _: ExecutionContext))
+      .expects(*, *)
+      .returns(response)
+  }
 
 }
