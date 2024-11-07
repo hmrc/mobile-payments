@@ -52,7 +52,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       }
     }
   }
-// failing
+
   "when createSession call is successful it" should {
     "return session data" in {
       performSuccessfulPOST(Future successful createSessionDataResponse)
@@ -60,7 +60,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
       result.sessionDataId.value shouldEqual sessionDataId
     }
   }
-//failing
+
   "when createSession call returns NotFoundException it" should {
     "return an error" in {
       performSuccessfulPOST(Future.failed(new NotFoundException("not found")))
