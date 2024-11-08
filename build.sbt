@@ -1,5 +1,5 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
-import uk.gov.hmrc.DefaultBuildSettings.oneForkedJvmPerTest
+
 val appName = "mobile-payments"
 
 lazy val microservice = Project(appName, file("."))

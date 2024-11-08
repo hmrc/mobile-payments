@@ -55,7 +55,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when createSession call is successful it" should {
     "return session data" in {
-      performPOST(Future successful createSessionDataResponse)
+      performSuccessfulPOST(Future successful createSessionDataResponse)
       val result = await(sut.createSession(amount, SelfAssessmentOriginSpecificData(SaUtr("CS700100A")), journeyId))
       result.sessionDataId.value shouldEqual sessionDataId
     }
@@ -63,7 +63,7 @@ class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePa
 
   "when createSession call returns NotFoundException it" should {
     "return an error" in {
-      performPOST(Future.failed(new NotFoundException("not found")))
+      performSuccessfulPOST(Future.failed(new NotFoundException("not found")))
       intercept[NotFoundException] {
         await(sut.createSession(amount, SelfAssessmentOriginSpecificData(SaUtr("CS700100A")), journeyId))
       }
