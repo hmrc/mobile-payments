@@ -6,15 +6,15 @@ object AppDependencies {
   private val playHmrcApiVersion   = "8.0.0"
   private val refinedVersion       = "0.11.2"
   private val domainVersion        = "10.0.0"
-  private val openBankingVersion   = "0.290.0"
+  private val openBankingVersion   = "0.303.0"
 
   private val scalaMockVersion = "5.2.0"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "play-hmrc-api-play-29"     % playHmrcApiVersion,
-    "eu.timepit"  %% "refined"                   % refinedVersion,
-    "uk.gov.hmrc" %% "domain-play-29"            % domainVersion,
-    "uk.gov.hmrc" %% "open-banking-cor"          % openBankingVersion
+    "uk.gov.hmrc" %% "play-hmrc-api-play-29" % playHmrcApiVersion,
+    "eu.timepit"  %% "refined"               % refinedVersion,
+    "uk.gov.hmrc" %% "domain-play-29"        % domainVersion,
+    "uk.gov.hmrc" %% "open-banking-cor"      % openBankingVersion
   )
 
   trait TestDependencies {
