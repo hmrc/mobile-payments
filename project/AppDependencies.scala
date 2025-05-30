@@ -6,7 +6,7 @@ object AppDependencies {
   private val playHmrcApiVersion   = "8.0.0"
   private val refinedVersion       = "0.11.2"
   private val domainVersion        = "10.0.0"
-  private val openBankingVersion   = "0.303.0"
+  private val openBankingVersion   = "0.309.0"
 
   private val scalaMockVersion = "5.2.0"
 
