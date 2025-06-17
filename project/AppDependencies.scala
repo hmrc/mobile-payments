@@ -14,7 +14,6 @@ object AppDependencies {
     "uk.gov.hmrc" %% "play-hmrc-api-play-29" % playHmrcApiVersion,
     "eu.timepit"  %% "refined"               % refinedVersion,
     "uk.gov.hmrc" %% "domain-play-29"        % domainVersion,
-    "uk.gov.hmrc" %% "open-banking-cor"      % openBankingVersion
   )
 
   trait TestDependencies {

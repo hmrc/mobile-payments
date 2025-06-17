@@ -15,9 +15,8 @@
  */
 
 package uk.gov.hmrc.mobilepayments.controllers.sessions
-import openbanking.cor.model.response.CreateSessionDataResponse
+
 import org.scalamock.handlers.CallHandler
-import payapi.corcommon.model.Origins.AppSa
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -27,6 +26,7 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.mocks.ShutteringMock
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
 import java.time.LocalDate

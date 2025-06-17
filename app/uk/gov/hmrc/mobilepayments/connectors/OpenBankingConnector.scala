@@ -18,9 +18,6 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import openbanking.cor.model.request.InitiateEmailSendRequest
-import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
@@ -29,6 +26,9 @@ import uk.gov.hmrc.mobilepayments.domain.dto.request._
 import uk.gov.hmrc.mobilepayments.domain.dto.response._
 import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.Bank
+import uk.gov.hmrc.mobilepayments.models.openBanking.request.InitiateEmailSendRequest
+import uk.gov.hmrc.mobilepayments.models.openBanking.{OriginSpecificSessionData, SessionData}
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 
 import java.time.LocalDate
 import javax.inject.Singleton

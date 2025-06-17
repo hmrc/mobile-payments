@@ -17,7 +17,7 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
-import openbanking.cor.model._
+import openbanking.cor.model.{BankSelected, OriginSpecificSessionData, PaymentFinalised, PaymentFinished, PaymentInitiated, SessionData, SessionInitiated}
 import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import payapi.corcommon.model.Origin
 import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
