@@ -16,20 +16,21 @@
 
 package uk.gov.hmrc.mobilepayments.domain
 
-import payapi.corcommon.model.{JourneyId, PaymentStatus, Reference, TaxType}
-import payapi.corcommon.model.barclays.TransactionReference
 import play.api.libs.json.{Json, OFormat, Reads}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.TaxType
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import uk.gov.hmrc.mobilepayments.models.payapi.*
 
 import java.time.LocalDateTime
 
-case class Payment(
-  id:                   JourneyId,
-  reference:            Reference,
-  transactionReference: TransactionReference,
-  amountInPence:        Long,
-  status:               PaymentStatus,
-  createdOn:            LocalDateTime,
-  taxType:              TaxType)
+case class Payment(id: JourneyId,
+                   reference: Reference,
+                   transactionReference: TransactionReference,
+                   amountInPence: Long,
+                   status: PaymentStatus,
+                   createdOn: LocalDateTime,
+                   taxType: TaxType
+                  )
 
 object Payment {
 

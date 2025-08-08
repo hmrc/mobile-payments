@@ -16,23 +16,22 @@
 
 package uk.gov.hmrc.mobilepayments.domain.dto.response
 
-import payapi.corcommon.model.Origin
 import play.api.libs.json.{Format, Json}
 
 import java.time.{LocalDate, LocalDateTime}
 
-final case class SessionDataResponse(
-  sessionDataId: String,
-  amountInPence: BigDecimal,
-  bankId:        Option[String],
-  state:         String,
-  createdOn:     LocalDateTime,
-  paymentDate:   Option[LocalDate],
-  reference:     String,
-  email:         Option[String],
-  emailSent:     Option[Boolean],
-  origin:        Origin,
-  maybeFutureDate: Option[LocalDate])
+final case class SessionDataResponse(sessionDataId: String,
+                                     amountInPence: BigDecimal,
+                                     bankId: Option[String],
+                                     state: String,
+                                     createdOn: LocalDateTime,
+                                     paymentDate: Option[LocalDate],
+                                     reference: String,
+                                     email: Option[String],
+                                     emailSent: Option[Boolean],
+                                     origin: Origin,
+                                     maybeFutureDate: Option[LocalDate]
+                                    )
 
 object SessionDataResponse {
   implicit val format: Format[SessionDataResponse] = Json.format[SessionDataResponse]

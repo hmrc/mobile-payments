@@ -18,12 +18,13 @@ package uk.gov.hmrc.mobilepayments.controllers.sessions
 
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
+import uk.gov.hmrc.mobilepayments.domain.dto.response.Origins.AppSa
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.mocks.ShutteringMock
 import uk.gov.hmrc.mobilepayments.models.openBanking.response.CreateSessionDataResponse
@@ -37,7 +38,7 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
   private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
-  implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
+  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   private val sut = new SandboxSessionController(
     Helpers.stubControllerComponents(),
@@ -81,12 +82,12 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       val result = sut.getSession(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[SessionDataResponse]
-      response.sessionDataId shouldEqual sessionDataId
-      response.state shouldEqual "BankSelected"
-      response.amountInPence shouldEqual 12564
-      response.bankId shouldEqual Some("obie-barclays-personal")
-      response.reference shouldEqual "1555369056K"
-      response.origin shouldEqual AppSa
+      response.sessionDataId   shouldEqual sessionDataId
+      response.state           shouldEqual "BankSelected"
+      response.amountInPence   shouldEqual 12564
+      response.bankId          shouldEqual Some("obie-barclays-personal")
+      response.reference       shouldEqual "1555369056K"
+      response.origin          shouldEqual AppSa
       response.maybeFutureDate shouldEqual Some(LocalDate.now.plusMonths(6))
     }
   }
@@ -102,12 +103,12 @@ class SandboxSessionControllerSpec extends BaseSpec with MobilePaymentsTestData 
       val result = sut.getSession(sessionDataId, journeyId)(request)
       status(result) shouldBe 200
       val response = contentAsJson(result).as[SessionDataResponse]
-      response.sessionDataId shouldEqual sessionDataId
-      response.amountInPence shouldEqual 12564
-      response.bankId shouldEqual Some("obie-barclays-personal")
-      response.reference shouldEqual "1555369056K"
-      response.email.get shouldEqual "test@test.com"
-      response.state shouldEqual "PaymentFinished"
+      response.sessionDataId   shouldEqual sessionDataId
+      response.amountInPence   shouldEqual 12564
+      response.bankId          shouldEqual Some("obie-barclays-personal")
+      response.reference       shouldEqual "1555369056K"
+      response.email.get       shouldEqual "test@test.com"
+      response.state           shouldEqual "PaymentFinished"
       response.maybeFutureDate shouldEqual None
     }
   }

@@ -24,7 +24,7 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.SelectBankRequest
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest

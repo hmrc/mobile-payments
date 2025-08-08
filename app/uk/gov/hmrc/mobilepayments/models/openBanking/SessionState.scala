@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.mobilepayments.models.openBanking
 
-
 import akka.http.scaladsl.model.Uri
 import play.api.libs.json.{Format, JsResult, JsString, JsSuccess, JsValue, Json, OFormat}
 import uk.gov.hmrc.mobilepayments.models.openBanking.ecospend.EcospendFinishedStatuses.Verified
 import uk.gov.hmrc.mobilepayments.models.openBanking.ecospend.{EcospendFinalStatus, EcospendFinishedStatus, EcospendNonFinalStatus, EcospendPaymentId, EcospendPaymentStatus}
-
+import uk.gov.hmrc.mobilepayments.models.openBanking.UriFormats.*
 import java.time.{LocalDate, LocalTime}
 
 sealed trait SessionState {
@@ -61,7 +60,8 @@ object SessionState {
     def reads(json: JsValue): JsResult[SessionState] = json match {
       case JsString("SessionInitiated") => JsSuccess(SessionInitiated)
       case _ =>
-        PaymentFinalised.format.reads(json)
+        PaymentFinalised.format
+          .reads(json)
           .orElse(PaymentInitiated.format.reads(json))
           .orElse(PaymentFinished.format.reads(json))
           .orElse(BankSelected.format.reads(json))
@@ -96,19 +96,20 @@ sealed trait PaymentSessionState extends SessionState {
   def bankLoginOption: Option[BankLoginOptions]
   def emailSent: Option[Boolean]
 
-  override def toString: String = s"[PaymentSessionState: ${this.getClass.getSimpleName}] [bankId: ${bankId.toString}] [paymentId: ${paymentId.toString}] [status: ${status.toString} [bankUrlHit: ${bankUrlHit.toString} [bankLoginOption: ${bankLoginOption.toString}] [emailSent: ${emailSent.toString}]"
+  override def toString: String =
+    s"[PaymentSessionState: ${this.getClass.getSimpleName}] [bankId: ${bankId.toString}] [paymentId: ${paymentId.toString}] [status: ${status.toString} [bankUrlHit: ${bankUrlHit.toString} [bankLoginOption: ${bankLoginOption.toString}] [emailSent: ${emailSent.toString}]"
 }
 
 final case class PaymentInitiated(
-                                   bankId:          BankId,
-                                   email:           Option[Email],
-                                   paymentId:       EcospendPaymentId,
-                                   paymentUrl:      Uri,
-                                   status:          EcospendNonFinalStatus,
-                                   bankUrlHit:      Option[Boolean],
-                                   bankLoginOption: Option[BankLoginOptions],
-                                   emailSent:       Option[Boolean]
-                                 ) extends PaymentSessionState
+  bankId: BankId,
+  email: Option[Email],
+  paymentId: EcospendPaymentId,
+  paymentUrl: Uri,
+  status: EcospendNonFinalStatus,
+  bankUrlHit: Option[Boolean],
+  bankLoginOption: Option[BankLoginOptions],
+  emailSent: Option[Boolean]
+) extends PaymentSessionState
 
 @SuppressWarnings(Array("org.wartremover.warts.Any"))
 object PaymentInitiated {
@@ -118,16 +119,16 @@ object PaymentInitiated {
 sealed trait PaymentFinishedSessionState extends PaymentSessionState
 
 final case class PaymentFinished(
-                                  bankId:          BankId,
-                                  email:           Option[Email],
-                                  paymentId:       EcospendPaymentId,
-                                  paymentUrl:      Uri,
-                                  dateFinalised:   LocalDate,
-                                  timeFinalised:   Option[LocalTime], //Optional because this is a new field. can be made mandatory after 60 days (mongo TTL)
-                                  bankUrlHit:      Option[Boolean],
-                                  bankLoginOption: Option[BankLoginOptions],
-                                  emailSent:       Option[Boolean]
-                                ) extends PaymentFinishedSessionState {
+  bankId: BankId,
+  email: Option[Email],
+  paymentId: EcospendPaymentId,
+  paymentUrl: Uri,
+  dateFinalised: LocalDate,
+  timeFinalised: Option[LocalTime], // Optional because this is a new field. can be made mandatory after 60 days (mongo TTL)
+  bankUrlHit: Option[Boolean],
+  bankLoginOption: Option[BankLoginOptions],
+  emailSent: Option[Boolean]
+) extends PaymentFinishedSessionState {
   def status: EcospendFinishedStatus = Verified
 
   override def toString: String = super.toString + s" [dateFinalised: ${dateFinalised.toString}] [timeFinalised: ${timeFinalised.toString}]"
@@ -139,17 +140,17 @@ object PaymentFinished {
 }
 
 final case class PaymentFinalised(
-                                   bankId:          BankId,
-                                   email:           Option[Email],
-                                   paymentId:       EcospendPaymentId,
-                                   paymentUrl:      Uri,
-                                   status:          EcospendFinalStatus,
-                                   dateFinalised:   LocalDate,
-                                   timeFinalised:   Option[LocalTime], //Optional because this is a new field. can be made mandatory after 60 days (mongo TTL)
-                                   bankUrlHit:      Option[Boolean],
-                                   bankLoginOption: Option[BankLoginOptions],
-                                   emailSent:       Option[Boolean]
-                                 ) extends PaymentFinishedSessionState {
+  bankId: BankId,
+  email: Option[Email],
+  paymentId: EcospendPaymentId,
+  paymentUrl: Uri,
+  status: EcospendFinalStatus,
+  dateFinalised: LocalDate,
+  timeFinalised: Option[LocalTime], // Optional because this is a new field. can be made mandatory after 60 days (mongo TTL)
+  bankUrlHit: Option[Boolean],
+  bankLoginOption: Option[BankLoginOptions],
+  emailSent: Option[Boolean]
+) extends PaymentFinishedSessionState {
   override def toString: String = super.toString + s" [dateFinalised: ${dateFinalised.toString}] [timeFinalised: ${timeFinalised.toString}]"
 }
 

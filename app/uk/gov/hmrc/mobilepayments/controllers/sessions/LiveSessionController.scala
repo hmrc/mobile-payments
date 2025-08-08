@@ -24,7 +24,8 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{CreateSessionRequest, SetEmailRequest, SetFutureDateRequest}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.services.{OpenBankingService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
@@ -34,12 +35,12 @@ import scala.concurrent.ExecutionContext
 
 @Singleton()
 class LiveSessionController @Inject() (
-  override val authConnector:                                   AuthConnector,
+  override val authConnector: AuthConnector,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents,
-  openBankingService:                                           OpenBankingService,
-  shutteringService:                                            ShutteringService
-)(implicit val executionContext:                                ExecutionContext)
+  cc: ControllerComponents,
+  openBankingService: OpenBankingService,
+  shutteringService: ShutteringService
+)(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with SessionController
     with AccessControl
@@ -48,7 +49,7 @@ class LiveSessionController @Inject() (
     with JsonHandler {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
-  override val app:    String                 = "Session-Controller"
+  override val app: String = "Session-Controller"
 
   override def createSession(journeyId: JourneyId): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
@@ -62,7 +63,7 @@ class LiveSessionController @Inject() (
                   createPaymentRequest,
                   journeyId
                 )
-                .map(response => Ok(Json.toJson(response)))
+                .map(response => Ok(Json.toJson[CreateSessionDataResponse](response)))
             }
           }
         }
@@ -71,7 +72,7 @@ class LiveSessionController @Inject() (
 
   override def getSession(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -91,7 +92,7 @@ class LiveSessionController @Inject() (
 
   override def setEmail(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -113,9 +114,9 @@ class LiveSessionController @Inject() (
     }
 
   override def setFutureDate(
-                         sessionDataId: String,
-                         journeyId: JourneyId
-                       ): Action[JsValue] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  ): Action[JsValue] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -136,9 +137,9 @@ class LiveSessionController @Inject() (
     }
 
   override def clearFutureDate(
-                                sessionDataId: String,
-                                journeyId: JourneyId
-                              ): Action[AnyContent] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -157,7 +158,7 @@ class LiveSessionController @Inject() (
 
   override def clearEmail(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)

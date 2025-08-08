@@ -19,6 +19,7 @@ package uk.gov.hmrc.mobilepayments.models.openBanking.response
 import akka.http.scaladsl.model.Uri
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.mobilepayments.models.openBanking.SessionDataId
+import uk.gov.hmrc.mobilepayments.models.openBanking.UriFormats.*
 
 final case class CreateSessionDataResponse(sessionDataId: SessionDataId, nextUrl: Uri)
 

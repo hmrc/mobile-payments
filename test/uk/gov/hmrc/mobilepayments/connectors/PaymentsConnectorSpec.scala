@@ -20,18 +20,17 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
-import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
 
 import scala.concurrent.Future
 
-class PaymentsConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData with ScalaFutures {
+class PaymentsConnectorSpec extends ConnectorStub with MobilePaymentsTestData with ScalaFutures {
 
-  val sut  = new PaymentsConnector(mockHttp, "https://baseUrl", "returnUrl", "backUrl")
-  val utr  = "12344566"
+  val sut = new PaymentsConnector(mockHttp, "https://baseUrl", "returnUrl", "backUrl")
+  val utr = "12344566"
   val nino = "CS700100A"
 
   "getPayments" should {

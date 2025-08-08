@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.mobilepayments
 
-import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.CreateSessionRequest
-import uk.gov.hmrc.mobilepayments.domain.dto.response._
+import uk.gov.hmrc.mobilepayments.domain.dto.response.*
 import uk.gov.hmrc.mobilepayments.domain.{Bank, BankGroupData, PaymentRecordListFromApi, Shuttering}
+import uk.gov.hmrc.mobilepayments.models.openBanking.{OriginSpecificSessionData, SessionData}
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 
 import java.time.LocalDate
 import scala.io.Source
@@ -102,7 +102,7 @@ trait MobilePaymentsTestData {
     Json.fromJson[PayByCardResponse](js("pay-by-card-response")).get
 
   def paymentsResponseString(date: LocalDate = LocalDate.now()): String =
-    json(("payments-response")).replace("<DATE>", date.toString).replace("<DATE2>", date.minusDays(10).toString)
+    json("payments-response").replace("<DATE>", date.toString).replace("<DATE2>", date.minusDays(10).toString)
 
   def paymentsResponse(date: LocalDate = LocalDate.now()): PaymentRecordListFromApi =
     Json
@@ -113,19 +113,19 @@ trait MobilePaymentsTestData {
       )
       .get
 
-  lazy val rawMalformedJson:                        String = "{\"data\": [{,]}"
-  lazy val banksResponseJson:                       String = json("banks-response")
-  lazy val sessionDataResponseJson:                 String = json("session-data-initiated-response")
-  lazy val createSessionDataResponseJson:           String = json("create-session-data-response")
-  lazy val sessionDataBankSelectedResponseJson:     String = json("session-data-bank-selected-response")
+  lazy val rawMalformedJson: String = "{\"data\": [{,]}"
+  lazy val banksResponseJson: String = json("banks-response")
+  lazy val sessionDataResponseJson: String = json("session-data-initiated-response")
+  lazy val createSessionDataResponseJson: String = json("create-session-data-response")
+  lazy val sessionDataBankSelectedResponseJson: String = json("session-data-bank-selected-response")
   lazy val sessionDataPaymentFinalisedResponseJson: String = json("session-data-payment-finalised-response")
-  lazy val createPaymentRequestJson:                String = json("create-payment-request")
-  lazy val paymentInitiatedResponseJson:            String = json("payment-initiated-response")
-  lazy val paymentInitiatedUpdateResponseJson:      String = json("payment-initiated-update-response")
-  lazy val paymentStatusResponseJson:               String = json("payment-status-ob-response")
-  lazy val payApiPayByCardResponseJson:             String = json("pay-api-pay-by-card-response")
-  lazy val latestPaymentsSelfAssessmentJson:        String = json("self-assessment-latest-payments-request")
-  lazy val latestPaymentsSimpleAssessmentJson:      String = json("simple-assessment-latest-payments-request")
+  lazy val createPaymentRequestJson: String = json("create-payment-request")
+  lazy val paymentInitiatedResponseJson: String = json("payment-initiated-response")
+  lazy val paymentInitiatedUpdateResponseJson: String = json("payment-initiated-update-response")
+  lazy val paymentStatusResponseJson: String = json("payment-status-ob-response")
+  lazy val payApiPayByCardResponseJson: String = json("pay-api-pay-by-card-response")
+  lazy val latestPaymentsSelfAssessmentJson: String = json("self-assessment-latest-payments-request")
+  lazy val latestPaymentsSimpleAssessmentJson: String = json("simple-assessment-latest-payments-request")
 
   lazy val sessionDataPaymentFinalisedEmailSentResponseJson: String = json(
     "session-data-payment-finalised-email-sent-response"
@@ -137,7 +137,7 @@ trait MobilePaymentsTestData {
 
   private def json(fileName: String): String = {
     val source = Source.fromFile(s"test-common/uk/gov/hmrc/mobilepayments/resources/test-$fileName.json")
-    val raw    = source.getLines().mkString
+    val raw = source.getLines().mkString
     source.close()
     raw
   }

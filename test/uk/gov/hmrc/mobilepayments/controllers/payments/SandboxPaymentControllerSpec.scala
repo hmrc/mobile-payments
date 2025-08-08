@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
-import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
@@ -26,22 +25,19 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PaymentStatusResponse, UrlConsumedResponse}
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.InitiatePaymentResponse
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class SandboxPaymentControllerSpec
-    extends BaseSpec
-    with AuthorisationStub
-    with MobilePaymentsTestData
-    with ShutteringMock {
+class SandboxPaymentControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData with ShutteringMock {
 
-  private val sessionDataId:   String          = "51cc67d6-21da-11ec-9621-0242ac130002"
-  private val utr:             String          = "11223344"
+  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val utr: String = "11223344"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
-  implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
+  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   private val sut = new SandboxPaymentController(
     "https://qa.tax.service.gov.uk/mobile-payments-frontend/sandbox/result/open-banking",

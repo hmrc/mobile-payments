@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.ShutteringConnector
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,8 +28,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ShutteringService @Inject() (connector: ShutteringConnector) {
 
   def getShutteringStatus(
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier,
-    ex:                     ExecutionContext
-  ): Future[Shuttering] = connector.getShutteringStatus(journeyId)
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier, ex: ExecutionContext): Future[Shuttering] = connector.getShutteringStatus(journeyId)
 }

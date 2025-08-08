@@ -19,28 +19,24 @@ package uk.gov.hmrc.mobilepayments.connectors
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
 import play.api.Logger
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ShutteringConnector @Inject() (
-  http:                                   HttpClientV2,
-  @Named("mobile-shuttering") serviceUrl: String) {
+class ShutteringConnector @Inject() (http: HttpClientV2, @Named("mobile-shuttering") serviceUrl: String) {
 
   val logger: Logger = Logger(this.getClass)
 
   def getShutteringStatus(
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier,
-    ex:                     ExecutionContext
-  ): Future[Shuttering] =
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier, ex: ExecutionContext): Future[Shuttering] =
     http
-      .get(url"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=$journeyId")
+      .get(url"$serviceUrl/mobile-shuttering/service/mobile-open-banking/shuttered-status?journeyId=${journeyId.value}")
       .execute[Shuttering]
       .recover {
         case e: UpstreamErrorResponse =>

@@ -1,24 +1,28 @@
-import sbt._
+import sbt.*
 
 object AppDependencies {
 
-  private val bootstrapPlayVersion = "9.5.0"
-  private val playHmrcApiVersion   = "8.0.0"
-  private val refinedVersion       = "0.11.2"
-  private val domainVersion        = "10.0.0"
-  private val openBankingVersion   = "0.309.0"
+  private val bootstrapPlayVersion = "10.1.0"
+  private val playHmrcApiVersion = "8.2.0"
+  private val refinedVersion = "0.11.3"
+  private val domainVersion = "12.1.0"
 
-  private val scalaMockVersion = "5.2.0"
+  private val scalaMockVersion = "7.4.0"
+  private val akkaHttpVersion = "10.7.1"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "play-hmrc-api-play-29" % playHmrcApiVersion,
-    "eu.timepit"  %% "refined"               % refinedVersion,
-    "uk.gov.hmrc" %% "domain-play-29"        % domainVersion,
+    "uk.gov.hmrc"       %% "play-hmrc-api-play-30" % playHmrcApiVersion,
+    "eu.timepit"        %% "refined"               % refinedVersion,
+    "uk.gov.hmrc"       %% "domain-play-30"        % domainVersion,
+    "com.beachape"      %% "enumeratum"            % "1.9.0",
+    "org.typelevel"     %% "cats-core"             % "2.13.0",
+    "com.typesafe.akka" %% "akka-http"             % "10.5.3",
+    "com.typesafe.akka" %% "akka-actor"            % "2.8.8"
   )
 
   trait TestDependencies {
-    lazy val scope: String        = "test"
-    lazy val test:  Seq[ModuleID] = ???
+    lazy val scope: String = "test"
+    lazy val test: Seq[ModuleID] = ???
   }
 
   object Test {
@@ -27,8 +31,8 @@ object AppDependencies {
       new TestDependencies {
 
         override lazy val test: Seq[ModuleID] = testCommon(scope) ++ Seq(
-            "org.scalamock" %% "scalamock" % scalaMockVersion % scope
-          )
+          "org.scalamock" %% "scalamock" % scalaMockVersion % scope
+        )
       }.test
   }
 
@@ -44,7 +48,7 @@ object AppDependencies {
   }
 
   private def testCommon(scope: String) = Seq(
-    "uk.gov.hmrc" %% "bootstrap-test-play-29" % bootstrapPlayVersion % scope
+    "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapPlayVersion % scope
   )
 
   def apply(): Seq[ModuleID] = compile ++ Test() ++ IntegrationTest()

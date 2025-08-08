@@ -1,21 +1,21 @@
 package stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import eu.timepit.refined.auto._
-import openbanking.cor.model.request.InitiateEmailSendRequest
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import eu.timepit.refined.auto.*
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.{Assertion, Assertions}
 import play.api.libs.json.Json
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import uk.gov.hmrc.mobilepayments.models.openBanking.request.InitiateEmailSendRequest
 
 object OpenBankingStub {
-  val journeyId:     JourneyId = "27085215-69a4-4027-8f72-b04b10ec16b0"
-  val sessionDataId: String    = "51cc67d6-21da-11ec-9621-0242ac130002"
+  val journeyId: String = "27085215-69a4-4027-8f72-b04b10ec16b0"
+  val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 
   def stubForGetBanks(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       get(
@@ -30,8 +30,8 @@ object OpenBankingStub {
     )
 
   def stubForCreateSession(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -58,8 +58,8 @@ object OpenBankingStub {
     )
 
   def stubForInitiatePayment(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -74,8 +74,8 @@ object OpenBankingStub {
     )
 
   def stubForGetPaymentStatus(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       get(
@@ -90,8 +90,8 @@ object OpenBankingStub {
     )
 
   def stubForUrlConsumed(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       get(
@@ -118,8 +118,8 @@ object OpenBankingStub {
     )
 
   def stubForClearFutureDate(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -134,8 +134,8 @@ object OpenBankingStub {
     )
 
   def stubForGetSession(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       get(
@@ -150,8 +150,8 @@ object OpenBankingStub {
     )
 
   def stubForSetEmail(
-    statusCode: Int    = 201,
-    response:   String = "{}"
+    statusCode: Int = 201,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -166,8 +166,8 @@ object OpenBankingStub {
     )
 
   def stubForSetFutureDate(
-    statusCode: Int    = 201,
-    response:   String = "{}"
+    statusCode: Int = 201,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -182,8 +182,8 @@ object OpenBankingStub {
     )
 
   def stubForSendEmail(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -198,8 +198,8 @@ object OpenBankingStub {
     )
 
   def stubForSetEmailSentFlag(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -214,8 +214,8 @@ object OpenBankingStub {
     )
 
   def stubForClearEmail(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -230,7 +230,7 @@ object OpenBankingStub {
     )
 
   def verifyEmailSent(sessionDataId: String): Assertion = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     val emailUrlString =
       s"/open-banking/session/$sessionDataId/send-email?journeyId=27085215-69a4-4027-8f72-b04b10ec16b0"
     verify(postRequestedFor(urlEqualTo(emailUrlString)))

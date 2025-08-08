@@ -23,30 +23,31 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
-import uk.gov.hmrc.mobilepayments.domain.dto.request._
+import uk.gov.hmrc.mobilepayments.domain.dto.request.*
 import uk.gov.hmrc.mobilepayments.domain.dto.response.PayApiPayByCardResponse
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import play.api.libs.ws.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class PaymentsConnector @Inject() (
-  http:                                   HttpClientV2,
-  @Named("payments") serviceUrl:          String,
+  http: HttpClientV2,
+  @Named("payments") serviceUrl: String,
   @Named("payByCardReturnUrl") returnUrl: String,
-  @Named("payByCardBackUrl") backUrl:     String
-)(implicit ex:                            ExecutionContext) {
+  @Named("payByCardBackUrl") backUrl: String
+)(implicit ex: ExecutionContext) {
 
   val logger: Logger = Logger(this.getClass)
 
   def getPayments(
-    utr:                    Option[String],
-    reference:              Option[String],
-    taxType:                Option[TaxTypeEnum.Value] = Some(TaxTypeEnum.appSelfAssessment),
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Either[String, Option[PaymentRecordListFromApi]]] = {
+    utr: Option[String],
+    reference: Option[String],
+    taxType: Option[TaxTypeEnum.Value] = Some(TaxTypeEnum.appSelfAssessment),
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Either[String, Option[PaymentRecordListFromApi]]] = {
     val url = {
       if (utr.isDefined)
         s"$serviceUrl/pay-api/v2/payment/search/${utr.getOrElse("")}?taxType=selfAssessment&journeyId=${journeyId.value}"
@@ -66,32 +67,31 @@ class PaymentsConnector @Inject() (
       }
     } recover {
       case _: NotFoundException => Right(None)
-      case e: Exception => {
+      case e: Exception =>
         logger.warn(s"Call to pay-api failed: $e")
         Left("exception thrown from payment api")
-      }
+
     }
   }
 
   def getPayByCardUrl(
-    amount:                 Long,
-    saUtr:                  SaUtr,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[PayApiPayByCardResponse] = {
-    http.post(url"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}")
+    amount: Long,
+    saUtr: SaUtr,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[PayApiPayByCardResponse] = {
+    http
+      .post(url"$serviceUrl/pay-api/app/sa/journey/start?journeyId=${journeyId.value}")
       .withBody(Json.toJson(PayApiPayByCardRequest(saUtr.utr, amount, returnUrl, backUrl)))
       .execute[PayApiPayByCardResponse]
   }
 
   def getPayByCardUrlSimpleAssessment(
-    amount:                 Long,
-    nino:                   String,
-    reference:              String,
-    taxYear:                Int,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[PayApiPayByCardResponse] = {
+    amount: Long,
+    nino: String,
+    reference: String,
+    taxYear: Int,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[PayApiPayByCardResponse] = {
     http
       .post(url"$serviceUrl/pay-api/app/simple-assessment/journey/start?journeyId=${journeyId.value}")
       .withBody(Json.toJson(PayByCardAPISimpleAssessmentRequest(reference, nino, taxYear, amount, returnUrl, backUrl)))

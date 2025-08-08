@@ -17,8 +17,8 @@
 package uk.gov.hmrc.mobilepayments.models.openBanking.ecospend
 
 import enumeratum.{Enum, EnumEntry}
-import payapi.corcommon.internal.jsonext.EnumFormat
 import play.api.libs.json.Format
+import uk.gov.hmrc.mobilepayments.domain.dto.response.jsonext.EnumFormat
 
 sealed trait EcospendPaymentStatus extends EnumEntry {
   def isFinished: Boolean = this match {

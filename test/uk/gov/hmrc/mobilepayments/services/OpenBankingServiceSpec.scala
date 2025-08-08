@@ -26,7 +26,7 @@ import uk.gov.hmrc.mobilepayments.connectors.OpenBankingConnector
 import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{OriginSpecificData, SelfAssessmentOriginSpecificData, SimpleAssessmentOriginSpecificData}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.OpenBankingPaymentStatusResponse
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.Bank
 import uk.gov.hmrc.mobilepayments.models.openBanking.response.{CreateSessionDataResponse, InitiatePaymentResponse}
 import uk.gov.hmrc.mobilepayments.models.openBanking.{OriginSpecificSessionData, SessionData}
@@ -137,7 +137,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
     "return unit response" in {
       mockSelectBank(Future successful HttpResponse.apply(200, ""))
 
-      val result = Await.result(sut.selectBank(sessionDataId, bankId, journeyId), 0.5.seconds)
+      val result: Unit = Await.result(sut.selectBank(sessionDataId, bankId, journeyId), 0.5.seconds)
       result shouldEqual ()
     }
   }

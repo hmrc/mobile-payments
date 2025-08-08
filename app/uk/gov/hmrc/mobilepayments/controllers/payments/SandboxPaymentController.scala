@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
-import openbanking.cor.model.response.InitiatePaymentResponse
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.InitiatePaymentResponse
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -36,9 +36,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton()
 class SandboxPaymentController @Inject() (
   @Named("sandboxOpenBankingPaymentUrl") sandboxOpenBankingPaymentUrl: String,
-  cc:                                                                  ControllerComponents,
-  shutteringService:                                                   ShutteringService
-)(implicit val executionContext:                                       ExecutionContext)
+  cc: ControllerComponents,
+  shutteringService: ShutteringService
+)(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with PaymentController
     with ControllerChecks
@@ -51,17 +51,17 @@ class SandboxPaymentController @Inject() (
 
   override def createPayment(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] = paymentUrl(journeyId)
 
   override def updatePayment(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] = paymentUrl(journeyId)
 
   override def urlConsumed(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -73,7 +73,7 @@ class SandboxPaymentController @Inject() (
 
   def getPaymentStatus(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -86,7 +86,7 @@ class SandboxPaymentController @Inject() (
     }
 
   def latestPaymentsLegacy(
-    utr:       String,
+    utr: String,
     journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
@@ -115,7 +115,7 @@ class SandboxPaymentController @Inject() (
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
-          Future successful Ok(toJson(InitiatePaymentResponse(paymentUrl = sandboxOpenBankingPaymentUrl)))
+          Future.successful(Ok(toJson(InitiatePaymentResponse(paymentUrl = sandboxOpenBankingPaymentUrl))))
         }
       }
     }

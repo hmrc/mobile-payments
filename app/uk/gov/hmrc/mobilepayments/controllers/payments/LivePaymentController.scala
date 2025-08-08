@@ -24,9 +24,10 @@ import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.action.AccessControl
 import uk.gov.hmrc.mobilepayments.controllers.errors.{ErrorHandling, JsonHandler}
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{LatestPaymentsRequest, PayByCardRequestGeneric}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 import uk.gov.hmrc.mobilepayments.models.openBanking.ecospend.EcospendFinalStatuses.Completed
 import uk.gov.hmrc.mobilepayments.models.openBanking.ecospend.EcospendFinishedStatuses.Verified
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.InitiatePaymentResponse
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
@@ -36,14 +37,14 @@ import scala.concurrent.ExecutionContext
 
 @Singleton()
 class LivePaymentController @Inject() (
-  override val authConnector:                                   AuthConnector,
+  override val authConnector: AuthConnector,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents,
-  openBankingService:                                           OpenBankingService,
-  shutteringService:                                            ShutteringService,
-  auditService:                                                 AuditService,
-  paymentsService:                                              PaymentsService
-)(implicit val executionContext:                                ExecutionContext)
+  cc: ControllerComponents,
+  openBankingService: OpenBankingService,
+  shutteringService: ShutteringService,
+  auditService: AuditService,
+  paymentsService: PaymentsService
+)(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with PaymentController
     with AccessControl
@@ -57,7 +58,7 @@ class LivePaymentController @Inject() (
 
   def createPayment(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -68,7 +69,7 @@ class LivePaymentController @Inject() (
               response <- openBankingService.initiatePayment(sessionDataId, journeyId)
               session  <- openBankingService.getSession(sessionDataId, journeyId)
               _        <- auditService.sendPaymentEvent(session, journeyId.value)
-            } yield Ok(Json.toJson(response))
+            } yield Ok(Json.toJson[InitiatePaymentResponse](response))
           }
         }
       }
@@ -76,7 +77,7 @@ class LivePaymentController @Inject() (
 
   def updatePayment(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -89,7 +90,7 @@ class LivePaymentController @Inject() (
                 journeyId
               )
               .map { response =>
-                Ok(Json.toJson(response))
+                Ok(Json.toJson[InitiatePaymentResponse](response))
               }
           }
         }
@@ -98,7 +99,7 @@ class LivePaymentController @Inject() (
 
   def urlConsumed(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -120,7 +121,7 @@ class LivePaymentController @Inject() (
 
   def getPaymentStatus(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules).async { implicit request =>
       implicit val hc: HeaderCarrier = fromRequest(request)
@@ -131,9 +132,11 @@ class LivePaymentController @Inject() (
               response <- openBankingService.getPaymentStatus(sessionDataId, journeyId)
               session  <- openBankingService.getSession(sessionDataId, journeyId)
             } yield {
-              if ((response.status == Verified.toString || response.status == Completed.toString) &&
-                  !session.emailSent
-                    .getOrElse(false)) {
+              if (
+                (response.status == Verified.toString || response.status == Completed.toString) &&
+                !session.emailSent
+                  .getOrElse(false)
+              ) {
                 openBankingService.sendEmail(sessionDataId, journeyId, session.origin)
               }
               Ok(Json.toJson(response))
@@ -150,10 +153,7 @@ class LivePaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[LatestPaymentsRequest] { latestPaymentsRequest =>
-              paymentsService.getLatestPayments(None,
-                                                Some(latestPaymentsRequest.reference),
-                                                Some(latestPaymentsRequest.taxType),
-                                                journeyId) map {
+              paymentsService.getLatestPayments(None, Some(latestPaymentsRequest.reference), Some(latestPaymentsRequest.taxType), journeyId) map {
                 case Right(None)     => NotFound
                 case Right(payments) => Ok(Json.toJson(payments))
                 case Left(e)         => InternalServerError(e)

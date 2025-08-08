@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.mobilepayments.models.openBanking
 
-import payapi.corcommon.internal.ValueClassBinder.valueClassBinder
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
+import uk.gov.hmrc.mobilepayments.domain.dto.response.ValueClassBinder.valueClassBinder
 
 final case class SessionDataId(value: String)
 

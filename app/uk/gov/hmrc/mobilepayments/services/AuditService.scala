@@ -17,10 +17,10 @@
 package uk.gov.hmrc.mobilepayments.services
 
 import com.google.inject.{Inject, Singleton}
-import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
 import play.api.libs.json.Json.obj
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
+import uk.gov.hmrc.mobilepayments.domain.dto.response.Origins.{AppSa, AppSimpleAssessment}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.play.audit.AuditExtensions.auditHeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -30,16 +30,12 @@ import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditService @Inject() (
-  auditConnector:                AuditConnector,
-  @Named("appName") val appName: String) {
+class AuditService @Inject() (auditConnector: AuditConnector, @Named("appName") val appName: String) {
 
   def sendPaymentEvent(
-    sessionData:      SessionDataResponse,
-    journeyId:        String
-  )(implicit hc:      HeaderCarrier,
-    executionContext: ExecutionContext
-  ): Future[AuditResult] = {
+    sessionData: SessionDataResponse,
+    journeyId: String
+  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[AuditResult] = {
     val taxType = if (sessionData.origin == AppSa) TaxTypeEnum.appSelfAssessment else TaxTypeEnum.appSimpleAssessment
     auditConnector.sendExtendedEvent(
       ExtendedDataEvent(
@@ -62,14 +58,14 @@ class AuditService @Inject() (
   }
 
   object AuditService {
-    val paymentPath      = "/payment"
+    val paymentPath = "/payment"
     val paymentEventName = "initiateOpenBankingPayment"
-    val transactionName  = "mobile-initiate-open-banking-payment"
-    val amountKey        = "amount"
-    val utrKey           = "utr"
-    val journeyIdKey     = "journeyId"
-    val taxTypeKey       = "taxType"
+    val transactionName = "mobile-initiate-open-banking-payment"
+    val amountKey = "amount"
+    val utrKey = "utr"
+    val journeyIdKey = "journeyId"
+    val taxTypeKey = "taxType"
     val p302ChargeRefKey = "p302ChargeReference"
-    val bankKey          = "bank"
+    val bankKey = "bank"
   }
 }

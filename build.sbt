@@ -6,7 +6,6 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(
     Seq(
       play.sbt.PlayScala,
-      SbtAutoBuildPlugin,
       SbtDistributablesPlugin,
       ScoverageSbtPlugin
     ): _*
@@ -18,19 +17,17 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     routesImport ++= Seq(
       "uk.gov.hmrc.mobilepayments.domain.types._",
-      "uk.gov.hmrc.mobilepayments.domain.types.ModelTypes._"
+      "uk.gov.hmrc.mobilepayments.domain.types.JourneyId._"
     )
   )
   .settings(
     majorVersion := 0,
-    scalaVersion := "2.13.12",
+    scalaVersion := "3.6.4",
     playDefaultPort := 8262,
     libraryDependencies ++= AppDependencies(),
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
-    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base =>
-      Seq(base / "it", base / "test-common")
-    ).value,
+    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it", base / "test-common")).value,
     Test / unmanagedSourceDirectories := (Test / baseDirectory)(base => Seq(base / "test", base / "test-common")).value,
     IntegrationTest / parallelExecution := false,
     scalacOptions ++= Seq(

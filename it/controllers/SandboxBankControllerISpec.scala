@@ -2,9 +2,10 @@ package controllers
 
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
-import stubs.ShutteringStub._
+import stubs.ShutteringStub.*
 import uk.gov.hmrc.mobilepayments.domain.dto.response.BanksResponse
 import utils.BaseISpec
+import play.api.libs.ws.writeableOf_JsValue
 
 class SandboxBankControllerISpec extends BaseISpec {
 

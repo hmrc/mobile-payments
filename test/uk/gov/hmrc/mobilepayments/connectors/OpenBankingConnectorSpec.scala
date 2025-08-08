@@ -16,26 +16,25 @@
 
 package uk.gov.hmrc.mobilepayments.connectors
 
-import openbanking.cor.model.SessionInitiated
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers.await
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.dto.request.SelfAssessmentOriginSpecificData
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub
+import uk.gov.hmrc.mobilepayments.models.openBanking.SessionInitiated
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class OpenBankingConnectorSpec extends BaseSpec with ConnectorStub with MobilePaymentsTestData with ScalaFutures {
 
-
-  val sut           = new OpenBankingConnector(mockHttp, "https://baseUrl")
+  val sut = new OpenBankingConnector(mockHttp, "https://baseUrl")
   val sessionDataId = "51cc67d6-21da-11ec-9621-0242ac130002"
-  val returnUrl     = "https://tax.hmrc.gov.uk/payment-result"
-  val amount        = BigDecimal((12500 * 100).longValue())
+  val returnUrl = "https://tax.hmrc.gov.uk/payment-result"
+  val amount: BigDecimal = BigDecimal((12500 * 100).longValue())
 
   "when getBanks call is successful it" should {
     "return banks" in {

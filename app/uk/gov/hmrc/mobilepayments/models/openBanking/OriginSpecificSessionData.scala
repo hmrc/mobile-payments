@@ -16,33 +16,33 @@
 
 package uk.gov.hmrc.mobilepayments.models.openBanking
 
-
-import payapi.corcommon.model.Origins._
-import payapi.corcommon.model.cgt.CgtAccountReference
-import payapi.corcommon.model.taxes.ReferenceMaker
-import payapi.corcommon.model.taxes.ad.{AlcoholDutyChargeReference, AlcoholDutyReference}
-import payapi.corcommon.model.taxes.amls.AmlsPaymentReference
-import payapi.corcommon.model.taxes.cds.{CdsCashRef, CdsRef}
-import payapi.corcommon.model.taxes.cdsd.CdsDefermentReference
-import payapi.corcommon.model.taxes.ct.{CtChargeType, CtPeriod, CtUtr}
-import payapi.corcommon.model.taxes.epaye._
-import payapi.corcommon.model.taxes.ioss.Ioss
-import payapi.corcommon.model.taxes.other._
-import payapi.corcommon.model.taxes.p302.{P302ChargeRef, P302Ref}
-import payapi.corcommon.model.taxes.trusts.TrustReference
-import payapi.corcommon.model.taxes.p800.P800Ref
-import payapi.corcommon.model.taxes.pillar2.Pillar2Reference
-import payapi.corcommon.model.taxes.ppt.PptReference
-import payapi.corcommon.model.taxes.sa.SaUtr
-import payapi.corcommon.model.taxes.sd.SpiritDrinksReference
-import payapi.corcommon.model.taxes.vat.{CalendarPeriod, VatChargeReference, Vrn}
-import payapi.corcommon.model.times.period.CalendarQuarterlyPeriod
-import payapi.corcommon.model.{Origin, Reference, SearchTag}
-import payapi.corcommon.model.taxes.sdlt.Utrn
-import payapi.corcommon.model.taxes.vatc2c.VatC2cReference
-import payapi.corcommon.model.thirdpartysoftware.{ClientJourneyId, FriendlyName}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{Json, _}
+import play.api.libs.json.{Json, *}
+import uk.gov.hmrc.mobilepayments.domain.dto.response.Origin
+import uk.gov.hmrc.mobilepayments.domain.dto.response.Origins.*
+import uk.gov.hmrc.mobilepayments.models.payapi.*
+import uk.gov.hmrc.mobilepayments.models.payapi.cgt.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.ReferenceMaker
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.ad.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.amls.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.cds.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.cdsd.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.ct.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.epaye.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.ioss.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.other.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.p302.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.p800.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.trusts.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.pillar2.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.ppt.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.sa.SaUtr
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.sd.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.vat.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.sdlt.*
+import uk.gov.hmrc.mobilepayments.models.payapi.taxes.vatc2c.*
+import uk.gov.hmrc.mobilepayments.models.payapi.times.period.CalendarQuarterlyPeriod
+import uk.gov.hmrc.mobilepayments.models.payapi.thirdpartysoftware.*
 
 sealed abstract class OriginSpecificSessionData(val origin: Origin) {
   def paymentReference: Reference
@@ -80,13 +80,15 @@ object OriginSpecificSessionData {
       case PfNiEuVatIoss       => Json.format[PfNiEuVatIossSessionData].reads(json)
       case CapitalGainsTax     => Json.format[CapitalGainsTaxSessionData].reads(json)
       case PtaSimpleAssessment => Json.format[PtaSimpleAssessmentSessionData].reads(json)
-      case PfSimpleAssessment => Json.format[PfSimpleAssessmentSessionData].reads(json) match {
-        case success: JsSuccess[PfSimpleAssessmentSessionData] => success
-        case _ => (
-          (JsPath \ "xRef").read[XRef14Char] and
-            (JsPath \ "returnUrl").readNullable[String]
-          )(PfSimpleAssessmentSessionData.apply _).reads(json)
-      }
+      case PfSimpleAssessment =>
+        Json.format[PfSimpleAssessmentSessionData].reads(json) match {
+          case success: JsSuccess[PfSimpleAssessmentSessionData] => success
+          case _ =>
+            (
+              (JsPath \ "xRef").read[XRef14Char] and
+                (JsPath \ "returnUrl").readNullable[String]
+            )(PfSimpleAssessmentSessionData.apply).reads(json)
+        }
       case PfBioFuels               => Json.format[PfBioFuelsSessionData].reads(json)
       case PfSdlt                   => Json.format[PfSdltSessionData].reads(json)
       case PfGbPbRgDuty             => Json.format[PfGbPbRgDutySessionData].reads(json)
@@ -132,10 +134,9 @@ object OriginSpecificSessionData {
       case Pillar2                  => Json.format[Pillar2SessionData].reads(json)
       case PfPillar2                => Json.format[PfPillar2SessionData].reads(json)
 
-      //Todo: Remove PfP800 when PtaP800 is fully available
-      case origin @ (PfOther | PtaP800 | PfP800
-                     | BcPngr | Parcels | DdVat | DdSdil | Mib | PfSimpleAssessment
-                     | PtaSimpleAssessment | PfJobRetentionScheme | JrsJobRetentionScheme) =>
+      // Todo: Remove PfP800 when PtaP800 is fully available
+      case origin @ (PfOther | PtaP800 | PfP800 | BcPngr |
+          Parcels | DdVat | DdSdil | Mib | PfSimpleAssessment | PtaSimpleAssessment | PfJobRetentionScheme | JrsJobRetentionScheme) =>
         throw new RuntimeException(s"Trying to read JSON for unimplemented Origin: ${origin.toString}")
     }
 
@@ -248,20 +249,22 @@ sealed trait ThirdPartySoftwareSessionData {
 }
 
 final case class `3psSaSessionData`(
-                                     saUtr:                  SaUtr,
-                                     clientJourneyId:        ClientJourneyId,
-                                     friendlyName:           Option[FriendlyName],
-                                     override val returnUrl: Option[String]       = None
-                                   ) extends SelfAssessmentSessionData(`3psSa`) with ThirdPartySoftwareSessionData {
+  saUtr: SaUtr,
+  clientJourneyId: ClientJourneyId,
+  friendlyName: Option[FriendlyName],
+  override val returnUrl: Option[String] = None
+) extends SelfAssessmentSessionData(`3psSa`)
+    with ThirdPartySoftwareSessionData {
   def searchTag = SearchTag(saUtr.value)
 }
 
 final case class `3psVatSessionData`(
-                                      vrn:                    Vrn,
-                                      clientJourneyId:        ClientJourneyId,
-                                      friendlyName:           Option[FriendlyName],
-                                      override val returnUrl: Option[String]       = None
-                                    ) extends VatSessionData(`3psVat`) with ThirdPartySoftwareSessionData {
+  vrn: Vrn,
+  clientJourneyId: ClientJourneyId,
+  friendlyName: Option[FriendlyName],
+  override val returnUrl: Option[String] = None
+) extends VatSessionData(`3psVat`)
+    with ThirdPartySoftwareSessionData {
   def paymentReference: Reference = ReferenceMaker.makeVatReference(vrn)
   def searchTag = SearchTag(vrn.value)
 }
@@ -269,44 +272,44 @@ final case class `3psVatSessionData`(
 sealed abstract class PayeSessionData(origin: Origin) extends OriginSpecificSessionData(origin) {}
 
 final case class BtaEpayeGeneralSessionData(
-                                             accountsOfficeReference: AccountsOfficeReference,
-                                             period:                  SubYearlyEpayeTaxPeriod,
-                                             returnUrl:               Option[String]          = None
-                                           ) extends PayeSessionData(BtaEpayeGeneral) {
+  accountsOfficeReference: AccountsOfficeReference,
+  period: SubYearlyEpayeTaxPeriod,
+  returnUrl: Option[String] = None
+) extends PayeSessionData(BtaEpayeGeneral) {
   def paymentReference: Reference = ReferenceMaker.makeEpayeNiReference(accountsOfficeReference, period)
   def searchTag = SearchTag(accountsOfficeReference.canonicalizedValue)
 }
 
 final case class BtaEpayeBillSessionData(
-                                          accountsOfficeReference: AccountsOfficeReference,
-                                          period:                  SubYearlyEpayeTaxPeriod,
-                                          returnUrl:               Option[String]          = None
-                                        ) extends PayeSessionData(BtaEpayeBill) {
+  accountsOfficeReference: AccountsOfficeReference,
+  period: SubYearlyEpayeTaxPeriod,
+  returnUrl: Option[String] = None
+) extends PayeSessionData(BtaEpayeBill) {
   def paymentReference: Reference = ReferenceMaker.makeEpayeNiReference(accountsOfficeReference, period)
   def searchTag = SearchTag(accountsOfficeReference.canonicalizedValue)
 }
 
 final case class BtaEpayeInterestSessionData(
-                                              payeInterestXRef: XRef,
-                                              returnUrl:        Option[String] = None
-                                            ) extends PayeSessionData(BtaEpayeInterest) {
+  payeInterestXRef: XRef,
+  returnUrl: Option[String] = None
+) extends PayeSessionData(BtaEpayeInterest) {
   def paymentReference: Reference = ReferenceMaker.makeXReference(payeInterestXRef)
   def searchTag = SearchTag(payeInterestXRef.canonicalizedValue)
 }
 
 final case class BtaEpayePenaltySessionData(
-                                             epayePenaltyReference: EpayePenaltyReference,
-                                             returnUrl:             Option[String]        = None
-                                           ) extends PayeSessionData(BtaEpayePenalty) {
+  epayePenaltyReference: EpayePenaltyReference,
+  returnUrl: Option[String] = None
+) extends PayeSessionData(BtaEpayePenalty) {
   def paymentReference: Reference = ReferenceMaker.makeEpayePenaltyReference(epayePenaltyReference)
   def searchTag = SearchTag(epayePenaltyReference.value)
 }
 
 final case class BtaClass1aNiSessionData(
-                                          accountsOfficeReference: AccountsOfficeReference,
-                                          period:                  YearlyEpayeTaxPeriod,
-                                          returnUrl:               Option[String]          = None
-                                        ) extends PayeSessionData(BtaClass1aNi) {
+  accountsOfficeReference: AccountsOfficeReference,
+  period: YearlyEpayeTaxPeriod,
+  returnUrl: Option[String] = None
+) extends PayeSessionData(BtaClass1aNi) {
   def paymentReference: Reference = ReferenceMaker.makeEpayeNiReference(accountsOfficeReference, period)
   def searchTag = SearchTag(accountsOfficeReference.canonicalizedValue)
 }
@@ -314,21 +317,21 @@ final case class BtaClass1aNiSessionData(
 sealed abstract class CoTaxSessionData(origin: Origin) extends OriginSpecificSessionData(origin)
 
 final case class BtaCtSessionData(
-                                   utr:          CtUtr,
-                                   ctPeriod:     CtPeriod,
-                                   ctChargeType: CtChargeType,
-                                   returnUrl:    Option[String] = None
-                                 ) extends CoTaxSessionData(BtaCt) {
+  utr: CtUtr,
+  ctPeriod: CtPeriod,
+  ctChargeType: CtChargeType,
+  returnUrl: Option[String] = None
+) extends CoTaxSessionData(BtaCt) {
   def paymentReference: Reference = ReferenceMaker.makeCtReference(utr, ctPeriod, ctChargeType)
   def searchTag = SearchTag(utr.canonicalizedValue)
 }
 
 final case class PfCtSessionData(
-                                  utr:          CtUtr,
-                                  ctPeriod:     CtPeriod,
-                                  ctChargeType: CtChargeType,
-                                  returnUrl:    Option[String] = None
-                                ) extends CoTaxSessionData(PfCt) {
+  utr: CtUtr,
+  ctPeriod: CtPeriod,
+  ctChargeType: CtChargeType,
+  returnUrl: Option[String] = None
+) extends CoTaxSessionData(PfCt) {
   def paymentReference: Reference = ReferenceMaker.makeCtReference(utr, ctPeriod, ctChargeType)
   def searchTag = SearchTag(utr.canonicalizedValue)
 }
@@ -345,7 +348,8 @@ final case class VcVatReturnSessionData(vrn: Vrn, returnUrl: Option[String] = No
   def searchTag = SearchTag(vrn.value)
 }
 
-final case class VcVatOtherSessionData(vrn: Vrn, vatChargeReference: VatChargeReference, returnUrl: Option[String] = None) extends VatSessionData(VcVatOther) {
+final case class VcVatOtherSessionData(vrn: Vrn, vatChargeReference: VatChargeReference, returnUrl: Option[String] = None)
+    extends VatSessionData(VcVatOther) {
   def paymentReference: Reference = ReferenceMaker.makeVatReference(vrn)
   def searchTag = SearchTag(vatChargeReference.reference)
 }
@@ -357,13 +361,17 @@ final case class PfVatSessionData(vrn: Option[Vrn], chargeRef: Option[XRef14Char
   def paymentReference: Reference = (vatReference, chargeReference) match {
     case (Some(vrn), _) => vrn
     case (_, Some(ref)) => ref
-    case _              => throw new IllegalStateException("[OriginSpecificData][PfVatSessionData] Unable to set paymentReference for PfVatSessionData")
+    case _ => throw new IllegalStateException("[OriginSpecificData][PfVatSessionData] Unable to set paymentReference for PfVatSessionData")
   }
 
   def searchTag = SearchTag(paymentReference.value)
 }
 
-final case class PfEpayeNiSessionData(accountsOfficeReference: AccountsOfficeReference, period: SubYearlyEpayeTaxPeriod, returnUrl: Option[String] = None) extends PayeSessionData(PfEpayeNi) {
+final case class PfEpayeNiSessionData(accountsOfficeReference: AccountsOfficeReference,
+                                      period: SubYearlyEpayeTaxPeriod,
+                                      returnUrl: Option[String] = None
+                                     )
+    extends PayeSessionData(PfEpayeNi) {
   def paymentReference: Reference = ReferenceMaker.makeEpayeNiReference(accountsOfficeReference, period)
   def searchTag = SearchTag(accountsOfficeReference.canonicalizedValue)
 }
@@ -383,53 +391,66 @@ final case class PfEpayeLateCisSessionData(payeInterestXRef: XRef14Char, returnU
   def searchTag = SearchTag(payeInterestXRef.canonicalizedValue)
 }
 
-final case class PfEpayeP11dSessionData(accountsOfficeReference: AccountsOfficeReference, period: YearlyEpayeTaxPeriod, returnUrl: Option[String] = None) extends PayeSessionData(PfEpayeP11d) {
+final case class PfEpayeP11dSessionData(accountsOfficeReference: AccountsOfficeReference,
+                                        period: YearlyEpayeTaxPeriod,
+                                        returnUrl: Option[String] = None
+                                       )
+    extends PayeSessionData(PfEpayeP11d) {
   def paymentReference: Reference = ReferenceMaker.makeEpayeNiReference(accountsOfficeReference, period)
   def searchTag = SearchTag(accountsOfficeReference.canonicalizedValue)
 }
 
-final case class CapitalGainsTaxSessionData(cgtReference: CgtAccountReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(CapitalGainsTax) {
+final case class CapitalGainsTaxSessionData(cgtReference: CgtAccountReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(CapitalGainsTax) {
   def paymentReference: Reference = ReferenceMaker.makeCgtReference(cgtReference)
   def searchTag = SearchTag(cgtReference.canonicalizedValue)
 }
 
-final case class NiEuVatOssSessionData(vrn: Vrn, period: CalendarQuarterlyPeriod, returnUrl: Option[String] = None) extends OriginSpecificSessionData(NiEuVatOss) {
+final case class NiEuVatOssSessionData(vrn: Vrn, period: CalendarQuarterlyPeriod, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(NiEuVatOss) {
   def paymentReference: Reference = ReferenceMaker.makeNiEuVatOssReference(vrn, period)
   def searchTag = SearchTag(vrn.value)
 }
 
-final case class PfNiEuVatOssSessionData(vrn: Vrn, period: CalendarQuarterlyPeriod, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfNiEuVatOss) {
+final case class PfNiEuVatOssSessionData(vrn: Vrn, period: CalendarQuarterlyPeriod, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfNiEuVatOss) {
   def paymentReference: Reference = ReferenceMaker.makeNiEuVatOssReference(vrn, period)
   def searchTag = SearchTag(vrn.value)
 }
 
-final case class NiEuVatIossSessionData(ioss: Ioss, period: CalendarPeriod, returnUrl: Option[String] = None) extends OriginSpecificSessionData(NiEuVatIoss) {
+final case class NiEuVatIossSessionData(ioss: Ioss, period: CalendarPeriod, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(NiEuVatIoss) {
   def paymentReference: Reference = ReferenceMaker.makeNiEuVatIossReference(ioss, period)
 
   def searchTag = SearchTag(ioss.value)
 }
 
-final case class PfNiEuVatIossSessionData(ioss: Ioss, period: CalendarPeriod, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfNiEuVatIoss) {
+final case class PfNiEuVatIossSessionData(ioss: Ioss, period: CalendarPeriod, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfNiEuVatIoss) {
   def paymentReference: Reference = ReferenceMaker.makeNiEuVatIossReference(ioss, period)
   def searchTag = SearchTag(ioss.value)
 }
 
-final case class PtaSimpleAssessmentSessionData(p302Ref: P302Ref, p302ChargeRef: P302ChargeRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PtaSimpleAssessment) {
+final case class PtaSimpleAssessmentSessionData(p302Ref: P302Ref, p302ChargeRef: P302ChargeRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PtaSimpleAssessment) {
   def paymentReference: Reference = Reference(p302ChargeRef.canonicalizedValue)
   def searchTag = SearchTag(p302ChargeRef.canonicalizedValue)
 }
 
-final case class AppSimpleAssessmentSessionData(p302Ref: P800Ref, override val returnUrl: Option[String] = None) extends OriginSpecificSessionData(AppSimpleAssessment) {
+final case class AppSimpleAssessmentSessionData(p302Ref: P800Ref, override val returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(AppSimpleAssessment) {
   def paymentReference: Reference = Reference(p302Ref.canonicalizedValue)
   def searchTag = SearchTag(p302Ref.canonicalizedValue)
 }
 
-final case class PfSimpleAssessmentSessionData(simpleAssessmentReference: XRef14Char, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfSimpleAssessment) {
+final case class PfSimpleAssessmentSessionData(simpleAssessmentReference: XRef14Char, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfSimpleAssessment) {
   def paymentReference: Reference = ReferenceMaker.makeSimpleAssessmentRef(simpleAssessmentReference)
   def searchTag = SearchTag(simpleAssessmentReference.canonicalizedValue)
 }
 
-final case class PfBioFuelsSessionData(bioFuelsRegistrationNumber: BioFuelsRegistrationNumber, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfBioFuels) {
+final case class PfBioFuelsSessionData(bioFuelsRegistrationNumber: BioFuelsRegistrationNumber, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfBioFuels) {
   def paymentReference: Reference = ReferenceMaker.makeBioFuelsReference(bioFuelsRegistrationNumber)
   def searchTag = SearchTag(bioFuelsRegistrationNumber.value)
 }
@@ -447,12 +468,14 @@ final case class PfGamingOrBingoDutySessionData(xRef: XRef, returnUrl: Option[St
   def paymentReference: Reference = ReferenceMaker.makeXReference(xRef)
   def searchTag = SearchTag(xRef.canonicalizedValue)
 }
-final case class PfGbPbRgDutySessionData(generalBettingXRef: XRef14Char, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfGbPbRgDuty) {
+final case class PfGbPbRgDutySessionData(generalBettingXRef: XRef14Char, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfGbPbRgDuty) {
   def paymentReference: Reference = ReferenceMaker.makeXRef14Char(generalBettingXRef)
   def searchTag = SearchTag(generalBettingXRef.canonicalizedValue)
 }
 
-final case class PfAmlsSessionData(amlsPaymentReference: AmlsPaymentReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfAmls) {
+final case class PfAmlsSessionData(amlsPaymentReference: AmlsPaymentReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfAmls) {
   def paymentReference: Reference = ReferenceMaker.makeAmlsReference(amlsPaymentReference)
   def searchTag = SearchTag(amlsPaymentReference.canonicalizedValue)
 }
@@ -467,7 +490,8 @@ final case class PfChildBenefitSessionData(yRef: YRef, returnUrl: Option[String]
   def searchTag = SearchTag(yRef.value)
 }
 
-final case class PfAggregatesLevySessionData(aggregatesLevyRef: AggregatesLevyRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfAggregatesLevy) {
+final case class PfAggregatesLevySessionData(aggregatesLevyRef: AggregatesLevyRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfAggregatesLevy) {
   def paymentReference: Reference = ReferenceMaker.makeAggregatesLevyReference(aggregatesLevyRef)
   def searchTag = SearchTag(aggregatesLevyRef.canonicalizedValue)
 }
@@ -475,7 +499,8 @@ final case class PfLandfillTaxSessionData(xRef: XRef, returnUrl: Option[String] 
   def paymentReference: Reference = ReferenceMaker.makeXReference(xRef)
   def searchTag = SearchTag(xRef.canonicalizedValue)
 }
-final case class AmlsSessionData(amlsPaymentReference: AmlsPaymentReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(Amls) {
+final case class AmlsSessionData(amlsPaymentReference: AmlsPaymentReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(Amls) {
   def paymentReference: Reference = ReferenceMaker.makeAmlsReference(amlsPaymentReference)
   def searchTag = SearchTag(amlsPaymentReference.canonicalizedValue)
 }
@@ -485,12 +510,14 @@ final case class PfCdsSessionData(cdsRef: CdsRef, returnUrl: Option[String] = No
   def searchTag = SearchTag(cdsRef.canonicalizedValue)
 }
 
-final case class PfClimateChangeLevySessionData(climateChangeLevyRef: ClimateChangeLevyRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfClimateChangeLevy) {
+final case class PfClimateChangeLevySessionData(climateChangeLevyRef: ClimateChangeLevyRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfClimateChangeLevy) {
   def paymentReference: Reference = ReferenceMaker.makeClimateChangeLevyRef(climateChangeLevyRef)
   def searchTag = SearchTag(climateChangeLevyRef.value)
 }
 
-final case class PfInsurancePremiumSessionData(insurancePremiumRef: InsurancePremiumRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfInsurancePremium) {
+final case class PfInsurancePremiumSessionData(insurancePremiumRef: InsurancePremiumRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfInsurancePremium) {
   def paymentReference: Reference = ReferenceMaker.makeInsurancePremiumRef(insurancePremiumRef)
   def searchTag = SearchTag(insurancePremiumRef.canonicalisedValue)
 }
@@ -499,7 +526,8 @@ final case class PfAirPassSessionData(airPassRef: AirPassReference, returnUrl: O
   def searchTag = SearchTag(airPassRef.canonicalisedValue)
 }
 
-final case class PfClass2NiSessionData(class2NiReference: Class2NiReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfClass2Ni) {
+final case class PfClass2NiSessionData(class2NiReference: Class2NiReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfClass2Ni) {
   def paymentReference: Reference = ReferenceMaker.makeClass2NiReference(class2NiReference)
   def searchTag = SearchTag(class2NiReference.canonicalisedValue)
 }
@@ -534,7 +562,8 @@ final case class PtaClass3NiSessionData(class3NiRef: Class3NiRef, returnUrl: Opt
   def searchTag: SearchTag = SearchTag(class3NiRef.value)
 }
 
-final case class PfSdilSessionData(softDrinksIndustryLevyRef: SoftDrinksIndustryLevyRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfSdil) {
+final case class PfSdilSessionData(softDrinksIndustryLevyRef: SoftDrinksIndustryLevyRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfSdil) {
   def paymentReference: Reference = ReferenceMaker.makeSoftDrinksIndustryLevyRef(softDrinksIndustryLevyRef)
   def searchTag = SearchTag(softDrinksIndustryLevyRef.canonicalizedValue)
 }
@@ -543,19 +572,23 @@ final case class BtaSdilSessionData(xRef: XRef, returnUrl: Option[String] = None
   def paymentReference: Reference = ReferenceMaker.makeXReference(xRef)
   def searchTag = SearchTag(xRef.canonicalizedValue)
 }
-final case class PfInheritanceTaxSessionData(inheritanceTaxRef: InheritanceTaxRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfInheritanceTax) {
+final case class PfInheritanceTaxSessionData(inheritanceTaxRef: InheritanceTaxRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfInheritanceTax) {
   def paymentReference: Reference = ReferenceMaker.makeInheritanceTaxRef(inheritanceTaxRef)
   def searchTag = SearchTag(inheritanceTaxRef.canonicalizedValue)
 }
-final case class PfWineAndCiderTaxSessionData(wineAndTaxRef: WineAndCiderTaxRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfWineAndCider) {
+final case class PfWineAndCiderTaxSessionData(wineAndTaxRef: WineAndCiderTaxRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfWineAndCider) {
   def paymentReference: Reference = ReferenceMaker.makeWineAndBeerTaxRef(wineAndTaxRef)
   def searchTag = SearchTag(wineAndTaxRef.canonicalizedValue)
 }
-final case class PfSpiritDrinksSessionData(spiritDrinksReference: SpiritDrinksReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfSpiritDrinks) {
+final case class PfSpiritDrinksSessionData(spiritDrinksReference: SpiritDrinksReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfSpiritDrinks) {
   def paymentReference: Reference = ReferenceMaker.makeSpiritDrinksReference(spiritDrinksReference)
   def searchTag = SearchTag(spiritDrinksReference.canonicalizedValue)
 }
-final case class PfImportedVehiclesSessionData(importedVehiclesRef: ImportedVehiclesRef, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfImportedVehicles) {
+final case class PfImportedVehiclesSessionData(importedVehiclesRef: ImportedVehiclesRef, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfImportedVehicles) {
   def paymentReference: Reference = ReferenceMaker.makeImportedVehiclesRef(importedVehiclesRef)
   def searchTag = SearchTag(importedVehiclesRef.canonicalizedValue)
 }
@@ -569,7 +602,8 @@ final case class PfCdsCashSessionData(cdsRef: CdsCashRef, returnUrl: Option[Stri
   def searchTag = SearchTag(cdsRef.canonicalizedValue)
 }
 
-final case class PfCdsDefermentSessionData(cdsDefermentReference: CdsDefermentReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfCdsDeferment) {
+final case class PfCdsDefermentSessionData(cdsDefermentReference: CdsDefermentReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfCdsDeferment) {
   def paymentReference: Reference = ReferenceMaker.makeCdsDefermentReference(cdsDefermentReference)
   def searchTag: SearchTag = SearchTag(cdsDefermentReference.canonicalizedValue)
 }
@@ -579,27 +613,34 @@ final case class PfTrustSessionData(trustReference: TrustReference, returnUrl: O
   def searchTag: SearchTag = SearchTag(trustReference.canonicalizedValue)
 }
 
-final case class EconomicCrimeLevySessionData(economicCrimeLevyReturnNumber: EconomicCrimeLevyReturnNumber, returnUrl: Option[String] = None) extends OriginSpecificSessionData(EconomicCrimeLevy) {
+final case class EconomicCrimeLevySessionData(economicCrimeLevyReturnNumber: EconomicCrimeLevyReturnNumber, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(EconomicCrimeLevy) {
   def paymentReference: Reference = ReferenceMaker.makeEconomicCrimeLevyReturnNumber(economicCrimeLevyReturnNumber)
 
   def searchTag: SearchTag = SearchTag(economicCrimeLevyReturnNumber.canonicalizedValue)
 }
 
-final case class PfEconomicCrimeLevySessionData(economicCrimeLevyReturnNumber: EconomicCrimeLevyReturnNumber, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfEconomicCrimeLevy) {
+final case class PfEconomicCrimeLevySessionData(economicCrimeLevyReturnNumber: EconomicCrimeLevyReturnNumber, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfEconomicCrimeLevy) {
   def paymentReference: Reference = ReferenceMaker.makeEconomicCrimeLevyReturnNumber(economicCrimeLevyReturnNumber)
   def searchTag: SearchTag = SearchTag(economicCrimeLevyReturnNumber.canonicalizedValue)
 }
 
-final case class PfAlcoholDutySessionData(alcoholDutyReference: AlcoholDutyReference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfAlcoholDuty) {
+final case class PfAlcoholDutySessionData(alcoholDutyReference: AlcoholDutyReference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfAlcoholDuty) {
   def paymentReference: Reference = ReferenceMaker.makeAlcoholDutyReference(alcoholDutyReference)
   def searchTag: SearchTag = SearchTag(alcoholDutyReference.canonicalizedValue)
 }
 
-final case class AlcoholDutySessionData(alcoholDutyReference: AlcoholDutyReference, alcoholDutyChargeReference: Option[AlcoholDutyChargeReference], returnUrl: Option[String] = None) extends OriginSpecificSessionData(AlcoholDuty) {
-  //try and use charge reference as reference, if not provided, use alcoholDutyReference instead.
+final case class AlcoholDutySessionData(alcoholDutyReference: AlcoholDutyReference,
+                                        alcoholDutyChargeReference: Option[AlcoholDutyChargeReference],
+                                        returnUrl: Option[String] = None
+                                       )
+    extends OriginSpecificSessionData(AlcoholDuty) {
+  // try and use charge reference as reference, if not provided, use alcoholDutyReference instead.
   def paymentReference: Reference =
-    alcoholDutyChargeReference.fold(ReferenceMaker.makeAlcoholDutyReference(alcoholDutyReference)) {
-      adcr => ReferenceMaker.makeAlcoholDutyChargeReference(adcr)
+    alcoholDutyChargeReference.fold(ReferenceMaker.makeAlcoholDutyReference(alcoholDutyReference)) { adcr =>
+      ReferenceMaker.makeAlcoholDutyChargeReference(adcr)
     }
 
   def searchTag: SearchTag = SearchTag(alcoholDutyReference.canonicalizedValue)
@@ -623,7 +664,8 @@ final case class Pillar2SessionData(pillar2Reference: Pillar2Reference, returnUr
   def searchTag: SearchTag = SearchTag(pillar2Reference.canonicalizedValue)
 }
 
-final case class PfPillar2SessionData(pillar2Reference: Pillar2Reference, returnUrl: Option[String] = None) extends OriginSpecificSessionData(PfPillar2) {
+final case class PfPillar2SessionData(pillar2Reference: Pillar2Reference, returnUrl: Option[String] = None)
+    extends OriginSpecificSessionData(PfPillar2) {
   def paymentReference: Reference = ReferenceMaker.makePillar2Reference(pillar2Reference)
   def searchTag: SearchTag = SearchTag(pillar2Reference.canonicalizedValue)
 }

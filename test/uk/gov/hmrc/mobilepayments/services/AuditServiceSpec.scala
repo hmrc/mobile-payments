@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
-import payapi.corcommon.model.Origins.{AppSa, AppSimpleAssessment}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
+import uk.gov.hmrc.mobilepayments.domain.dto.response.Origins.{AppSa, AppSimpleAssessment}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
 import uk.gov.hmrc.mobilepayments.mocks.AuditStub
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -29,10 +29,10 @@ import java.util.UUID
 class AuditServiceSpec extends BaseSpec with AuditStub {
 
   private implicit val mockConnector: AuditConnector = mock[AuditConnector]
-  private val amountInPence:          Long           = 15463L
-  private val saUtr:                  SaUtr          = SaUtr("CS700100A")
-  private val p302ChargeRef:          String         = "5544332211"
-  private val bank:                   String         = "barclays-personal"
+  private val amountInPence: Long = 15463L
+  private val saUtr: SaUtr = SaUtr("CS700100A")
+  private val p302ChargeRef: String = "5544332211"
+  private val bank: String = "barclays-personal"
 
   private val appSaSessionData: SessionDataResponse = SessionDataResponse(
     sessionDataId   = UUID.randomUUID().toString,
@@ -55,13 +55,13 @@ class AuditServiceSpec extends BaseSpec with AuditStub {
 
   "when event triggered and stubbed it" should {
     "receive audit event for Self Assessment Payment" in {
-      stubSAPaymentEvent(amountInPence, saUtr, journeyId.toString(), bank)
-      sut.sendPaymentEvent(appSaSessionData, journeyId.toString())
+      stubSAPaymentEvent(amountInPence, saUtr, journeyId.value, bank)
+      sut.sendPaymentEvent(appSaSessionData, journeyId.value)
     }
 
     "receive audit event for Simple Assessment Payment" in {
-      stubSimpleAssessmentPaymentEvent(amountInPence, p302ChargeRef, journeyId.toString(), bank)
-      sut.sendPaymentEvent(appSimpleAssessmentSessionData, journeyId.toString())
+      stubSimpleAssessmentPaymentEvent(amountInPence, p302ChargeRef, journeyId.value, bank)
+      sut.sendPaymentEvent(appSimpleAssessmentSessionData, journeyId.value)
     }
   }
 }

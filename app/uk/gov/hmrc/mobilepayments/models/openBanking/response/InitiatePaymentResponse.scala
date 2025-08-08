@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.mobilepayments.models.openBanking.response
 
-import akka.http.scaladsl.model.Uri
 import play.api.libs.json.{Json, OFormat}
-
+import akka.http.scaladsl.model.Uri
+import uk.gov.hmrc.mobilepayments.models.openBanking.UriFormats.*
 
 final case class InitiatePaymentResponse(
-                                          paymentUrl: Uri
-                                        )
+  paymentUrl: Uri
+)
 
 object InitiatePaymentResponse {
   implicit val format: OFormat[InitiatePaymentResponse] = Json.format[InitiatePaymentResponse]
 }
-
