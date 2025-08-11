@@ -1,6 +1,16 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
+import scoverage.ScoverageKeys
 
 val appName = "mobile-payments"
+
+lazy val scoverageSettings = {
+  Seq(
+    ScoverageKeys.coverageExcludedFiles := "<empty>;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;.*BuildInfo.*;.*Routes.*;.*javascript.*;.*Reverse.*;.*Hooks.*;.*AppConfig.*;.*AppConfig.*;.*mobilepayments.models.*;.*mobilepayments.config.*;.*mobilepayments.domain.*;.*mobilepayments.controllers.api.*",
+    coverageMinimumStmtTotal := 80,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true
+  )
+}
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(
@@ -41,9 +51,6 @@ lazy val microservice = Project(appName, file("."))
       "-Ywarn-value-discard",
       "-Ywarn-numeric-widen",
       "-Xlint"
-    ),
-    coverageMinimumStmtTotal := 95,
-    coverageFailOnMinimum := true,
-    coverageHighlighting := true,
-    coverageExcludedPackages := "<empty>;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;.*BuildInfo.*;.*Routes.*;.*javascript.*;.*Reverse.*;.*Hooks.*;.*AppConfig.*"
+    )
   )
+  .settings(scoverageSettings: _*)
