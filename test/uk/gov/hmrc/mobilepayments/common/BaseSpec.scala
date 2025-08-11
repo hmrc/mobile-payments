@@ -16,18 +16,15 @@
 
 package uk.gov.hmrc.mobilepayments.common
 
-import akka.actor.ActorSystem
 import eu.timepit.refined.auto.*
+import org.apache.pekko.actor.ActorSystem
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.test.DefaultAwaitTimeout
-import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
-import uk.gov.hmrc.mobilepayments.mocks.AuthorisationStub
 
 import scala.concurrent.ExecutionContext
 

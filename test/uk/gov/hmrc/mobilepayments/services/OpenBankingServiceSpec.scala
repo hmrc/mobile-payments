@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
-import akka.http.scaladsl.model.Uri
 import play.api.test.Helpers.await
+import org.apache.pekko.http.scaladsl.model.Uri
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
@@ -32,19 +32,19 @@ import uk.gov.hmrc.mobilepayments.models.openBanking.response.{CreateSessionData
 import uk.gov.hmrc.mobilepayments.models.openBanking.{OriginSpecificSessionData, SessionData}
 
 import java.time.LocalDate
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 
 class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
-  private val mockConnector:              OpenBankingConnector             = mock[OpenBankingConnector]
-  private val amount:                     BigDecimal                       = 102.85
-  private val amountInPence:              BigDecimal                       = (amount * 100).longValue
-  private val saUtr:                      SaUtr                            = SaUtr("CS700100A")
-  private val bankId:                     String                           = "asd-123"
-  private val sessionDataId:              String                           = "51cc67d6-21da-11ec-9621-0242ac130002"
-  private val returnUrl:                  String                           = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
-  private val paymentUrl:                 Uri                              = "https://some-bank.com?param=dosomething"
+  private val mockConnector: OpenBankingConnector = mock[OpenBankingConnector]
+  private val amount: BigDecimal = 102.85
+  private val amountInPence: BigDecimal = (amount * 100).longValue
+  private val saUtr: SaUtr = SaUtr("CS700100A")
+  private val bankId: String = "asd-123"
+  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val returnUrl: String = "https://tax.service.gov.uk/mobile-payments/ob-payment-result"
+  private val paymentUrl: Uri = "https://some-bank.com?param=dosomething"
   private val selfAssessmentSpecificData: SelfAssessmentOriginSpecificData = SelfAssessmentOriginSpecificData(saUtr)
 
   private val simpleAssessmentSpecificData: SimpleAssessmentOriginSpecificData = SimpleAssessmentOriginSpecificData(
@@ -196,7 +196,7 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockInitiatePayment(Future successful paymentInitiatedUpdateResponse)
 
       val result = Await.result(sut.updatePayment(sessionDataId, journeyId), 0.5.seconds)
-      print("Print_result::"+  result.toString)
+      print("Print_result::" + result.toString)
       true
 //      result.paymentUrl.toString() shouldEqual "https://some-updated-bank.com?param=dosomething"
     }
@@ -239,10 +239,10 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amountInPence shouldEqual BigDecimal.valueOf(12564)
-      result.bankId shouldEqual None
-      result.state shouldEqual "SessionInitiated"
-      result.paymentDate shouldEqual None
-      result.reference shouldEqual "CS700100AK"
+      result.bankId        shouldEqual None
+      result.state         shouldEqual "SessionInitiated"
+      result.paymentDate   shouldEqual None
+      result.reference     shouldEqual "CS700100AK"
     }
   }
 
@@ -253,10 +253,10 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amountInPence shouldEqual 12564
-      result.bankId shouldEqual Some("a-bank-id")
-      result.state shouldEqual "BankSelected"
-      result.paymentDate shouldEqual None
-      result.reference shouldEqual "CS700100AK"
+      result.bankId        shouldEqual Some("a-bank-id")
+      result.state         shouldEqual "BankSelected"
+      result.paymentDate   shouldEqual None
+      result.reference     shouldEqual "CS700100AK"
     }
   }
 
@@ -267,10 +267,10 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amountInPence shouldEqual 12564
-      result.bankId shouldEqual Some("a-bank-id")
-      result.state shouldEqual "PaymentFinished"
-      result.paymentDate shouldEqual Some(LocalDate.now())
-      result.reference shouldEqual "CS700100AK"
+      result.bankId        shouldEqual Some("a-bank-id")
+      result.state         shouldEqual "PaymentFinished"
+      result.paymentDate   shouldEqual Some(LocalDate.now())
+      result.reference     shouldEqual "CS700100AK"
     }
   }
 
@@ -281,10 +281,10 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       val result = Await.result(sut.getSession(sessionDataId, journeyId), 0.5.seconds)
       result.sessionDataId shouldEqual "51cc67d6-21da-11ec-9621-0242ac130002"
       result.amountInPence shouldEqual 12564
-      result.bankId shouldEqual Some("a-bank-id")
-      result.state shouldEqual "PaymentFinalised"
-      result.paymentDate shouldEqual Some(LocalDate.parse("2021-12-01"))
-      result.reference shouldEqual "CS700100AK"
+      result.bankId        shouldEqual Some("a-bank-id")
+      result.state         shouldEqual "PaymentFinalised"
+      result.paymentDate   shouldEqual Some(LocalDate.parse("2021-12-01"))
+      result.reference     shouldEqual "CS700100AK"
     }
   }
 

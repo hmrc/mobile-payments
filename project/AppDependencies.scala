@@ -11,13 +11,13 @@ object AppDependencies {
   private val akkaHttpVersion = "10.7.1"
 
   val compile = Seq(
-    "uk.gov.hmrc"       %% "play-hmrc-api-play-30" % playHmrcApiVersion,
-    "eu.timepit"        %% "refined"               % refinedVersion,
-    "uk.gov.hmrc"       %% "domain-play-30"        % domainVersion,
-    "com.beachape"      %% "enumeratum"            % "1.9.0",
-    "org.typelevel"     %% "cats-core"             % "2.13.0",
-    "com.typesafe.akka" %% "akka-http"             % "10.5.3",
-    "com.typesafe.akka" %% "akka-actor"            % "2.8.8"
+    "uk.gov.hmrc"      %% "play-hmrc-api-play-30" % playHmrcApiVersion,
+    "eu.timepit"       %% "refined"               % refinedVersion,
+    "uk.gov.hmrc"      %% "domain-play-30"        % domainVersion,
+    "com.beachape"     %% "enumeratum"            % "1.9.0",
+    "org.typelevel"    %% "cats-core"             % "2.13.0",
+    "org.apache.pekko" %% "pekko-http"            % "1.2.0",
+    "org.apache.pekko" %% "pekko-actor"           % "1.0.3"
   )
 
   trait TestDependencies {

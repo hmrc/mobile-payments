@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.mobilepayments.models.openBanking
 
-import akka.http.scaladsl.model.Uri
 import play.api.libs.json.{Format, JsResult, JsString, JsSuccess, JsValue, Json, OFormat}
 import uk.gov.hmrc.mobilepayments.models.openBanking.ecospend.EcospendFinishedStatuses.Verified
 import uk.gov.hmrc.mobilepayments.models.openBanking.ecospend.{EcospendFinalStatus, EcospendFinishedStatus, EcospendNonFinalStatus, EcospendPaymentId, EcospendPaymentStatus}
 import uk.gov.hmrc.mobilepayments.models.openBanking.UriFormats.*
 import java.time.{LocalDate, LocalTime}
+import org.apache.pekko.http.scaladsl.model.Uri
 
 sealed trait SessionState {
   def email: Option[Email]

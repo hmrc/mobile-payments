@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.mobilepayments.models.openBanking
 
-import akka.http.scaladsl.model.Uri
+import org.apache.pekko.http.scaladsl.model.Uri
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import uk.gov.hmrc.mobilepayments.domain.dto.response.jsonext.*
