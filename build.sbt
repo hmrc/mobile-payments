@@ -6,7 +6,7 @@ val appName = "mobile-payments"
 lazy val scoverageSettings = {
   Seq(
     ScoverageKeys.coverageExcludedFiles := "<empty>;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;.*BuildInfo.*;.*Routes.*;.*javascript.*;.*Reverse.*;.*Hooks.*;.*AppConfig.*;.*AppConfig.*;.*mobilepayments.models.*;.*mobilepayments.config.*;.*mobilepayments.domain.*;.*mobilepayments.controllers.api.*",
-    coverageMinimumStmtTotal := 80,
+    coverageMinimumStmtTotal := 93,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
@@ -54,3 +54,13 @@ lazy val microservice = Project(appName, file("."))
     )
   )
   .settings(scoverageSettings: _*)
+  .settings(
+    scalacOptions ++= Seq(
+      // Suppress warnings matching specific message pattern
+      "-Wconf:msg=possible missing interpolator.*\\$date:silent",
+      // Suppress warnings in generated files (e.g., target directory)
+      "-Wconf:src=target/.*:silent",
+      // Default rule to warn on everything else
+      "-Wconf:any:warning"
+    )
+  )
