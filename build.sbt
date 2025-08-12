@@ -23,7 +23,6 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     routesImport ++= Seq(
       "uk.gov.hmrc.mobilepayments.domain.types._",
