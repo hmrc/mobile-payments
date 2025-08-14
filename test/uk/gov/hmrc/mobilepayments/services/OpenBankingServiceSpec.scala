@@ -196,9 +196,8 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
       mockInitiatePayment(Future successful paymentInitiatedUpdateResponse)
 
       val result = Await.result(sut.updatePayment(sessionDataId, journeyId), 0.5.seconds)
-      print("Print_result::" + result.toString)
-      true
-//      result.paymentUrl.toString() shouldEqual "https://some-updated-bank.com?param=dosomething"
+
+      result.paymentUrl.toString() shouldEqual "https://some-updated-bank.com?param=dosomething"
     }
   }
 
