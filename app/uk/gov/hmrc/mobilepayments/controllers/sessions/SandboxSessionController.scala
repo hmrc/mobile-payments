@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.sessions
 
-import openbanking.cor.model.response.CreateSessionDataResponse
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.mobilepayments.controllers.ControllerChecks
 import uk.gov.hmrc.mobilepayments.controllers.errors.ErrorHandling
 import uk.gov.hmrc.mobilepayments.domain.dto.response.SessionDataResponse
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.CreateSessionDataResponse
 import uk.gov.hmrc.mobilepayments.services.ShutteringService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -35,8 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SandboxSessionController @Inject() (
-  cc:                            ControllerComponents,
-  shutteringService:             ShutteringService
+  cc: ControllerComponents,
+  shutteringService: ShutteringService
 )(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with SessionController
@@ -46,7 +46,7 @@ class SandboxSessionController @Inject() (
     with FileResource {
 
   override def parser: BodyParser[AnyContent] = controllerComponents.parsers.anyContent
-  override val app:    String                 = "Session-Controller"
+  override val app: String = "Session-Controller"
 
   override def createSession(journeyId: JourneyId): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
@@ -59,7 +59,7 @@ class SandboxSessionController @Inject() (
 
   override def getSession(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       shutteringService.getShutteringStatus(journeyId).flatMap { shuttered =>
@@ -95,7 +95,7 @@ class SandboxSessionController @Inject() (
 
   override def setEmail(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       Future successful Created
@@ -103,7 +103,7 @@ class SandboxSessionController @Inject() (
 
   override def setFutureDate(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[JsValue] =
     validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
       Future successful Created
@@ -111,7 +111,7 @@ class SandboxSessionController @Inject() (
 
   override def clearFutureDate(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful NoContent
@@ -119,7 +119,7 @@ class SandboxSessionController @Inject() (
 
   override def clearEmail(
     sessionDataId: String,
-    journeyId:     JourneyId
+    journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful NoContent

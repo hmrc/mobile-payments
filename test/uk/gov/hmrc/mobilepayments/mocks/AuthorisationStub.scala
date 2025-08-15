@@ -19,14 +19,22 @@ package uk.gov.hmrc.mobilepayments.mocks
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
-import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel, Enrolments}
+import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel, Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.mobilepayments.common.BaseSpec
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthorisationStub extends MockFactory {
+trait AuthorisationStub extends BaseSpec {
 
   type GrantAccess = ConfidenceLevel ~ Enrolments
+
+  val enrolments: Set[Enrolment] =
+    Set(Enrolment("IR-SA", identifiers = Seq(EnrolmentIdentifier("UTR", "12212321")), state = "Activated"))
+
+  val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
+  val authorisedResponse: GrantAccess = new ~(confidenceLevel, Enrolments(enrolments))
+  val authorisedLowCLResponse: GrantAccess = new ~(ConfidenceLevel.L50, Enrolments(enrolments))
 
   def stubAuthorisationGrantAccess(response: GrantAccess)(implicit authConnector: AuthConnector) =
     (authConnector

@@ -18,17 +18,18 @@ package uk.gov.hmrc.mobilepayments.connectors
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import openbanking.cor.model.request.InitiateEmailSendRequest
-import openbanking.cor.model.response.{CreateSessionDataResponse, InitiatePaymentResponse}
-import openbanking.cor.model.{OriginSpecificSessionData, SessionData}
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.mobilepayments.domain.dto.request._
-import uk.gov.hmrc.mobilepayments.domain.dto.response._
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.dto.request.*
+import uk.gov.hmrc.mobilepayments.domain.dto.response.*
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 import uk.gov.hmrc.mobilepayments.domain.Bank
+import uk.gov.hmrc.mobilepayments.models.openBanking.request.InitiateEmailSendRequest
+import uk.gov.hmrc.mobilepayments.models.openBanking.{OriginSpecificSessionData, SessionData}
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.{CreateSessionDataResponse, InitiatePaymentResponse}
+import play.api.libs.ws.writeableOf_JsValue
 
 import java.time.LocalDate
 import javax.inject.Singleton
@@ -36,19 +37,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class OpenBankingConnector @Inject() (
-  http:                              HttpClientV2,
+  http: HttpClientV2,
   @Named("open-banking") serviceUrl: String
-)(implicit ex:                       ExecutionContext) {
+)(implicit ex: ExecutionContext) {
 
   def getBanks(journeyId: JourneyId)(implicit headerCarrier: HeaderCarrier): Future[List[Bank]] =
     http.get(url"$serviceUrl/open-banking/banks?journeyId=${journeyId.value}").execute[List[Bank]]
 
   def createSession(
-    amount:                 BigDecimal,
-    originSpecificData:     OriginSpecificData,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[CreateSessionDataResponse] =
+    amount: BigDecimal,
+    originSpecificData: OriginSpecificData,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[CreateSessionDataResponse] =
     http
       .post(url"$serviceUrl/open-banking/session?journeyId=${journeyId.value}")
       .withBody(Json.toJson(CreateSessionDataRequest(amount, originSpecificData)))
@@ -56,10 +56,9 @@ class OpenBankingConnector @Inject() (
       .execute[CreateSessionDataResponse]
 
   def getSession(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[SessionData[OriginSpecificSessionData]] = {
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[SessionData[OriginSpecificSessionData]] = {
     val journey = journeyId.value
     http
       .get(url"$serviceUrl/open-banking/session/$sessionDataId?journeyId=$journey")
@@ -67,111 +66,100 @@ class OpenBankingConnector @Inject() (
   }
 
   def selectBank(
-    sessionDataId:          String,
-    bankId:                 String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[HttpResponse] =
+    sessionDataId: String,
+    bankId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[HttpResponse] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/select-bank?journeyId=${journeyId.value}")
       .withBody(Json.toJson(SelectBankRequest(bankId)))
       .execute[HttpResponse]
 
   def initiatePayment(
-    sessionDataId:          String,
-    returnUrl:              String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[InitiatePaymentResponse] =
+    sessionDataId: String,
+    returnUrl: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[InitiatePaymentResponse] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/initiate-payment?journeyId=${journeyId.value}")
       .withBody(Json.toJson(InitiatePaymentRequest(returnUrl)))
       .execute[InitiatePaymentResponse]
 
   def getPaymentStatus(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[OpenBankingPaymentStatusResponse] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[OpenBankingPaymentStatusResponse] =
     http
       .get(url"$serviceUrl/open-banking/session/$sessionDataId/payment-status?journeyId=${journeyId.value}")
       .execute[OpenBankingPaymentStatusResponse]
 
   def urlConsumed(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Boolean] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     http
       .get(url"$serviceUrl/open-banking/session/$sessionDataId/url-consumed?journeyId=${journeyId.value}")
       .execute[Boolean]
 
   def clearPayment(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .delete(url"$serviceUrl/open-banking/session/$sessionDataId/clear-payment?journeyId=${journeyId.value}")
       .execute[Unit]
 
   def setEmail(
-    sessionDataId:          String,
-    email:                  String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    email: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/set-email?journeyId=${journeyId.value}")
       .withBody(Json.toJson(SetEmailRequest(email)))
       .execute[Unit]
 
   def setFutureDate(
-    sessionDataId:          String,
-    maybeFutureDate:        LocalDate,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    maybeFutureDate: LocalDate,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/update-date?journeyId=${journeyId.value}")
       .withBody(Json.toJson(SetFutureDateRequest(maybeFutureDate)))
       .execute[Unit]
 
   def clearFutureDate(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/update-date?journeyId=${journeyId.value}")
       .withBody(Json.parse("{}"))
       .execute[Unit]
 
   def sendEmail(
-    sessionDataId:          String,
-    journeyId:              JourneyId,
-    taxType:                String
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    journeyId: JourneyId,
+    taxType: String
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/send-email?journeyId=${journeyId.value}")
       .withBody(Json.toJson(InitiateEmailSendRequest("en", taxType)))
       .execute[Unit]
 
   def setEmailSentFlag(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .post(url"$serviceUrl/open-banking/session/$sessionDataId/set-email-sent-flag?journeyId=${journeyId.value}")
       .execute[Unit]
 
   def clearEmail(
-    sessionDataId:          String,
-    journeyId:              JourneyId
-  )(implicit headerCarrier: HeaderCarrier
-  ): Future[Unit] =
+    sessionDataId: String,
+    journeyId: JourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[Unit] =
     http
       .delete(url"$serviceUrl/open-banking/session/$sessionDataId/clear-email?journeyId=${journeyId.value}")
       .execute[Unit]

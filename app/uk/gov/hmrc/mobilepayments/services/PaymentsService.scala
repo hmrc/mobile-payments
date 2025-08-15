@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.mobilepayments.services
 
-import payapi.corcommon.model.PaymentStatuses.Successful
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.PaymentsConnector
@@ -24,7 +23,8 @@ import uk.gov.hmrc.mobilepayments.controllers.errors.MalformedRequestException
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequestGeneric, TaxTypeEnum}
 import uk.gov.hmrc.mobilepayments.domain.{Payment, PaymentRecordListFromApi}
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
+import uk.gov.hmrc.mobilepayments.models.payapi.PaymentStatuses.Successful
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -33,13 +33,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class PaymentsService @Inject() (connector: PaymentsConnector) {
 
   def getLatestPayments(
-    utr:                       Option[String],
-    reference:                 Option[String],
-    taxType:                   Option[TaxTypeEnum.Value],
-    journeyId:                 JourneyId
-  )(implicit executionContext: ExecutionContext,
-    headerCarrier:             HeaderCarrier
-  ): Future[Either[String, Option[LatestPaymentsResponse]]] =
+    utr: Option[String],
+    reference: Option[String],
+    taxType: Option[TaxTypeEnum.Value],
+    journeyId: JourneyId
+  )(implicit executionContext: ExecutionContext, headerCarrier: HeaderCarrier): Future[Either[String, Option[LatestPaymentsResponse]]] =
     connector.getPayments(utr, reference, taxType, journeyId) map {
       case Right(payments) => {
         val recentPayments: List[Payment] =
@@ -56,12 +54,10 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
     }
 
   def getPayByCardUrl(
-    request:                   PayByCardRequestGeneric,
-    nino:                      Option[String],
-    journeyId:                 JourneyId
-  )(implicit executionContext: ExecutionContext,
-    headerCarrier:             HeaderCarrier
-  ): Future[PayByCardResponse] =
+    request: PayByCardRequestGeneric,
+    nino: Option[String],
+    journeyId: JourneyId
+  )(implicit executionContext: ExecutionContext, headerCarrier: HeaderCarrier): Future[PayByCardResponse] =
     request.taxType match {
       case TaxTypeEnum.appSelfAssessment =>
         connector
@@ -79,7 +75,7 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
 
   private def filterPaymentsOlderThan14DaysOrUnsuccessful(paymentsFromApi: PaymentRecordListFromApi) =
     paymentsFromApi.payments.filter(payment =>
-      (payment.createdOn.isAfter(LocalDate.now().minusDays(14).atStartOfDay()) && payment.status == Successful)
+      payment.createdOn.isAfter(LocalDate.now().minusDays(14).atStartOfDay()) && payment.status == Successful
     )
 
 }

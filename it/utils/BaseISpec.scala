@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package utils
 
-import eu.timepit.refined.auto._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.WsScalaTestClient
@@ -25,7 +24,6 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
 
 abstract class BaseISpec
     extends AnyWordSpecLike
@@ -36,13 +34,13 @@ abstract class BaseISpec
     with FutureAwaits
     with DefaultAwaitTimeout {
 
-  override implicit lazy val app:        Application      = appBuilder.build()
-  protected val sandboxHeader:           (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
-  protected val contentHeader:           (String, String) = "Content-Type" -> "application/json"
-  protected val acceptJsonHeader:        (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
+  override implicit lazy val app: Application = appBuilder.build()
+  protected val sandboxHeader: (String, String) = "X-MOBILE-USER-ID"        -> "208606423740"
+  protected val contentHeader: (String, String) = "Content-Type"            -> "application/json"
+  protected val acceptJsonHeader: (String, String) = "Accept"               -> "application/vnd.hmrc.1.0+json"
   protected val authorisationJsonHeader: (String, String) = "AUTHORIZATION" -> "Bearer 123"
-  protected val sessionIdHeader:         (String, String) = "X-Session-ID" -> "13345a9d-0958-4931-ae83-5a36e4ccd979"
-  val journeyId:                         JourneyId        = "27085215-69a4-4027-8f72-b04b10ec16b0"
+  protected val sessionIdHeader: (String, String) = "X-Session-ID"          -> "13345a9d-0958-4931-ae83-5a36e4ccd979"
+  val journeyId: String = "27085215-69a4-4027-8f72-b04b10ec16b0"
 
   def config: Map[String, Any] =
     Map[String, Any](

@@ -1,19 +1,19 @@
 package stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import eu.timepit.refined.auto._
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import eu.timepit.refined.auto.*
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 
 object PayApiStub {
-  val journeyId: JourneyId = "27085215-69a4-4027-8f72-b04b10ec16b0"
-  val utr:       String    = "1122334455"
+  val journeyId: String = "27085215-69a4-4027-8f72-b04b10ec16b0"
+  val utr: String = "1122334455"
 
   def stubForGetPayments(
-    statusCode: Int    = 200,
-    response:   String = "{}",
-    taxType:    String = "selfAssessment",
-    reference:  String = utr
+    statusCode: Int = 200,
+    response: String = "{}",
+    taxType: String = "selfAssessment",
+    reference: String = utr
   ): StubMapping =
     stubFor(
       get(
@@ -28,8 +28,8 @@ object PayApiStub {
     )
 
   def stubForPayByCard(
-    statusCode: Int    = 200,
-    response:   String = "{}"
+    statusCode: Int = 200,
+    response: String = "{}"
   ): StubMapping =
     stubFor(
       post(
@@ -44,9 +44,9 @@ object PayApiStub {
     )
 
   def stubForPayByCardSimpleAssessment(
-                        statusCode: Int = 200,
-                        response: String = "{}"
-                      ): StubMapping =
+    statusCode: Int = 200,
+    response: String = "{}"
+  ): StubMapping =
     stubFor(
       post(
         urlEqualTo(

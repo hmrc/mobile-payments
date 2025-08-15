@@ -18,7 +18,7 @@ package uk.gov.hmrc.mobilepayments.controllers.banks
 
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
@@ -30,14 +30,10 @@ import uk.gov.hmrc.mobilepayments.services.ShutteringService
 
 import scala.concurrent.Future
 
-class SandboxBankControllerSpec
-    extends BaseSpec
-    with AuthorisationStub
-    with MobilePaymentsTestData
-    with ShutteringMock {
+class SandboxBankControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData with ShutteringMock {
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
-  implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
+  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
 

@@ -22,21 +22,21 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.obj
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuditStub extends MockFactory {
+trait AuditStub extends BaseSpec {
 
   def stubSAPaymentEvent(
-    amount:                  Long,
-    saUtr:                   SaUtr,
-    journeyId:               String,
-    bank:                    String
-  )(implicit auditConnector: AuditConnector
-  ): Unit = {
+    amount: Long,
+    saUtr: SaUtr,
+    journeyId: String,
+    bank: String
+  )(implicit auditConnector: AuditConnector): Unit = {
     (auditConnector
       .sendExtendedEvent(_: ExtendedDataEvent)(_: HeaderCarrier, _: ExecutionContext))
       .expects(
@@ -49,7 +49,8 @@ trait AuditStub extends MockFactory {
               "p302ChargeReference" -> "",
               "bank"                -> bank,
               "taxType"             -> "appSelfAssessment",
-              "journeyId"           -> journeyId)
+              "journeyId"           -> journeyId
+             )
         ),
         *,
         *
@@ -59,12 +60,11 @@ trait AuditStub extends MockFactory {
   }
 
   def stubSimpleAssessmentPaymentEvent(
-    amount:                  Long,
-    p302ChargeRef:           String,
-    journeyId:               String,
-    bank:                    String
-  )(implicit auditConnector: AuditConnector
-  ): Unit = {
+    amount: Long,
+    p302ChargeRef: String,
+    journeyId: String,
+    bank: String
+  )(implicit auditConnector: AuditConnector): Unit = {
     (auditConnector
       .sendExtendedEvent(_: ExtendedDataEvent)(_: HeaderCarrier, _: ExecutionContext))
       .expects(
@@ -77,7 +77,8 @@ trait AuditStub extends MockFactory {
               "p302ChargeReference" -> p302ChargeRef,
               "bank"                -> bank,
               "taxType"             -> "appSimpleAssessment",
-              "journeyId"           -> journeyId)
+              "journeyId"           -> journeyId
+             )
         ),
         *,
         *
@@ -87,10 +88,10 @@ trait AuditStub extends MockFactory {
   }
 
   private def dataEventWith(
-    auditSource:     String,
-    auditType:       String,
+    auditSource: String,
+    auditType: String,
     transactionName: String,
-    detail:          JsValue
+    detail: JsValue
   ): MatcherBase =
     argThat { (dataEvent: ExtendedDataEvent) =>
       dataEvent.auditSource.equals(auditSource) &&

@@ -16,11 +16,9 @@
 
 package uk.gov.hmrc.mobilepayments.controllers.payments
 
-import openbanking.cor.model.response.InitiatePaymentResponse
 import org.scalamock.handlers.CallHandler
-import payapi.corcommon.model.Origin
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
@@ -29,29 +27,26 @@ import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.domain.Shuttering
 import uk.gov.hmrc.mobilepayments.domain.dto.request.PayByCardRequestGeneric
 import uk.gov.hmrc.mobilepayments.domain.dto.request.TaxTypeEnum
-import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, Origin, PayByCardResponse, PaymentStatusResponse, SessionDataResponse, UrlConsumedResponse}
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 import uk.gov.hmrc.mobilepayments.mocks.{AuthorisationStub, ShutteringMock}
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.InitiatePaymentResponse
 import uk.gov.hmrc.mobilepayments.services.{AuditService, OpenBankingService, PaymentsService, ShutteringService}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LivePaymentControllerSpec
-    extends BaseSpec
-    with AuthorisationStub
-    with MobilePaymentsTestData
-    with ShutteringMock {
+class LivePaymentControllerSpec extends BaseSpec with AuthorisationStub with MobilePaymentsTestData with ShutteringMock {
 
   private val mockOpenBankingService: OpenBankingService = mock[OpenBankingService]
-  private val sessionDataId:          String             = "51cc67d6-21da-11ec-9621-0242ac130002"
-  private val utr:                    String             = "12212321"
-  private val nino:                   String             = "CS700100A"
+  private val sessionDataId: String = "51cc67d6-21da-11ec-9621-0242ac130002"
+  private val utr: String = "12212321"
+  private val nino: String = "CS700100A"
 
   implicit val mockShutteringService: ShutteringService = mock[ShutteringService]
-  implicit val mockAuthConnector:     AuthConnector     = mock[AuthConnector]
-  implicit val mockAuditService:      AuditService      = mock[AuditService]
-  implicit val mockPaymentsService:   PaymentsService   = mock[PaymentsService]
+  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  implicit val mockAuditService: AuditService = mock[AuditService]
+  implicit val mockPaymentsService: PaymentsService = mock[PaymentsService]
 
   private val sut = new LivePaymentController(
     mockAuthConnector,
@@ -540,7 +535,7 @@ class LivePaymentControllerSpec
     (mockOpenBankingService
       .sendEmail(_: String, _: JourneyId, _: Origin)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)
-      .returning(Future successful Success)
+      .returning(Future.successful(Success))
 
   private def mockGetLatestPayments(future: Future[Either[String, Option[LatestPaymentsResponse]]]) =
     (mockPaymentsService
@@ -553,8 +548,7 @@ class LivePaymentControllerSpec
 
   private def mockPayByCardUrl(future: Future[PayByCardResponse]): Unit =
     (mockPaymentsService
-      .getPayByCardUrl(_: PayByCardRequestGeneric, _: Option[String], _: JourneyId)(_: ExecutionContext,
-                                                                                    _: HeaderCarrier))
+      .getPayByCardUrl(_: PayByCardRequestGeneric, _: Option[String], _: JourneyId)(_: ExecutionContext, _: HeaderCarrier))
       .expects(*, *, journeyId, *, *)
       .returning(future)
 

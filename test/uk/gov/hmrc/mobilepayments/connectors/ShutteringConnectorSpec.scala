@@ -17,7 +17,7 @@
 package uk.gov.hmrc.mobilepayments.connectors
 
 import play.api.test.Helpers.await
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.common.BaseSpec
 import uk.gov.hmrc.mobilepayments.mocks.ConnectorStub

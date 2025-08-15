@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.mobilepayments.domain.types
+package uk.gov.hmrc.mobilepayments.models.payapi.taxes.epaye
 
-import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.string.MatchesRegex
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Format
 
-object ModelTypes {
+final case class EpayePenaltyReference(value: String)
 
-  type JourneyId = String Refined ValidJourneyId
-
-  private type ValidJourneyId =
-    MatchesRegex[W.`"""[A-Fa-f0-9]{8}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{12}"""`.T]
-
+object EpayePenaltyReference {
+  implicit val format: Format[EpayePenaltyReference] = implicitly[Format[String]].inmap(EpayePenaltyReference(_), _.value)
 }

@@ -1,12 +1,13 @@
 package controllers
 
-import openbanking.cor.model.response.InitiatePaymentResponse
 import play.api.libs.json.Json
 import play.api.libs.ws.WSRequest
 import stubs.ShutteringStub.{stubForShutteringDisabled, stubForShutteringEnabled}
 import uk.gov.hmrc.mobilepayments.MobilePaymentsTestData
 import uk.gov.hmrc.mobilepayments.domain.dto.response.{LatestPaymentsResponse, PayByCardResponse, PaymentStatusResponse, UrlConsumedResponse}
 import utils.BaseISpec
+import play.api.libs.ws.writeableOf_JsValue
+import uk.gov.hmrc.mobilepayments.models.openBanking.response.InitiatePaymentResponse
 
 class SandboxPaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 

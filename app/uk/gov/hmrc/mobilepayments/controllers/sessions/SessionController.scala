@@ -18,7 +18,7 @@ package uk.gov.hmrc.mobilepayments.controllers.sessions
 
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.mobilepayments.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.mobilepayments.domain.types.JourneyId
 
 trait SessionController {
   def createSession(journeyId: JourneyId): Action[JsValue]
