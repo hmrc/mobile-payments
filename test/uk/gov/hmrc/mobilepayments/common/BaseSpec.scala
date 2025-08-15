@@ -42,12 +42,4 @@ trait BaseSpec extends AnyWordSpecLike with Matchers with DefaultAwaitTimeout wi
   protected val contentHeader: (String, String) = "Content-Type"     -> "application/json"
   protected val acceptJsonHeader: (String, String) = "Accept"        -> "application/vnd.hmrc.1.0+json"
 
-//  val enrolments: Set[Enrolment] =
-//    Set(Enrolment("IR-SA", identifiers = Seq(EnrolmentIdentifier("UTR", "12212321")), state = "Activated"))
-//
-//  val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
-//
-//  val authorisedResponse: GrantAccess = confidenceLevel and Enrolments(enrolments)
-//  val authorisedLowCLResponse: GrantAccess = ConfidenceLevel.L50 and Enrolments(enrolments)
-
 }
