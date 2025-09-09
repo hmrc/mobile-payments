@@ -25,32 +25,10 @@ final case class SearchScope(value: String) extends AnyVal
 
 object SearchScope {
 
-  val `BTA`: SearchScope = SearchScope("BTA")
-  val `payments-frontend`: SearchScope = SearchScope("payments-frontend")
-  val `third-party-software`: SearchScope = SearchScope("third-party-software")
-  val `pillar-2`: SearchScope = SearchScope("pillar-2")
-  val `web-chat`: SearchScope = SearchScope("web-chat")
 
   private val validSearchScopes: Set[String] = Set(
-    `payments-frontend`.value,
-    `BTA`.value,
-    "PNGR",
-    "AMLS",
-    "ITSA",
     "PTA",
-    "DD",
-    "PPT",
     "APP",
-    "capital-gains-tax",
-    "job-retention-scheme",
-    "parcels",
-    "ni-eu-vat-oss",
-    "ni-eu-vat-ioss",
-    "VNC",
-    "MIB",
-    `third-party-software`.value,
-    `pillar-2`.value,
-    `web-chat`.value
   )
 
   implicit val format: Format[SearchScope] = implicitly[Format[String]].inmap(SearchScope(_), _.value)
