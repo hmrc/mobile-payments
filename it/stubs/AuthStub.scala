@@ -162,7 +162,7 @@ object AuthStub {
                  |      }],
                  |      "state": "${if (activeUtr) "Activated" else "Deactivated"}"
                  |  }],
-                 |  "sautr": $saUtr
+                 |  "sautr": "$saUtr"
                  |}
 
                """.stripMargin)
