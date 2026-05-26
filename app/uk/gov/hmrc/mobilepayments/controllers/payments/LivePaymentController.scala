@@ -156,9 +156,10 @@ class LivePaymentController @Inject() (
               getSaUTRFromAuth.flatMap { sautrOpt =>
                 paymentsService
                   .getLatestPayments(sautrOpt.map(_.utr), Some(latestPaymentsRequest.reference), Some(latestPaymentsRequest.taxType), journeyId) map {
-                  case Right(None)     => NotFound
-                  case Right(payments) => Ok(Json.toJson(payments))
-                  case Left(e)         => InternalServerError(e)
+                  case Right(None)                 => NotFound
+                  case Right(payments)             => Ok(Json.toJson(payments))
+                  case Left(s"Unauthorized! $msg") => Unauthorized(s"Unauthorized! $msg")
+                  case Left(e)                     => InternalServerError(e)
                 }
               }
             }

@@ -77,7 +77,7 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
       val result =
         Await.result(sut.getLatestPayments(None, Some(saUtr.value), Some(TaxTypeEnum.appSelfAssessment), journeyId), 0.5.seconds)
-      result.swap.getOrElse("") shouldBe "Unauthorized! UTR or reference is missing from payload"
+      result.swap.getOrElse("") shouldBe "Unauthorized! UTR or reference is missing from payload/Enrolments"
     }
 
     "return Error if utr and reference don't match" in {

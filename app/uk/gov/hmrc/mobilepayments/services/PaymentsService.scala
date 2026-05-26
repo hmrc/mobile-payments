@@ -64,8 +64,8 @@ class PaymentsService @Inject() (connector: PaymentsConnector) {
           Future.successful(Left("Unauthorized! Reference in payload doesn't match with logged in UTR"))
         }
       case _ =>
-        logger.info("Unauthorized! UTR or reference is missing from payload")
-        Future.successful(Left("Unauthorized! UTR or reference is missing from payload"))
+        logger.info("Unauthorized! UTR or reference is missing from payload/Enrolments")
+        Future.successful(Left("Unauthorized! UTR or reference is missing from payload/Enrolments"))
     }
 
   }
