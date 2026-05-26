@@ -380,6 +380,18 @@ class LivePaymentControllerSpec extends BaseSpec with AuthorisationStub with Mob
       val result = sut.latestPayments(journeyId)(request)
       status(result) shouldBe 500
     }
+    // TODO remove this test case once we have changes for simple assessment
+    "return 400 Bad Request in case of simple assessment" in {
+      stubAuthorisationGrantAccess(authorisedResponse)
+      shutteringDisabled()
+
+      val request = FakeRequest("POST", s"/payments/latest-payments")
+        .withHeaders(acceptJsonHeader, contentHeader)
+        .withBody(Json.obj("taxType" -> "appSimpleAssessment", "reference" -> utr))
+
+      val result = sut.latestPayments(journeyId)(request)
+      status(result) shouldBe 400
+    }
   }
 
   "when get pay by card url invoked with self assessment and service returns success then" should {
