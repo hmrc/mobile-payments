@@ -153,8 +153,8 @@ class LivePaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[LatestPaymentsRequest] { latestPaymentsRequest =>
-              getNinoFromAuth.flatMap { nino => //checking for auth NINO
-                getSaUTRFromAuth.flatMap { sautrOpt => //checking for auth sautr
+              getNinoFromAuth.flatMap { nino => // checking for auth NINO
+                getSaUTRFromAuth.flatMap { sautrOpt => // checking for auth sautr
                   paymentsService
                     .getLatestPayments(nino,
                                        sautrOpt.map(_.utr),
@@ -164,7 +164,7 @@ class LivePaymentController @Inject() (
                                       ) map {
                     case Right(None)                 => NotFound
                     case Right(payments)             => Ok(Json.toJson(payments))
-                    case Left(s"Unauthorized! $msg") => Unauthorized(s"Unauthorized! $msg")
+                    case Left(s"Unauthorized! $msg") => Unauthorized(s"Unauthorized!")
                     case Left(e)                     => InternalServerError(e)
                   }
                 }

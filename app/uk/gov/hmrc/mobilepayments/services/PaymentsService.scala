@@ -50,7 +50,7 @@ class PaymentsService @Inject() (connector: PaymentsConnector, p800Service: P800
         if (sautr == referenceValue) { //check if the auth sautr equals reference in case of appSelfAssessment
           getPayments(utr, reference, taxType, journeyId) 
         } else {
-          logger.info("Unauthorized! reference in payload doesn't match with logged in UTR")
+          logger.info("Unauthorized! Reference in payload doesn't match with logged in UTR")
           Future.successful(Left("Unauthorized! Reference in payload doesn't match with logged in UTR"))
         }
 
@@ -100,7 +100,7 @@ class PaymentsService @Inject() (connector: PaymentsConnector, p800Service: P800
   )(implicit executionContext: ExecutionContext, headerCarrier: HeaderCarrier): Future[PayByCardResponse] =
     request.taxType match {
       case TaxTypeEnum.appSelfAssessment =>
-        if (sautrOpt.exists(_.utr == request.reference)) { //For appSelfAssessment- check if auth sautr equals reference
+        if (sautrOpt.exists(_.utr == request.reference)) { // For appSelfAssessment- check if auth sautr equals reference
           connector
             .getPayByCardUrl(request.amountInPence, SaUtr(request.reference), journeyId)
             .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
@@ -111,14 +111,15 @@ class PaymentsService @Inject() (connector: PaymentsConnector, p800Service: P800
       case TaxTypeEnum.appSimpleAssessment =>
         (request.reference, request.amountInPence, request.taxYear, nino) match {
           case (reference, amountInPence, Some(taxYear), Some(nino)) =>
-            p800Service.getChargeRefernceList(Some(nino), previousTaxYear).flatMap { referenceList => //For appSimpleAssessment- Fetch charge reference list for logged-in user
-              if (referenceList.contains(reference)) { //Check if request reference is there in the above list
-                connector
-                  .getPayByCardUrlSimpleAssessment(amountInPence, nino, reference, taxYear, journeyId)
-                  .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
-              } else {
-                throw new FailToMatchTaxIdOnAuth
-              }
+            p800Service.getChargeRefernceList(Some(nino), previousTaxYear).flatMap {
+              referenceList => // For appSimpleAssessment- Fetch charge reference list for logged-in user
+                if (referenceList.contains(reference)) { // Check if request reference is there in the above list
+                  connector
+                    .getPayByCardUrlSimpleAssessment(amountInPence, nino, reference, taxYear, journeyId)
+                    .map(response => PayByCardResponse(response.urlWithoutDomainPrefix))
+                } else {
+                  throw new FailToMatchTaxIdOnAuth
+                }
             }
           case _ =>
             logger.warn(s"Malformed JSON:: TaxYear  is Missing")
