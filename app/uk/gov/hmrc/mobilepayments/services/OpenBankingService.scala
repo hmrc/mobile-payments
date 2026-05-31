@@ -58,11 +58,14 @@ class OpenBankingService @Inject() (connector: OpenBankingConnector,
     sautrOpt: Option[SaUtr] = None
   )(implicit headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[CreateSessionDataResponse] =
     if (request.taxType.isDefined) {
+      println(" inside if")
       request.taxType match {
         case Some(TaxTypeEnum.appSelfAssessment) =>
           (request.amountInPence, request.reference, request.saUtr, sautrOpt) match {
             case (Some(amountInPence), Some(reference), requestUtrOpt, Some(authSautr)) =>
-              if ((reference == authSautr.utr) && requestUtrOpt.exists(_.utr == authSautr.utr))//For self assessment - check if reference is equal to auth sautr and also equal to the sautr in payload request
+              if (
+                (reference == authSautr.utr) && requestUtrOpt.exists(_.utr == authSautr.utr)
+              ) // For self assessment - check if reference is equal to auth sautr and also equal to the sautr in payload request
                 connector.createSession(amountInPence, SelfAssessmentOriginSpecificData(SaUtr(reference)), journeyId)
               else throw new FailToMatchTaxIdOnAuth
             case (_, _, _, None) =>
@@ -73,12 +76,13 @@ class OpenBankingService @Inject() (connector: OpenBankingConnector,
         case Some(TaxTypeEnum.appSimpleAssessment) =>
           (request.amountInPence, request.reference, ninoOpt) match {
             case (Some(amountInPence), Some(reference), ninoOpt) =>
-              p800Service.getChargeRefernceList(ninoOpt, previousTaxYear).flatMap { referenceList =>//For simple assessment - fetch reference list for the logged-in user
-                if (referenceList.contains(reference)) { //Check if the payload reference is in the above list
-                  connector.createSession(amountInPence, SimpleAssessmentOriginSpecificData(reference), journeyId)
-                } else {
-                  throw new FailToMatchTaxIdOnAuth
-                }
+              p800Service.getChargeRefernceList(ninoOpt, previousTaxYear).flatMap {
+                referenceList => // For simple assessment - fetch reference list for the logged-in user
+                  if (referenceList.contains(reference)) { // Check if the payload reference is in the above list
+                    connector.createSession(amountInPence, SimpleAssessmentOriginSpecificData(reference), journeyId)
+                  } else {
+                    throw new FailToMatchTaxIdOnAuth
+                  }
               }
             case _ =>
               throw new MalformedRequestException("Malformed Json")
@@ -88,16 +92,18 @@ class OpenBankingService @Inject() (connector: OpenBankingConnector,
 
       }
     } else {
-      (request.amount, request.saUtr, sautrOpt) match { //If no tas type is mentioned, then default self assessment type is taken into consideration
+      println(" inside else")
+      (request.amount, request.saUtr, sautrOpt) match { // If no tas type is mentioned, then default self assessment type is taken into consideration
         case (Some(amount), Some(saUtr), Some(authSautr)) =>
-          if (saUtr.utr == authSautr.utr) { //check if sautr in the request equals auth sautr
+          if (saUtr.utr == authSautr.utr) { // check if sautr in the request equals auth sautr
             connector
               .createSession(BigDecimal((amount * 100).longValue), SelfAssessmentOriginSpecificData(saUtr), journeyId)
           } else {
             Future.failed(throw new FailToMatchTaxIdOnAuth)
           }
 
-        case _ => throw new MalformedRequestException("Malformed Json")
+        case _ =>
+          throw new MalformedRequestException("Malformed Json")
       }
     }
 
