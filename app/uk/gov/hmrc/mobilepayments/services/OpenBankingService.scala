@@ -58,7 +58,6 @@ class OpenBankingService @Inject() (connector: OpenBankingConnector,
     sautrOpt: Option[SaUtr] = None
   )(implicit headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[CreateSessionDataResponse] =
     if (request.taxType.isDefined) {
-      println(" inside if")
       request.taxType match {
         case Some(TaxTypeEnum.appSelfAssessment) =>
           (request.amountInPence, request.reference, request.saUtr, sautrOpt) match {
@@ -92,7 +91,6 @@ class OpenBankingService @Inject() (connector: OpenBankingConnector,
 
       }
     } else {
-      println(" inside else")
       (request.amount, request.saUtr, sautrOpt) match { // If no tas type is mentioned, then default self assessment type is taken into consideration
         case (Some(amount), Some(saUtr), Some(authSautr)) =>
           if (saUtr.utr == authSautr.utr) { // check if sautr in the request equals auth sautr
