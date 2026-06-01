@@ -29,7 +29,7 @@ import uk.gov.hmrc.mobilepayments.domain.PaymentRecordListFromApi
 import uk.gov.hmrc.mobilepayments.domain.dto.request.{PayByCardRequestGeneric, TaxTypeEnum}
 
 import java.time.LocalDate
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
@@ -292,8 +292,8 @@ class PaymentsServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private def mockGetChargeReferenceList(response: Future[List[String]]) =
     (mockP800Service
-      .getChargeRefernceList(_: Option[String], _: Int)(_: HeaderCarrier))
-      .expects(*, *, *)
+      .getChargeRefernceList(_: Option[String], _: Int)(_: ExecutionContext, _: HeaderCarrier))
+      .expects(*, *, *, *)
       .returning(response)
 
   private def mockPayByCardUrl(future: Future[PayApiPayByCardResponse]): Unit =

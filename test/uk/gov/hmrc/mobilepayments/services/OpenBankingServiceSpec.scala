@@ -33,7 +33,7 @@ import uk.gov.hmrc.mobilepayments.models.openBanking.{OriginSpecificSessionData,
 
 import java.time.LocalDate
 import scala.concurrent.duration.*
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
@@ -464,8 +464,8 @@ class OpenBankingServiceSpec extends BaseSpec with MobilePaymentsTestData {
 
   private def mockGetReferenceList(response: Future[List[String]]) = {
     (mockP800Service
-      .getChargeRefernceList(_: Option[String], _: Int)(_: HeaderCarrier))
-      .expects(*, *, *)
+      .getChargeRefernceList(_: Option[String], _: Int)(_: ExecutionContext, _: HeaderCarrier))
+      .expects(*, *, *, *)
       .returning(response)
   }
 

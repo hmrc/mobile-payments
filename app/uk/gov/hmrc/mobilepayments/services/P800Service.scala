@@ -20,13 +20,12 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mobilepayments.connectors.P800Connector
 
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class P800Service @Inject() (p800Connector: P800Connector) {
 
-  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
-
-  def getChargeRefernceList(nino: Option[String], taxYear: Int)(implicit hc: HeaderCarrier) = {
+  def getChargeRefernceList(nino: Option[String], taxYear: Int)(implicit executionContext: ExecutionContext, headerCarrier: HeaderCarrier) = {
     p800Connector.getPaymentsData(nino, taxYear).map { resOpt =>
       resOpt.toList.flatMap { res =>
         List(res.chargeReference,
