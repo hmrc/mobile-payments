@@ -22,27 +22,40 @@ import play.api.mvc.*
 import uk.gov.hmrc.api.controllers.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.*
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength}
+import uk.gov.hmrc.auth.core.{AuthorisedFunctions, ConfidenceLevel, CredentialStrength, Enrolments}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, UtrNotFoundOnAccount}
+import uk.gov.hmrc.mobilepayments.connectors.CitizenDetailsConnector
+import uk.gov.hmrc.mobilepayments.controllers.errors.{AccountWithLowCL, ErrorUnauthorizedNoUtr, FailToMatchTaxIdOnAuth, ForbiddenAccess, NinoNotFoundOnAccount, UtrNotFoundOnAccount}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Authorisation extends Results with AuthorisedFunctions {
 
+  val cdConnector: CitizenDetailsConnector
   val confLevel: Int
   private val logger: Logger = Logger(this.getClass)
 
   lazy val requiresAuth = true
   private lazy val lowConfidenceLevel = new AccountWithLowCL
+  private lazy val noNinoFound = new NinoNotFoundOnAccount
+  private lazy val utrNotFoundOnAccount = new UtrNotFoundOnAccount
 
   def grantAccess()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
       .retrieve(confidenceLevel and allEnrolments) { case foundConfidenceLevel ~ enrolments =>
         if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
         else Future successful true
+      }
+
+  def grantAccess1()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
+      .retrieve(nino and confidenceLevel) {
+        case None ~ foundConfidenceLevel                                        => throw noNinoFound
+        case _ ~ foundConfidenceLevel if confLevel > foundConfidenceLevel.level => throw lowConfidenceLevel
+        case _                                                                  => Future.successful(true)
+
       }
 
   def invokeAuthBlock[A](
@@ -74,6 +87,41 @@ trait Authorisation extends Results with AuthorisedFunctions {
       }
   }
 
+  private def getSAEnrolledUtr(enrolments: Enrolments): Option[SaUtr] =
+    enrolments.enrolments
+      .find(_.key == "IR-SA")
+      .flatMap { enrolment =>
+        enrolment.identifiers
+          .find(id => id.key == "UTR" && enrolment.state == "Activated")
+          .map(key => SaUtr(key.value))
+      }
+
+  private def hasMTDEnrolment(enrolments: Enrolments): Option[Boolean] =
+    enrolments.enrolments
+      .find(_.key == "HMRC-MTD-ID")
+      .flatMap { enrolment =>
+        enrolment.identifiers
+          .find(id => id.key.toUpperCase == "MTDITID" && enrolment.state == "Activated")
+          .map(key => true)
+      }
+
+  def getUtrFromEnrolments(enrolments: Enrolments, foundNino: Option[String], sautrOpt: Option[String])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[SaUtr]] = {
+    (getSAEnrolledUtr(enrolments), hasMTDEnrolment(enrolments), sautrOpt) match {
+      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr == retrieveUtr => println(" inside 1"); Future.successful(Some(sautr))
+      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr != retrieveUtr => println(" inside 2"); Future.successful(None)
+      case (None, _, Some(retrieveUtr)) => Future.successful(Some(SaUtr(retrieveUtr))) // this case might happen in case of MTD only enrolment
+      case (None, Some(true), None) => // calling cid connector  if there is MTD only enrolment and no IR-SA, otherwise pick sautr from SA enrolment
+        cdConnector.getUtrByNino(foundNino.getOrElse("")).map {
+          case Some(utr) => Some(utr)
+          case _         => throw utrNotFoundOnAccount
+        }
+      case _ =>  Future.successful(None)
+    }
+  }
+
 }
 
 trait AccessControl extends HeaderValidator with Authorisation {
@@ -102,6 +150,17 @@ trait AccessControl extends HeaderValidator with Authorisation {
             )
           )
     }
+
+  def getNnoAndUtrFromAuth(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[(Option[SaUtr], Option[String])] = {
+    authorised()
+      .retrieve(nino and saUtr and allEnrolments) {
+        case foundNino ~ sautrOpt ~ enrolments => getUtrFromEnrolments(enrolments, foundNino, sautrOpt).map(utrOpt => (utrOpt, foundNino))
+        case _                                 => Future.successful(None, None)
+      }
+  }
 
   def getNinoFromAuth(implicit
     hc: HeaderCarrier,
