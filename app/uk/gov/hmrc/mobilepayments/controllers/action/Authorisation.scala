@@ -110,15 +110,15 @@ trait Authorisation extends Results with AuthorisedFunctions {
     ec: ExecutionContext
   ): Future[Option[SaUtr]] = {
     (getSAEnrolledUtr(enrolments), hasMTDEnrolment(enrolments), sautrOpt) match {
-      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr == retrieveUtr => println(" inside 1"); Future.successful(Some(sautr))
-      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr != retrieveUtr => println(" inside 2"); Future.successful(None)
+      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr == retrieveUtr => Future.successful(Some(sautr))
+      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr != retrieveUtr => Future.successful(None)
       case (None, _, Some(retrieveUtr)) => Future.successful(Some(SaUtr(retrieveUtr))) // this case might happen in case of MTD only enrolment
       case (None, Some(true), None) => // calling cid connector  if there is MTD only enrolment and no IR-SA, otherwise pick sautr from SA enrolment
         cdConnector.getUtrByNino(foundNino.getOrElse("")).map {
           case Some(utr) => Some(utr)
-          case _         => throw utrNotFoundOnAccount
+          case _         => None
         }
-      case _ =>  Future.successful(None)
+      case _ => Future.successful(None)
     }
   }
 
@@ -161,35 +161,5 @@ trait AccessControl extends HeaderValidator with Authorisation {
         case _                                 => Future.successful(None, None)
       }
   }
-
-  def getNinoFromAuth(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Option[String]] =
-    authorised().retrieve(nino)(foundNino => Future successful foundNino)
-
-  def getSaUTRFromAuth(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Option[SaUtr]] =
-    authorised()
-      .retrieve(saUtr and allEnrolments) { case sautrOpt ~ enrolments =>
-        val enrolmentSautr: Option[String] = enrolments.enrolments
-          .find(enKey => enKey.key == "IR-SA")
-          .flatMap { enrolment =>
-            enrolment.identifiers
-              .find(id => id.key.toUpperCase == "UTR" && enrolment.state == "Activated")
-              .map(key => key.value)
-          }
-
-        (sautrOpt, enrolmentSautr) match {
-          case (Some(utr1), Some(enrolmentUtr)) =>
-            if (enrolmentUtr == utr1) Future.successful(enrolmentSautr.map(SaUtr(_))) else Future.successful(None)
-          case (None, enrolmentUtrOpt) => Future.successful(enrolmentSautr.map(SaUtr(_)))
-          case (sautrOpt, None)        => Future.successful(sautrOpt.map(SaUtr(_)))
-          case _                       => Future.successful(None)
-
-        }
-      }
 
 }
