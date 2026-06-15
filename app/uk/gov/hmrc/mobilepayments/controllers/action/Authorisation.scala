@@ -49,21 +49,11 @@ trait Authorisation extends Results with AuthorisedFunctions {
         else Future successful true
       }
 
-  def grantAccess1()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    authorised(CredentialStrength("strong") and ConfidenceLevel.L200)
-      .retrieve(nino and confidenceLevel) {
-        case None ~ foundConfidenceLevel                                        => throw noNinoFound
-        case _ ~ foundConfidenceLevel if confLevel > foundConfidenceLevel.level => throw lowConfidenceLevel
-        case _                                                                  => Future.successful(true)
-
-      }
-
   def invokeAuthBlock[A](
     request: Request[A],
     block: Request[A] => Future[Result]
   )(implicit ec: ExecutionContext): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
-
     grantAccess()
       .flatMap { _ =>
         block(request)

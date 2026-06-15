@@ -15,9 +15,6 @@ import stubs.CidStub.getStubToFetchUtrViaNino
 import stubs.P800Stub.stubForP800Response
 
 import java.time.LocalDate
-import scala.concurrent.duration.FiniteDuration
-import java.util.concurrent.TimeUnit.SECONDS
-import scala.concurrent.duration.FiniteDuration
 
 class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
@@ -755,7 +752,7 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
 
     }
 
-    "taxType = Not present" should {
+    "taxType = BLANK" should {
 
       "400, bad request  as malformed json" in {
         grantAccess()
@@ -1104,6 +1101,23 @@ class LivePaymentControllerISpec extends BaseISpec with MobilePaymentsTestData {
           )
           response.status shouldBe 400
         }
+      }
+    }
+
+    "type = BLANK" should {
+
+      "return 400, bad request ,malformed json" in {
+
+        grantAccess()
+        stubForShutteringDisabled
+
+        val request: WSRequest = wsUrl(
+          s"/payments/pay-by-card?journeyId=$journeyId"
+        ).addHttpHeaders(acceptJsonHeader, authorisationJsonHeader, sessionIdHeader)
+        val response =
+          await(request.post(Json.obj("amountInPence" -> 100000, "taxType" -> "", "reference" -> "123456")))
+        response.status shouldBe 400
+
       }
     }
   }
