@@ -60,7 +60,7 @@ class LiveSessionController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[CreateSessionRequest] { createPaymentRequest =>
-              getNnoAndUtrFromAuth.flatMap { (sautrOpt, nino) =>
+              getNinoAndUtrFromAuth.flatMap { (sautrOpt, nino) =>
                 val updatedCreatePaymentRequest =
                   if (createPaymentRequest.saUtr.isEmpty) createPaymentRequest.copy(saUtr = sautrOpt)
                   else

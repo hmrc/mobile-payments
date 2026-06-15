@@ -155,7 +155,7 @@ class LivePaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[LatestPaymentsRequest] { latestPaymentsRequest =>
-              getNnoAndUtrFromAuth.flatMap { (sautrOpt, nino) =>
+              getNinoAndUtrFromAuth.flatMap { (sautrOpt, nino) =>
                 paymentsService
                   .getLatestPayments(nino,
                                      sautrOpt.map(_.utr),
@@ -183,7 +183,7 @@ class LivePaymentController @Inject() (
         withShuttering(shuttered) {
           withErrorWrapper {
             withValidJson[PayByCardRequestGeneric] { payByCardRequest =>
-              getNnoAndUtrFromAuth.flatMap { (sautrOpt, nino) =>
+              getNinoAndUtrFromAuth.flatMap { (sautrOpt, nino) =>
                 paymentsService
                   .getPayByCardUrl(
                     payByCardRequest,

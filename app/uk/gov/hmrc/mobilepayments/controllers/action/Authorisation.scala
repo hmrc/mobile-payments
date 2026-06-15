@@ -142,7 +142,7 @@ trait AccessControl extends HeaderValidator with Authorisation {
           )
     }
 
-  def getNnoAndUtrFromAuth(implicit
+  def getNinoAndUtrFromAuth(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[(Option[SaUtr], Option[String])] = {
