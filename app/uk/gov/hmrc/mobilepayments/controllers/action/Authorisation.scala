@@ -109,16 +109,20 @@ trait Authorisation extends Results with AuthorisedFunctions {
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[SaUtr]] = {
+    println(" SA enrolment  ::" + getSAEnrolledUtr(enrolments))
+    println("hasMTDEnrolment(enrolments)  ::" + hasMTDEnrolment(enrolments))
+    println("sautrOpt  ::" + sautrOpt)
     (getSAEnrolledUtr(enrolments), hasMTDEnrolment(enrolments), sautrOpt) match {
-      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr == retrieveUtr => Future.successful(Some(sautr))
-      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr != retrieveUtr => Future.successful(None)
-      case (None, _, Some(retrieveUtr)) => Future.successful(Some(SaUtr(retrieveUtr))) // this case might happen in case of MTD only enrolment
+      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr == retrieveUtr => println(" inside 1a"); Future.successful(Some(sautr))
+      case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr != retrieveUtr => println(" inside 2a"); Future.successful(None)
+      case (None, _, Some(retrieveUtr)) =>
+        println(" inside 3a"); Future.successful(Some(SaUtr(retrieveUtr))) // this case might happen in case of MTD only enrolment
       case (None, Some(true), None) => // calling cid connector  if there is MTD only enrolment and no IR-SA, otherwise pick sautr from SA enrolment
         cdConnector.getUtrByNino(foundNino.getOrElse("")).map {
-          case Some(utr) => Some(utr)
-          case _         => None
+          case Some(utr) => println(" inside 4a"); Some(utr)
+          case _         => println(" inside 5a"); None
         }
-      case _ => Future.successful(None)
+      case _ => println(" inside 6a"); Future.successful(None)
     }
   }
 
