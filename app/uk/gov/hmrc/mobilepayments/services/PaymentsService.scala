@@ -47,7 +47,6 @@ class PaymentsService @Inject() (connector: PaymentsConnector, p800Service: P800
 
     (ninoOpt, utr, reference, taxType) match {
       case (_, Some(sautr), Some(referenceValue), Some(TaxTypeEnum.appSelfAssessment)) =>
-        println(" inside 1")
         if (sautr == referenceValue) { // check if the auth sautr equals reference in case of appSelfAssessment
           getPayments(utr, reference, taxType, journeyId)
         } else {
@@ -60,10 +59,7 @@ class PaymentsService @Inject() (connector: PaymentsConnector, p800Service: P800
           .getChargeRefernceList(ninoOpt, previousTaxYear)
           .flatMap { chargeRefList =>
             if (chargeRefList.contains(referenceValue)) { // Comparing the charge ref fetched in the list against the reference in payload
-              println(" inside charge ref equalf")
-              val m = getPayments(None, reference, taxType, journeyId)
-              m.map(x => println(" x is ::" + x))
-              m
+              getPayments(None, reference, taxType, journeyId)
             } else {
               // if charge ref is not a match then respond with the Unauthorised message
               logger.info("Unauthorized! Reference in payload doesn't match with Charge Reference of the user")
@@ -73,7 +69,6 @@ class PaymentsService @Inject() (connector: PaymentsConnector, p800Service: P800
       // case when no UTR found via cid call for MTD enrolment
       case (_, None, Some(referenceValue), Some(TaxTypeEnum.appSelfAssessment)) => Future.successful(Left("Unauthorized! UTR not found"))
       case _ =>
-        println(" inside 4");
         logger.info("Malformed json")
         Future.successful(Left("Malformed json"))
     }
