@@ -104,6 +104,8 @@ trait Authorisation extends Results with AuthorisedFunctions {
       case (Some(sautr), _, Some(retrieveUtr)) if sautr.utr != retrieveUtr => Future.successful(None)
       case (None, _, Some(retrieveUtr)) =>
         Future.successful(Some(SaUtr(retrieveUtr))) // this case might happen in case of MTD only enrolment
+      case (Some(sautr), _, None) =>
+        Future.successful(Some(sautr))
       case (None, Some(true), None) => // calling cid connector  if there is MTD only enrolment and no IR-SA, otherwise pick sautr from SA enrolment
         cdConnector.getUtrByNino(foundNino.getOrElse("")).map {
           case Some(utr) => Some(utr)
