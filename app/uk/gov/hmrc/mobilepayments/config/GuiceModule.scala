@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.mobilepayments.config
 
-import com.google.inject.name.Names.named
 import com.google.inject.AbstractModule
+import com.google.inject.name.Names.named
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.mobilepayments.controllers.api.ApiAccess
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -41,7 +40,9 @@ class GuiceModule(
     bindConfigString("sandboxOpenBankingPaymentUrl", "sandboxOpenBankingPaymentUrl")
     bindConfigString("payByCardReturnUrl", "payByCardReturnUrl")
     bindConfigString("payByCardBackUrl", "payByCardBackUrl")
-    bind(classOf[ApiAccess]).toInstance(ApiAccess("PRIVATE"))
+    bind(classOf[String])
+      .annotatedWith(named("api-access"))
+      .toInstance("CONTROLLED")
     bind(classOf[String])
       .annotatedWith(named("auth"))
       .toInstance(servicesConfig.baseUrl("auth"))
