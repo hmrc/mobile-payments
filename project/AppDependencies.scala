@@ -2,9 +2,9 @@ import sbt.*
 
 object AppDependencies {
 
-  private val bootstrapPlayVersion = "10.7.0"
+  private val bootstrapPlayVersion = "10.8.0"
   private val playHmrcApiVersion = "9.0.0"
-  private val refinedVersion = "0.11.3"
+  private val refinedVersion = "0.11.4"
   private val domainVersion = "13.0.0"
   private val taxYearVersion = "6.0.0"
   private val scalaMockVersion = "7.5.5"
@@ -15,7 +15,7 @@ object AppDependencies {
     "uk.gov.hmrc"      %% "play-hmrc-api-play-30" % playHmrcApiVersion,
     "eu.timepit"       %% "refined"               % refinedVersion,
     "uk.gov.hmrc"      %% "domain-play-30"        % domainVersion,
-    "com.beachape"     %% "enumeratum"            % "1.9.7",
+    "com.beachape"     %% "enumeratum"            % "1.9.8",
     "org.typelevel"    %% "cats-core"             % "2.13.0",
     "org.apache.pekko" %% "pekko-http"            % pekkoHttpVersion,
     "org.apache.pekko" %% "pekko-actor"           % pekkoActorVersion,
