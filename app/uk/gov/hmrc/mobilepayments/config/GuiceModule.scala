@@ -42,7 +42,7 @@ class GuiceModule(
     bindConfigString("payByCardBackUrl", "payByCardBackUrl")
     bind(classOf[String])
       .annotatedWith(named("api-access"))
-      .toInstance("CONTROLLED")
+      .toInstance("INTERNAL")
     bind(classOf[String])
       .annotatedWith(named("auth"))
       .toInstance(servicesConfig.baseUrl("auth"))
